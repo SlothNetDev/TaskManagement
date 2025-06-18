@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using TaskManagementApi.Domains.Entities;
 
 namespace TaskManagement.Infrastructures.Identity
 {
@@ -7,10 +8,10 @@ namespace TaskManagement.Infrastructures.Identity
     {
         public DateTime? CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
-    
+
         // Navigation properties
-       /* public ICollection<Tasks> Tasks { get; set; } = new List<Tasks>();
-        public ICollection<Category> Categories { get; set; } = new List<Category>();*/
+        public ICollection<Tasks> Tasks { get; set; } = new List<Tasks>();
+        public ICollection<Category> Categories { get; set; } = new List<Category>();
     }
 
 }
