@@ -1,8 +1,9 @@
 ﻿
 using System.ComponentModel.DataAnnotations;
-using TaskManagementApi.Domain.Enums;
+using TaskManagement.Infrastructures.Identity;
+using TaskManagementApi.Domains.Enums;
 
-namespace TaskManagementApi.Domain.Entities
+namespace TaskManagementApi.Domains.Entities
 {
     /// <summary>
     /// Model for Task

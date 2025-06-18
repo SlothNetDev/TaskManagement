@@ -1,7 +1,7 @@
 
 using Microsoft.AspNetCore.Http.Json;
+using System.ComponentModel;
 using System.Text.Json.Serialization;
-using TaskManagementApi.Application.ApplicationHelpers;
 
 namespace TaskManagementApi.PresentationUI
 {
@@ -24,7 +24,6 @@ namespace TaskManagementApi.PresentationUI
                 options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
 
                 //convert date time
-                options.SerializerOptions.Converters.Add(new DatetimeConversion());
                 options.SerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
                 options.SerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
 

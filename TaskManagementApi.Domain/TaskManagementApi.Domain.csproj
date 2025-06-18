@@ -6,8 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\TaskManagementApi.Infrastructure\TaskManagementApi.Infrastructure.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\TaskManagementApi.Infrastructure\TaskManagementApi.Infrastructure.csproj" />
+	</ItemGroup>
 
 </Project>

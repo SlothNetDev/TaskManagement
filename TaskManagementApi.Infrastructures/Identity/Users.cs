@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 
-namespace TaskManagementApi.Domain.Entities
+namespace TaskManagement.Infrastructures.Identity
 {
     //Models for User, User Account 
     public class Users : IdentityUser<Guid>
@@ -9,8 +9,8 @@ namespace TaskManagementApi.Domain.Entities
         public DateTime? UpdatedAt { get; set; }
     
         // Navigation properties
-        public ICollection<Tasks> Tasks { get; set; } = new List<Tasks>();
-        public ICollection<Category> Categories { get; set; } = new List<Category>();
+       /* public ICollection<Tasks> Tasks { get; set; } = new List<Tasks>();
+        public ICollection<Category> Categories { get; set; } = new List<Category>();*/
     }
 
 }

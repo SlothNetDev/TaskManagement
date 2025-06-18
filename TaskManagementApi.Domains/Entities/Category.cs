@@ -1,8 +1,8 @@
 ﻿
-using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using TaskManagement.Infrastructures.Identity;
 
-namespace TaskManagementApi.Domain.Entities
+namespace TaskManagementApi.Domains.Entities
 {
     /// <summary>
     /// Model for Categories

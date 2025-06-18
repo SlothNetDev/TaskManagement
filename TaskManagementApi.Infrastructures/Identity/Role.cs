@@ -1,11 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Text.RegularExpressions;
 
-namespace TaskManagementApi.Infrastructure.Identity
+namespace TaskManagement.Infrastructures.Identity
 {
     public class Role :IdentityRole<Guid>
     {

@@ -13,7 +13,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\TaskManagementApi.Domain\TaskManagementApi.Domain.csproj" />
+    <ProjectReference Include="..\TaskManagementApi.Domains\TaskManagementApi.Domains.csproj" />
+    <ProjectReference Include="..\TaskManagementApi.PresentationUI\TaskManagementApi.PresentationUI.csproj" />
   </ItemGroup>
 
 </Project>
