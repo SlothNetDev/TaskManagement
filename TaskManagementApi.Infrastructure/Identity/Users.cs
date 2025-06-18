@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
 
-
 namespace TaskManagementApi.Domain.Entities
 {
     //Models for User, User Account 

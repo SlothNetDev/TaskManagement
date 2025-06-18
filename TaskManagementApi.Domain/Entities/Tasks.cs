@@ -1,6 +1,6 @@
 ﻿
-using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using TaskManagementApi.Domain.Enums;
 
 namespace TaskManagementApi.Domain.Entities
 {
@@ -15,8 +15,8 @@ namespace TaskManagementApi.Domain.Entities
         /*[DisplayName("Title")]*/
         [StringLength(120/*, ErrorMessage = "{0} Cannot exceed with 120 characters"*/)]
         public string Title { get; set; } = string.Empty;
-        public string? Priority { get; set; }
-        public string? Status { get; set; }
+        public Priority Priority { get; set; }
+        public Status? Status { get; set; }
         public DateTime? DueDate { get; set; }
         public DateTime? CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
@@ -26,7 +26,7 @@ namespace TaskManagementApi.Domain.Entities
         // Foreign key and navigation to User
         public Guid UserId { get; set; }
         public Users User { get; set; }
-    
+
         // Foreign key and navigation to Category
         public Guid CategoryId { get; set; }
         public Category Category { get; set; }

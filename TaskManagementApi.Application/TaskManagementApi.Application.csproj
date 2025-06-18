@@ -8,9 +8,12 @@
 
   <ItemGroup>
     <Folder Include="Interfaces\" />
-    <Folder Include="DTOs\" />
     <Folder Include="Validators\" />
     <Folder Include="Services\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\TaskManagementApi.Domain\TaskManagementApi.Domain.csproj" />
   </ItemGroup>
 
 </Project>

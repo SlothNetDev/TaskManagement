@@ -14,4 +14,8 @@
     <Folder Include="Controllers\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\TaskManagementApi.Application\TaskManagementApi.Application.csproj" />
+  </ItemGroup>
+
 </Project>

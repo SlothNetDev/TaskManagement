@@ -1,0 +1,26 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace TaskManagementApi.Application.DTOs.UserDto
+{
+    /// <summary>
+    /// Used for HTTPatch 
+    /// </summary>
+    /// <param name="UserName"></param>
+    /// <param name="Email"></param>
+    public record UserUpdateDto(
+
+        [Required(ErrorMessage = "Id is Required")]
+        Guid Id,
+
+        [RegularExpression("^[a-zA-Z0-9_]{3,20}$")]
+        string? UserName,
+
+        [RegularExpression("^[\\w\\.-]+@[\\w\\.-]+\\.\\w{2,}$")]
+        string? Email
+    );
+}

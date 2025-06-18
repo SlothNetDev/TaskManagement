@@ -5,11 +5,20 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
-
+  
   <ItemGroup>
     <Folder Include="Authentication\" />
     <Folder Include="Data\" />
     <Folder Include="Repositorty\" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.3.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.6" />
+  </ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\TaskManagementApi.Domain\TaskManagementApi.Domain.csproj" />
+	</ItemGroup>
 
 </Project>

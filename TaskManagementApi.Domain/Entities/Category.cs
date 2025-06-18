@@ -22,7 +22,7 @@ namespace TaskManagementApi.Domain.Entities
         // Foreign key and navigation to User
         public Guid UserId { get; set; }
         public Users User { get; set; }
-    
+
         // Navigation to related Tasks
         public ICollection<Tasks> Tasks { get; set; } = new List<Tasks>();
     }
