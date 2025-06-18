@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 
 namespace TaskManagement.Infrastructures.Identity
 {
-    public class Role :IdentityRole<Guid>
+    public class ApplicationRole :IdentityRole<Guid>
     {
         //provide roles
         public string Description { get; set; } = string.Empty;

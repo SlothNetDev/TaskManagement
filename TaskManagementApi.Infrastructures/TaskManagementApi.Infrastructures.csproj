@@ -17,7 +17,9 @@
       <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.6" />
     </ItemGroup>
 
-	<ItemGroup>
-		<ProjectReference Include="..\TaskManagementApi.Domains\TaskManagementApi.Domains.csproj" />
-	</ItemGroup>
+    <ItemGroup>
+      <ProjectReference Include="..\TaskManagementApi.Domains\TaskManagementApi.Domains.csproj" />
+    </ItemGroup>
+
+	
 </Project>
