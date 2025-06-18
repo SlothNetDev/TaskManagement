@@ -14,11 +14,5 @@ namespace TaskManagementApi.Application.DTOs.CategoriesDto
         string CategoryName,
         [StringLength(1000, ErrorMessage = "Descriptions Cannot exceed with 1000 characters")]
         string? Description
-        )
-    {
-        public CategoryRequestDto(Category category):this(
-            category.CategoryName,
-            category.Description)
-        { }
-    }
+        );
 }

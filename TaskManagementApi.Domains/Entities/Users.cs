@@ -12,9 +12,7 @@ namespace TaskManagementApi.Domains.Entities
         [Key]
         public Guid Id { get; set; }
        
-        //Audit when it was created and when it was updated
-        public DateTime? CreatedAt { get; set; }
-        public DateTime? UpdatedAt { get; set; }
+       
 
          // Navigation properties to other domain entities  that this user owns related to it
         public ICollection<Tasks> Tasks { get; set; } = new List<Tasks>();

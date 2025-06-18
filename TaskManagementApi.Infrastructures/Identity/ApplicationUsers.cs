@@ -13,6 +13,12 @@ namespace TaskManagement.Infrastructures.Identity
         // Instead, the link is established in ApplicationDbContext via the Domain.Users entity.
         // If you were to add them here, they would point to your Domain.Entities classes, which is fine,
         // but the recommended way to bridge is via the Domain.Users entity.
+
+
+        //Audit when it was created and when it was updated
+        public DateTime? CreatedAt { get; set; }
+        public DateTime? UpdatedAt { get; set; }
+
        
         // The critical link to your Domain User:
         public Guid DomainUserId { get; set; } // Foreign key to the Domain.Users Id

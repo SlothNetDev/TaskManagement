@@ -21,10 +21,5 @@ namespace TaskManagementApi.Application.DTOs.TaskDto
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public Priority Priority { get; init; } = Priority;
 
-        public TaskRequestDto(Tasks task):this(
-            task.Title,
-            task.Priority
-            )
-        { }
     }
 }

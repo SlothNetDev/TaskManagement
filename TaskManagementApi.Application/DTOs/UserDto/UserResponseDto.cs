@@ -1,7 +1,6 @@
-﻿using System;
+﻿
 using TaskManagement.Infrastructures.Identity;
-
-
+using TaskManagementApi.Domains.Entities;
 namespace TaskManagementApi.Application.DTOs.UserDto
 {
     /// <summary>
@@ -22,7 +21,7 @@ namespace TaskManagementApi.Application.DTOs.UserDto
         DateTime? UpdatedAt
     )
     {
-        public UserResponseDto(Users users) : this(
+        public UserResponseDto(ApplicationUsers users) : this(
             users.Id,
             users.UserName ?? string.Empty,
             users.Email ?? string.Empty,

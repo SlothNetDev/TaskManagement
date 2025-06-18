@@ -26,11 +26,5 @@ namespace TaskManagementApi.Application.DTOs.TaskDto
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public Status? Status { get; init; } = Status;
         
-        public TaskUpdateDto(Tasks tasks):this(
-            tasks.Id,
-            tasks.Title,
-            tasks.Priority,
-            tasks.Status)
-        { }
     };
 }
