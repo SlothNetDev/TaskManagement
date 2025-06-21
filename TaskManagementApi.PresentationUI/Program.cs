@@ -1,7 +1,9 @@
 
 using Microsoft.AspNetCore.Http.Json;
+using Microsoft.EntityFrameworkCore;
 using System.ComponentModel;
 using System.Text.Json.Serialization;
+using TaskManagement.Infrastructures.Data;
 
 namespace TaskManagementApi.PresentationUI
 {
@@ -28,7 +30,10 @@ namespace TaskManagementApi.PresentationUI
                 options.SerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
 
             });
-            
+            //Adding Database sql
+            builder.Services.AddDbContext<TaskManagementDbContext>(options =>
+                options.UseSqlServer(builder.Configuration.GetConnectionString("TaskDbConnection")));
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
