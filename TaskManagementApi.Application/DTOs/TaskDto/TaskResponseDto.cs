@@ -17,7 +17,7 @@ namespace TaskManagementApi.Application.DTOs.TaskDto
           DateTime? UpdatedAt
     )
     {
-        public TaskResponseDto(Tasks task): this(
+        public TaskResponseDto(TaskItem task): this(
             task.Id,
             task.Title,
             task.Priority.ToString() ?? string.Empty, //make this string empty as default

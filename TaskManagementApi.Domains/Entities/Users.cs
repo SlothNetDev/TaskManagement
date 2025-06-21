@@ -15,7 +15,7 @@ namespace TaskManagementApi.Domains.Entities
        
 
          // Navigation properties to other domain entities  that this user owns related to it
-        public ICollection<Tasks> Tasks { get; set; } = new List<Tasks>();
+        public ICollection<TaskItem> Tasks { get; set; } = new List<TaskItem>();
         public ICollection<Category> Categories { get; set; } = new List<Category>();
     }
 }

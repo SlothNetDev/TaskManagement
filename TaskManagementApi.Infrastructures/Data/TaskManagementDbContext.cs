@@ -9,7 +9,7 @@ namespace TaskManagement.Infrastructures.Data
     public class TaskManagementDbContext : IdentityDbContext<ApplicationUsers,ApplicationRole,Guid>
     {
         public DbSet<ApplicationUsers> UserApplicationDb { get; set; }
-        public DbSet<Tasks> TaskDb { get; set; }
+        public DbSet<TaskItem> TaskDb { get; set; }
         public DbSet<Category> CategoryDb { get; set; }
 
         public TaskManagementDbContext(DbContextOptions<TaskManagementDbContext> options): base(options) { }

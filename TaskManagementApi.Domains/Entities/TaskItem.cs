@@ -6,7 +6,7 @@ namespace TaskManagementApi.Domains.Entities
     /// <summary>
     /// Model for Task
     /// </summary>
-    public class Tasks
+    public class TaskItem
     {
         [Key]
         public Guid Id { get; set; }

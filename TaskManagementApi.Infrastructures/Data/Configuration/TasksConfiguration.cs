@@ -4,9 +4,9 @@ using TaskManagementApi.Domains.Entities;
 
 namespace TaskManagement.Infrastructures.Data.Configuration
 {
-    internal class TasksConfiguration : IEntityTypeConfiguration<Tasks>
+    internal class TasksConfiguration : IEntityTypeConfiguration<TaskItem>
     {
-        public void Configure(EntityTypeBuilder<Tasks> builder)
+        public void Configure(EntityTypeBuilder<TaskItem> builder)
         {
             builder.ToTable("Tasks");
             builder.HasKey(x => x.Id);
