@@ -1,6 +1,4 @@
-﻿
-using System.ComponentModel.DataAnnotations;
-using TaskManagement.Infrastructures.Identity;
+﻿using System.ComponentModel.DataAnnotations;
 using TaskManagementApi.Domains.Enums;
 
 namespace TaskManagementApi.Domains.Entities
