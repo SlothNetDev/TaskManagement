@@ -1,6 +1,5 @@
 ﻿
 using System.ComponentModel.DataAnnotations;
-using TaskManagement.Infrastructures.Identity;
 
 namespace TaskManagementApi.Domains.Entities
 {
@@ -24,6 +23,7 @@ namespace TaskManagementApi.Domains.Entities
         public Users User { get; set; }
 
         // Navigation to related Tasks
+        public Task TaskId { get; set; }
         public ICollection<Tasks> Tasks { get; set; } = new List<Tasks>();
     }
 
