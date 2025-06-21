@@ -15,8 +15,10 @@ namespace TaskManagement.Infrastructures.Data.Configuration
         {
             builder.ToTable("User_Type");
 
+            builder.HasKey(x => x.DomainUserId);
+
             builder.Property(x => x.CreatedAt)
-                .HasDefaultValue("GETUTCDATE()")
+                .HasDefaultValueSql("GETUTCDATE()")
                 .IsRequired(false);
 
             builder.HasOne(x => x.DomainUser)

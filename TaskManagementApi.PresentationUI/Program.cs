@@ -1,9 +1,11 @@
 
 using Microsoft.AspNetCore.Http.Json;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel;
 using System.Text.Json.Serialization;
 using TaskManagement.Infrastructures.Data;
+using TaskManagement.Infrastructures.Identity;
 
 namespace TaskManagementApi.PresentationUI
 {
@@ -34,6 +36,22 @@ namespace TaskManagementApi.PresentationUI
             builder.Services.AddDbContext<TaskManagementDbContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("TaskDbConnection")));
 
+            //If you're doing [Authorize] and roles:
+            builder.Services.AddAuthentication();
+            builder.Services.AddAuthorization();
+
+
+            //add identity
+            builder.Services.AddIdentity<ApplicationUsers, ApplicationRole>(options =>
+            {
+                options.Password.RequireDigit = true;
+                options.Password.RequiredLength = 8;
+                options.Password.RequireNonAlphanumeric = true;
+                options.Password.RequireUppercase = true;
+            })
+                .AddDefaultTokenProviders()
+                .AddEntityFrameworkStores<TaskManagementDbContext>();
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -45,7 +63,7 @@ namespace TaskManagementApi.PresentationUI
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
-
+            app.UseAuthentication();
 
             app.MapControllers();
 
