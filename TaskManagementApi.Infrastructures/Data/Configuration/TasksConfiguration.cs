@@ -9,7 +9,6 @@ namespace TaskManagement.Infrastructures.Data.Configuration
         public void Configure(EntityTypeBuilder<TaskItem> builder)
         {
             builder.ToTable("Tasks");
-            builder.HasKey(x => x.Id);
 
             builder.Property(x => x.Title)
                 .IsRequired();

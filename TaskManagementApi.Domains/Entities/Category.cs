@@ -23,7 +23,6 @@ namespace TaskManagementApi.Domains.Entities
         public Users User { get; set; }
 
         // Navigation to related Tasks
-        public Task TaskId { get; set; }
         public ICollection<TaskItem> Tasks { get; set; } = new List<TaskItem>();
     }
 

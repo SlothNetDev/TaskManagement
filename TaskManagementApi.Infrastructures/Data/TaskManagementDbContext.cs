@@ -6,18 +6,18 @@ using TaskManagementApi.Domains.Entities;
 
 namespace TaskManagement.Infrastructures.Data
 {
-    public class TaskManagementDbContext : IdentityDbContext<ApplicationUsers,ApplicationRole,Guid>
+    public class TaskManagementDbContext(DbContextOptions<TaskManagementDbContext> options)
+        : IdentityDbContext<ApplicationUsers, ApplicationRole, Guid>(options)
     {
         public DbSet<ApplicationUsers> UserApplicationDb { get; set; }
         public DbSet<TaskItem> TaskDb { get; set; }
         public DbSet<Category> CategoryDb { get; set; }
 
-        public TaskManagementDbContext(DbContextOptions<TaskManagementDbContext> options): base(options) { }
-
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
+
             builder.ApplyConfiguration(new CategoriesConfiguration());
             builder.ApplyConfiguration(new TasksConfiguration());
             builder.ApplyConfiguration(new UserConfiguration());
