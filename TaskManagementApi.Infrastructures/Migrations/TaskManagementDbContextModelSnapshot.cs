@@ -386,7 +386,7 @@ namespace TaskManagement.Infrastructures.Migrations
                     b.HasOne("TaskManagementApi.Domains.Entities.Users", "User")
                         .WithMany("Categories")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("User");

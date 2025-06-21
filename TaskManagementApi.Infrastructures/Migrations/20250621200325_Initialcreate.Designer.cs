@@ -12,8 +12,8 @@ using TaskManagement.Infrastructures.Data;
 namespace TaskManagement.Infrastructures.Migrations
 {
     [DbContext(typeof(TaskManagementDbContext))]
-    [Migration("20250621195609_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20250621200325_Initialcreate")]
+    partial class Initialcreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -389,7 +389,7 @@ namespace TaskManagement.Infrastructures.Migrations
                     b.HasOne("TaskManagementApi.Domains.Entities.Users", "User")
                         .WithMany("Categories")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("User");

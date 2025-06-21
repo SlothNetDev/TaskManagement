@@ -24,13 +24,9 @@ namespace TaskManagement.Infrastructures.Data.Configuration
             builder.HasOne(x => x.User)
                 .WithMany(x => x.Categories)
                 .HasForeignKey(x => x.UserId)
-                .OnDelete(deleteBehavior: DeleteBehavior.Cascade);
-
-            //category has many task and if task deleted it should restrict 
-            builder.HasMany(x => x.Tasks)
-                .WithOne(x => x.Category)
-                .HasForeignKey(x => x.Id)
                 .OnDelete(deleteBehavior: DeleteBehavior.Restrict);
+
+
                 
         }
 
