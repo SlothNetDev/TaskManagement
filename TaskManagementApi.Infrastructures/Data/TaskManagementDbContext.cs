@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TaskManagement.Infrastructures.Data.Configuration;
 using TaskManagement.Infrastructures.Identity;
 using TaskManagementApi.Domains.Entities;
 
@@ -22,7 +23,9 @@ namespace TaskManagement.Infrastructures.Data
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            
+            builder.ApplyConfiguration(new CategoriesConfiguration());
+            builder.ApplyConfiguration(new TasksConfiguration());
+            builder.ApplyConfiguration(new UserConfiguration());
         }
 
 

@@ -13,7 +13,16 @@ namespace TaskManagement.Infrastructures.Data.Configuration
     {
         public void Configure(EntityTypeBuilder<ApplicationUsers> builder)
         {
-            
+            builder.ToTable("User_Type");
+
+            builder.Property(x => x.CreatedAt)
+                .HasDefaultValue("GETUTCDATE()")
+                .IsRequired(false);
+
+            builder.HasOne(x => x.DomainUser)
+                .WithOne()
+                .HasForeignKey<ApplicationUsers>(x => x.DomainUserId);
+               
         }
     }
 }
