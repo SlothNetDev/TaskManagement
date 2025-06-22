@@ -10,6 +10,6 @@ namespace TaskManagementApi.Application.Interfaces.IAuthentication
 {
     public interface IRegisterCommand
     {
-        Task<ResponseType<UserResponseDto>> RegisterAsync(UserRegisterRequestDto registerDto, string role);
+        Task<ResponseType<AuthResultDto>> RegisterAsync(UserRegisterRequestDto registerDto, string role);
     }
 }

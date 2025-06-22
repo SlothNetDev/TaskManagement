@@ -8,6 +8,6 @@ namespace TaskManagementApi.Application.Interfaces
     /// </summary>
     public interface ILoginCommand
     {
-        Task<ResponseType<UserResponseDto>> LoginAsync(UserLoginRequestDto loginDto);
+        Task<ResponseType<AuthResultDto>> LoginAsync(UserLoginRequestDto loginDto);
     }
 }
