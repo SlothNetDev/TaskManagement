@@ -7,8 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Services\" />
-    <Folder Include="Validators\" />
+    <Compile Remove="Services\**" />
+    <Compile Remove="Validators\**" />
+    <EmbeddedResource Remove="Services\**" />
+    <EmbeddedResource Remove="Validators\**" />
+    <None Remove="Services\**" />
+    <None Remove="Validators\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -19,7 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\TaskManagementApi.Domains\TaskManagementApi.Domains.csproj" />
+    <ProjectReference Include="..\TaskManagementApi.Domains\TaskManagementApi.Core.csproj" />
     <ProjectReference Include="..\TaskManagementApi.Infrastructures\TaskManagementApi.Infrastructures.csproj" />
   </ItemGroup>
 

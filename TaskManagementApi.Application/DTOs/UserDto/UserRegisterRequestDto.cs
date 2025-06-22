@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace TaskManagementApi.Application.DTOs.UserDto
 {
-    partial record UserRegisterRequestDto(
+    public record UserRegisterRequestDto(
         [Required(ErrorMessage = "UserName is Required")]
         [RegularExpression("^[a-zA-Z0-9_]{3,20}$")]
         string UserName,

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.36121.58 d17.14
+VisualStudioVersion = 17.14.36121.58
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaskManagementApi.Application", "TaskManagementApi.Application\TaskManagementApi.Application.csproj", "{F3585803-6B9D-4B25-87B9-EA299B7B3C49}"
 EndProject
@@ -11,7 +11,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaskManagementApi.Presentat
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaskManagementApi.Infrastructures", "TaskManagementApi.Infrastructures\TaskManagementApi.Infrastructures.csproj", "{F3FFF09D-38E3-45F5-B0CC-07049FFAA8C5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaskManagementApi.Domains", "TaskManagementApi.Domains\TaskManagementApi.Domains.csproj", "{E350C3CC-20F0-45D5-A29A-DB9A524B00DD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaskManagementApi.Core", "TaskManagementApi.Domains\TaskManagementApi.Core.csproj", "{E350C3CC-20F0-45D5-A29A-DB9A524B00DD}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -42,6 +44,12 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{F3585803-6B9D-4B25-87B9-EA299B7B3C49} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{C2C7BD8C-CBE4-42FB-86A1-84AB77D57A6A} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{F3FFF09D-38E3-45F5-B0CC-07049FFAA8C5} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{E350C3CC-20F0-45D5-A29A-DB9A524B00DD} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {35FFEE2F-E8D8-4285-8F74-04562FC94CEF}
