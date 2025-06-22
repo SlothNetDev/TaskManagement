@@ -31,9 +31,9 @@ namespace TaskManagementApi.Application.Features.Authentication.Commands
         /// <param name="dto">The user's registration data.</param>
         /// <param name="role">The role to assign to the user (e.g. "User").</param>
         /// <returns>A DTO containing token and user info if registration succeeds.</returns>
-        public async Task<ResponseType<UserResponseDto>> RegisterAsync(UserRegisterRequestDto registerDto, string role)
+        public async Task<ResponseType<AuthResultDto>> RegisterAsync(UserRegisterRequestDto registerDto, string role)
         {
-            ResponseType<UserResponseDto> response = new();
+            ResponseType<AuthResultDto> response = new();
 
             //1. Checking if User email is already Exist or created
             var existingUser = await _userManager.FindByEmailAsync(registerDto.Email);
@@ -87,12 +87,14 @@ namespace TaskManagementApi.Application.Features.Authentication.Commands
             }
 
             //6. Generate JWT token 
-            var token = await _tokenService.GenerateTokenAsync(user);
+            var tokens = await _tokenService.GenerateTokenAsync(user);
 
-            var resultDto = 
+            //7.Expired Time
+            DateTime expireAt = DateTime.UtcNow.AddYears(1);
+
             response.Success = true;
             response.Message = "Successfully Register your Account";
-            response.Data = new UserResponseDto(user.Id,user.UserName, user.Email, user.CreatedAt, DateTime.UtcNow);
+            response.Data = new AuthResultDto(token,expireAt,user.UserName,role);
             return response;
         }
     }
