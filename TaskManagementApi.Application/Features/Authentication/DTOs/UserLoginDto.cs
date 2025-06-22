@@ -8,8 +8,8 @@ using System.Threading.Tasks;
 namespace TaskManagementApi.Application.Features.Authentication.DTOs
 {
      public record UserLoginRequestDto(
-        [Required(ErrorMessage = "UserName is Required")] // Or use Email if you allow login by email
-        string UserName,
+        [Required(ErrorMessage = "Email is Required")] // Or use Email if you allow login by email
+        string Email,
 
         [Required(ErrorMessage = "Password is Required")]
         string Password
