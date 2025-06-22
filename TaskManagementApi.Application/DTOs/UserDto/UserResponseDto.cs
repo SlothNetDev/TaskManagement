@@ -13,7 +13,6 @@ namespace TaskManagementApi.Application.DTOs.UserDto
     /// <param name="UpdatedAt"></param>
     public record UserResponseDto(
     
-        Guid Id,
         string UserName,
         string Email,
 
@@ -22,7 +21,6 @@ namespace TaskManagementApi.Application.DTOs.UserDto
     )
     {
         public UserResponseDto(ApplicationUsers users) : this(
-            users.Id,
             users.UserName ?? string.Empty,
             users.Email ?? string.Empty,
             users.CreatedAt,
