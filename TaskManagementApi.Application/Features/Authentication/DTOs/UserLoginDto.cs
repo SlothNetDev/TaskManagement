@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TaskManagementApi.Application.DTOs.UserDto
+namespace TaskManagementApi.Application.Features.Authentication.DTOs
 {
      public record UserLoginRequestDto(
         [Required(ErrorMessage = "UserName is Required")] // Or use Email if you allow login by email

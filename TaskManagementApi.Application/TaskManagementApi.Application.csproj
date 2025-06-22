@@ -7,11 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Services\**" />
     <Compile Remove="Validators\**" />
-    <EmbeddedResource Remove="Services\**" />
     <EmbeddedResource Remove="Validators\**" />
-    <None Remove="Services\**" />
     <None Remove="Validators\**" />
   </ItemGroup>
 

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TaskManagementApi.Application.DTOs.UserDto
+namespace TaskManagementApi.Application.Features.Authentication.DTOs
 {
     public record UserRegisterRequestDto(
         [Required(ErrorMessage = "UserName is Required")]
