@@ -6,17 +6,18 @@ using TaskManagementApi.Application.Common.Interfaces.IAuthentication;
 using TaskManagementApi.Application.Common.Settings;
 using TaskManagementApi.Application.Features.Authentication.DTOs;
 using TaskManagementApi.Domains.Wrapper;
+using TaskManagementApi.Application.DTOs;
 
 namespace TaskManagementApi.Application.Features.Authentication.Commands
 {
-    public class RegisterCommand : IRegisterCommand
+    public class IdentityService : IIdentityService
     {
         private readonly IdentitySettings _identitySettings;
         private readonly ILogger _logger;
         private readonly UserManager<ApplicationUsers> _userManager;
         private readonly RoleManager<ApplicationRole> _roleManager;
         private readonly ITokenService _tokenService;
-        public RegisterCommand(ITokenService tokenService,UserManager<ApplicationUsers> userManager,RoleManager<ApplicationRole> roleManager,ILogger logger,IdentitySettings identitySettings)
+        public IdentityService(ITokenService tokenService,UserManager<ApplicationUsers> userManager,RoleManager<ApplicationRole> roleManager,ILogger logger,IdentitySettings identitySettings)
         {                                              
             _tokenService = tokenService;
             _roleManager = roleManager;
@@ -47,10 +48,9 @@ namespace TaskManagementApi.Application.Features.Authentication.Commands
 
             }
 
-
             //1. Checking if User email is already Exist or created
             var existingUser = await _userManager.FindByEmailAsync(registerDto.Email);
-            if(existingUser != null)
+            if(existingUser is not null)
             {
                 _logger.LogError("Login attempt for Existing email: {Email}", registerDto.Email);
                 response.Success = false;
@@ -91,7 +91,11 @@ namespace TaskManagementApi.Application.Features.Authentication.Commands
 
 
             //6. Generate JWT token 
-            var token = await _tokenService.GenerateTokenAsync(user);
+            var token = await _tokenService.GenerateTokenAsync(new TokenUserDto(
+                user.Id.ToString(),
+                user.UserName ?? string.Empty,
+                user.Email ?? string.Empty,
+                new List<string>{ "User"}));
 
             //7.Expired Time
             DateTime expireAt = DateTime.UtcNow.AddDays(7);
@@ -100,7 +104,7 @@ namespace TaskManagementApi.Application.Features.Authentication.Commands
             {
                 response.Success = true;
                 response.Message = "Successfully Register your Account";
-                response.Data = new AuthResultDto(token,expireAt,user.UserName,role);
+                response.Data = new AuthResultDto(token,expireAt,user.UserName ?? string.Empty,role);
                 return response;
             }
             catch(Exception ex)
@@ -111,5 +115,77 @@ namespace TaskManagementApi.Application.Features.Authentication.Commands
                 return response;
             }
         }
+        public async Task<ResponseType<AuthResultDto>> LoginAsync(UserLoginRequestDto loginDto)
+        {
+            var response = new ResponseType<AuthResultDto>();
+
+            //0. Check if information by user is correct
+            var validateUser = ModelValidation.ModelValidationResponse(loginDto);
+
+            if (validateUser.Any()) //If any error will catch
+            {
+                //logging if there's something wrong in fields by user
+                 _logger.LogWarning("Validation Failed for {Email}. Invalid fields: {@validationError}",
+                     loginDto.Email,validateUser);
+
+                 response.Success = false;
+                 response.Message = "There are Model Validation Occurred";
+                 return response;
+            }
+
+            //1. finding email if it's exist 
+            var user = await _userManager.FindByEmailAsync(loginDto.Email);
+
+            if(user is null)
+            {
+                _logger.LogError("Login attempt for non-existent email: {Email}", loginDto.Email);
+                response.Success = false;
+                response.Message = "Invalid login credentials." + $"User {loginDto.Email} not found.";
+                return response;
+            }
+            //2. check if password was correct by built in method
+            var passwordValid = await _userManager.CheckPasswordAsync(user,loginDto.Password);
+
+            if (!passwordValid)
+            {
+                _logger.LogWarning("Invalid password attempt for user {UserId} (Email: {Email})", 
+                user.Id, loginDto.Email);
+
+                response.Success = false;
+                response.Message = "Invalid login credentials." + $"{loginDto.Password} is incorrect";
+                return response;
+            }
+            // 3. Get the roles assigned to the user (could be one or more)
+            var roles = await _userManager.GetRolesAsync(user);
+
+            // For this simple example, we'll just use the first role (if there's more than one)
+            var userRole = roles.FirstOrDefault() ?? "User";
+
+            //4. generate token a JWT token for user
+            var token = await _tokenService.GenerateTokenAsync(new TokenUserDto(
+                user.Id.ToString(),
+                user.UserName ?? string.Empty,
+                user.Email ?? string.Empty,
+                new List<string>{ "User"}));
+
+            //5. create a expiration date
+            DateTime expireAt = DateTime.UtcNow.AddYears(1);
+            try
+            {
+                _logger.LogInformation("User {UserId} logged in successfully. Role: {UserRole}", user.Id, userRole);
+                response.Success = true;
+                response.Message = "Successfully Login your Account";
+                response.Data = new AuthResultDto(token, expireAt, user.UserName ?? string.Empty , userRole);
+                return response;
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError(ex, "Login failed for account. Reason: {ErrorMessage}", ex.Message);
+                response.Success = false;
+                response.Message = ex.Message;
+                return response;
+            }
+        }
+
     }
 }
