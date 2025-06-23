@@ -8,6 +8,6 @@ namespace TaskManagementApi.Application.Interfaces
     /// </summary>
     public interface ITokenService
     {
-        Task<ResponseType<string>> GenerateTokenAsync(ApplicationUsers user);
+        Task<string> GenerateTokenAsync(ApplicationUsers user);
     }
 }

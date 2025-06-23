@@ -87,7 +87,7 @@ namespace TaskManagementApi.Application.Features.Authentication.Commands
             }
 
             //6. Generate JWT token 
-            var tokens = await _tokenService.GenerateTokenAsync(user);
+            var token = await _tokenService.GenerateTokenAsync(user);
 
             //7.Expired Time
             DateTime expireAt = DateTime.UtcNow.AddYears(1);
