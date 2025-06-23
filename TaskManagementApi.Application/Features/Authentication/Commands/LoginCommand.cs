@@ -1,69 +1,97 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using TaskManagement.Infrastructures.Data;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.Extensions.Logging;
+using System.Data;
 using TaskManagement.Infrastructures.Identity;
+using TaskManagementApi.Application.ApplicationHelpers;
 using TaskManagementApi.Application.Features.Authentication.DTOs;
 using TaskManagementApi.Application.Interfaces;
 using TaskManagementApi.Domains.Wrapper;
 
 namespace TaskManagementApi.Application.Features.Authentication.Commands
 {
-   /* public class LoginCommand : IAccountService
+    /// <summary>
+    /// Login Account Service
+    /// </summary>
+    public class LoginCommand : ILoginCommand
     {
+        private readonly ILogger _logger;
         private readonly UserManager<ApplicationUsers> _userManager;
         private readonly RoleManager<ApplicationRole> _roleManager;
         private readonly ITokenService _tokenService;
-        public LoginCommand(ITokenService tokenService,UserManager<ApplicationUsers> userManager,RoleManager<ApplicationRole> roleManager)
-        {                                              
+        public LoginCommand(ITokenService tokenService, UserManager<ApplicationUsers> userManager, RoleManager<ApplicationRole> roleManager,ILogger logger)
+        {
+            _logger = logger;
             _tokenService = tokenService;
             _roleManager = roleManager;
             _userManager = userManager;
         }
-        
-        public Task<ResponseType<UserResponseDto>> LoginAsync(UserLoginRequestDto loginDto)
+        public async Task<ResponseType<AuthResultDto>> LoginAsync(UserLoginRequestDto loginDto)
         {
-            throw new NotImplementedException();
-        }
+            var response = new ResponseType<AuthResultDto>();
 
-        /// <summary>
-        /// Registers a new user with a given role.
-        /// </summary>
-        /// <param name="dto">The user's registration data.</param>
-        /// <param name="role">The role to assign to the user (e.g. "User").</param>
-        /// <returns>A DTO containing token and user info if registration succeeds.</returns>
-        public async Task<ResponseType<UserResponseDto>> RegisterAsync(UserRegisterRequestDto registerDto, string role)
-        {
-            ResponseType<UserResponseDto> response = new();
+            //0. Check if information by user is correct
+            var validateUser = ModelValidation.ModelValidationResponse(loginDto);
 
-            //1. Checking if User email is already Exist or created
-            var existingUser = await _userManager.FindByEmailAsync(registerDto.Email);
-
-            if(existingUser != null)
+            if (validateUser.Any()) //If any error will catch
             {
+                //logging if there's something wrong in fields by user
+                 _logger.LogWarning("Validation Failed for {Email}. Invalid fields: {@validationError}",
+                     loginDto.Email,validateUser);
+
+                 response.Success = false;
+                 response.Message = "There are Model Validation Occurred";
+                 return response;
+            }
+
+            //1. finding email if it's exist 
+            var user = await _userManager.FindByEmailAsync(loginDto.Email);
+
+            if(user == null)
+            {
+                _logger.LogError("Login attempt for non-existent email: {Email}", loginDto.Email);
                 response.Success = false;
-                response.Message = "Invalid Email";
-                response.Errors?.Add("Email is Already Exist");
+                response.Message = "Invalid login credentials." + $"User {loginDto.Email} not found.";
                 return response;
             }
+            //2. check if password was correct by built in method
+            var passwordValid = await _userManager.CheckPasswordAsync(user,loginDto.Password);
 
-            //2. Create User By new ApplicationUser Object
-            var user = new ApplicationUsers
+            if (!passwordValid)
             {
-                UserName = registerDto.UserName,
-                Email = registerDto.Email,
-                SecurityStamp = Guid.NewGuid().ToString()
-            };
+                _logger.LogWarning("Invalid password attempt for user {UserId} (Email: {Email})", 
+                user.Id, loginDto.Email);
 
-            // 3. Create the user using UserManager (this handles password hashing and validations
-            var result = await _userManager.CreateAsync(user, registerDto.Password);
-            if (!result.Succeeded)
-            {
-                //Collect all errors and throw it
-                var errors = string.Join(",", result.Errors.Select(x => x.Description));
                 response.Success = false;
-                response.Errors?.Add(errors);
+                response.Message = "Invalid login credentials." + $"{loginDto.Password} is incorrect";
+                return response;
             }
-            response.Success = true;
+            // 3. Get the roles assigned to the user (could be one or more)
+            var roles = await _userManager.GetRolesAsync(user);
 
+            // For this simple example, we'll just use the first role (if there's more than one)
+            var userRole = roles.FirstOrDefault() ?? "User";
+
+            //4. generate token a JWT token for user
+            var token = await _tokenService.GenerateTokenAsync(user);
+
+            //5. create a expiration date
+            DateTime expireAt = DateTime.UtcNow.AddYears(1);
+            try
+            {
+                _logger.LogInformation("User {UserId} logged in successfully. Role: {UserRole}", user.Id, userRole);
+                response.Success = true;
+                response.Message = "Successfully Login your Account";
+                response.Data = new AuthResultDto(token, expireAt, user.UserName ?? string.Empty , userRole);
+                return response;
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError(ex, "Login failed for account. Reason: {ErrorMessage}", ex.Message);
+                response.Success = false;
+                response.Message = ex.Message;
+                return response;
+            }
         }
-    }*/
+    }
 }
