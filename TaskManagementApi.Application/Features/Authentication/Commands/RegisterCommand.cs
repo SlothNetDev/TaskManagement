@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using TaskManagement.Infrastructures.Identity;
 using TaskManagementApi.Application.ApplicationHelpers;
 using TaskManagementApi.Application.Common.Interfaces.IAuthentication;
+using TaskManagementApi.Application.Common.Settings;
 using TaskManagementApi.Application.Features.Authentication.DTOs;
 using TaskManagementApi.Domains.Wrapper;
 
@@ -11,6 +12,7 @@ namespace TaskManagementApi.Application.Features.Authentication.Commands
 {
     public class RegisterCommand : IRegisterCommand
     {
+        private readonly IdentitySettings _identitySettings;
         private readonly ILogger _logger;
         private readonly UserManager<ApplicationUsers> _userManager;
         private readonly RoleManager<ApplicationRole> _roleManager;
@@ -30,7 +32,7 @@ namespace TaskManagementApi.Application.Features.Authentication.Commands
         /// <param name="dto">The user's registration data.</param>
         /// <param name="role">The role to assign to the user (e.g. "User").</param>
         /// <returns>A DTO containing token and user info if registration succeeds.</returns>
-        public async Task<ResponseType<AuthResultDto>> RegisterAsync(UserRegisterRequestDto registerDto, string role)
+        public async Task<ResponseType<AuthResultDto>> RegisterAsync(UserRegisterRequestDto registerDto)
         {
             ResponseType<AuthResultDto> response = new();
 
@@ -77,28 +79,16 @@ namespace TaskManagementApi.Application.Features.Authentication.Commands
                 response.Errors?.Add(errors);
             }
 
-            // 4. Check if the role exists — create it if not (optional safety)
-            if(!await _roleManager.RoleExistsAsync(role))
-            {
-                var roleResult = await _roleManager.CreateAsync(new ApplicationRole { Name = role });
-                if (!roleResult.Succeeded)
-                {
-                    _logger.LogWarning("Creating Role is has an Error: {Error}", result.Errors);
-                    response.Success = false;
-                    response.Message = "Failed to create role";
-                    return response;
-                }
-            }
+            // 4. Determine role based on config, not hardcoded
+            var isAdminEmail = _identitySettings.AdminEmails
+                .Any(x => x.Equals(registerDto.Email, StringComparison.CurrentCultureIgnoreCase));
 
-            // 5. Assign role to the user
-            var roleAssign = await _userManager.AddToRoleAsync(user, role);
-            if (!roleAssign.Succeeded)
-            {
-                _logger.LogWarning("Assigning Role Failed, Reason: {Error}", roleAssign.Errors);
-                 response.Success = false;
-                 response.Message = "Failed to assign role to user.";
-                 return response;
-            }
+            //if role is equal to isAdminEmail then it's admin, if not, then it's User Role
+            var role = isAdminEmail ? "Admin" : "User";
+
+            //5. adding role to user based on email
+            await _userManager.AddToRoleAsync(user, role);
+
 
             //6. Generate JWT token 
             var token = await _tokenService.GenerateTokenAsync(user);
