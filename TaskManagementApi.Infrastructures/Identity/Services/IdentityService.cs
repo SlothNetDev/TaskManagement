@@ -80,7 +80,7 @@ namespace TaskManagementApi.Application.Features.Authentication.Commands
             }
 
             // 4. Determine role based on config, not hardcoded
-            var isAdminEmail = _identitySettings.AdminEmails
+            var isAdminEmail = _identitySettings.Value.AdminEmails
                 .Any(x => x.Equals(registerDto.Email, StringComparison.CurrentCultureIgnoreCase));
 
             //if role is equal to isAdminEmail then it's admin, if not, then it's User Role
