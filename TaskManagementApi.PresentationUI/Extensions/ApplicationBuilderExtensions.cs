@@ -12,7 +12,7 @@ namespace TaskManagementApi.PresentationUI.Extensions
              // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
-                app.MapOpenApi();
+                app.UseSwagger(); //changes to UseSwagger
                 app.UseSwaggerUI();
             }
 
