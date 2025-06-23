@@ -8,6 +8,6 @@ namespace TaskManagementApi.Application.Common.Settings
 {
     public class IdentitySettings
     {
-        public List<string> AdminEmails { get; set } = new();
+        public List<string> AdminEmails { get; set; } = new();
     }
 }

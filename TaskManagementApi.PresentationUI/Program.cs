@@ -1,15 +1,3 @@
-
-using Microsoft.AspNetCore.Http.Json;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Internal;
-using System.ComponentModel;
-using System.Text.Json.Serialization;
-using TaskManagement.Infrastructures.Data;
-using TaskManagement.Infrastructures.Identity;
-using TaskManagementApi.Application.Features.Authentication.Commands;
-using TaskManagementApi.Application.Interfaces;
-using TaskManagementApi.Application.Interfaces.IAuthentication;
 using TaskManagementApi.PresentationUI.Extensions;
 
 namespace TaskManagementApi.PresentationUI
