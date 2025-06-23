@@ -7,20 +7,20 @@ using TaskManagementApi.Application.Common.Settings;
 using TaskManagementApi.Application.Features.Authentication.DTOs;
 using TaskManagementApi.Domains.Wrapper;
 using TaskManagementApi.Application.DTOs;
+using Microsoft.Extensions.Options;
 
 namespace TaskManagementApi.Application.Features.Authentication.Commands
 {
     public class IdentityService : IIdentityService
     {
-        private readonly IdentitySettings _identitySettings;
-        private readonly ILogger _logger;
+        private readonly IOptions<IdentitySettings> _identitySettings;
+        private readonly ILogger<IdentityService> _logger;
         private readonly UserManager<ApplicationUsers> _userManager;
-        private readonly RoleManager<ApplicationRole> _roleManager;
         private readonly ITokenService _tokenService;
-        public IdentityService(ITokenService tokenService,UserManager<ApplicationUsers> userManager,RoleManager<ApplicationRole> roleManager,ILogger logger,IdentitySettings identitySettings)
+        public IdentityService(ITokenService tokenService,UserManager<ApplicationUsers> userManager,RoleManager<ApplicationRole> roleManager,
+            ILogger<IdentityService> logger,IOptions<IdentitySettings> identitySettings)
         {                                              
             _tokenService = tokenService;
-            _roleManager = roleManager;
             _userManager = userManager;
             _logger = logger;
             _identitySettings = identitySettings;
@@ -115,6 +115,11 @@ namespace TaskManagementApi.Application.Features.Authentication.Commands
                 return response;
             }
         }
+        /// <summary>
+        /// Login Account Services
+        /// </summary>
+        /// <param name="loginDto"></param>
+        /// <returns>A DTO containing token and user info if Login succeeds.</returns>
         public async Task<ResponseType<AuthResultDto>> LoginAsync(UserLoginRequestDto loginDto)
         {
             var response = new ResponseType<AuthResultDto>();
