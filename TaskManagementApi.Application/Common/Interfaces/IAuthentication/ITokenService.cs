@@ -1,7 +1,7 @@
 ﻿using TaskManagement.Infrastructures.Identity;
 using TaskManagementApi.Domains.Wrapper;
 
-namespace TaskManagementApi.Application.Interfaces
+namespace TaskManagementApi.Application.Common.Interfaces.IAuthentication
 {
     /// <summary>
     /// For JWT generating Token

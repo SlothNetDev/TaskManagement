@@ -30,9 +30,9 @@ namespace TaskManagementApi.PresentationUI
             var app = builder.Build();
 
             //Calling ApplicationBuilderExtensions 
-            app.ConfigureApplication();
+            app?.ConfigureApplication();
            
-            app.Run();
+            app?.Run();
         }
     }
 }

@@ -1,7 +1,7 @@
 ﻿using TaskManagementApi.Application.Features.Authentication.DTOs;
 using TaskManagementApi.Domains.Wrapper;
 
-namespace TaskManagementApi.Application.Interfaces
+namespace TaskManagementApi.Application.Common.Interfaces.IAuthentication
 {
     /// <summary>
     /// For Logging and Register

@@ -3,9 +3,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using TaskManagement.Infrastructures.Identity;
 using TaskManagementApi.Application.ApplicationHelpers;
+using TaskManagementApi.Application.Common.Interfaces.IAuthentication;
 using TaskManagementApi.Application.Features.Authentication.DTOs;
-using TaskManagementApi.Application.Interfaces;
-using TaskManagementApi.Application.Interfaces.IAuthentication;
 using TaskManagementApi.Domains.Wrapper;
 
 namespace TaskManagementApi.Application.Features.Authentication.Commands

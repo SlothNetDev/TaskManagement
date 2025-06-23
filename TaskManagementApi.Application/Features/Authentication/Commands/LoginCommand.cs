@@ -4,8 +4,8 @@ using Microsoft.Extensions.Logging;
 using System.Data;
 using TaskManagement.Infrastructures.Identity;
 using TaskManagementApi.Application.ApplicationHelpers;
+using TaskManagementApi.Application.Common.Interfaces.IAuthentication;
 using TaskManagementApi.Application.Features.Authentication.DTOs;
-using TaskManagementApi.Application.Interfaces;
 using TaskManagementApi.Domains.Wrapper;
 
 namespace TaskManagementApi.Application.Features.Authentication.Commands

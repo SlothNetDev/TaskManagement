@@ -4,9 +4,10 @@ using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 using TaskManagement.Infrastructures.Data;
 using TaskManagement.Infrastructures.Identity;
+using TaskManagementApi.Application.Common.Interfaces.IAuthentication;
+using TaskManagementApi.Application.Common.Settings;
 using TaskManagementApi.Application.Features.Authentication.Commands;
 using TaskManagementApi.Application.Interfaces;
-using TaskManagementApi.Application.Interfaces.IAuthentication;
 
 namespace TaskManagementApi.PresentationUI.Extensions
 {
@@ -31,6 +32,10 @@ namespace TaskManagementApi.PresentationUI.Extensions
 
             // Identity
             services.AddCustomIdentity();
+
+            //add identity settings for roles
+            services.Configure<IdentitySettings>(
+                configuration.GetSection("IdentitySettings"));
 
             //Authentication/Autherization
             services.AddAuthentication();

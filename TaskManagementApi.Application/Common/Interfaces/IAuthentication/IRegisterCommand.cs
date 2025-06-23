@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using TaskManagementApi.Application.Features.Authentication.DTOs;
 using TaskManagementApi.Domains.Wrapper;
 
-namespace TaskManagementApi.Application.Interfaces.IAuthentication
+namespace TaskManagementApi.Application.Common.Interfaces.IAuthentication
 {
     public interface IRegisterCommand
     {
