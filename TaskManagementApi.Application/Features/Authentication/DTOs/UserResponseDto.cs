@@ -1,7 +1,4 @@
-﻿
-using TaskManagement.Infrastructures.Identity;
-using TaskManagementApi.Domains.Entities;
-namespace TaskManagementApi.Application.Features.Authentication.DTOs
+﻿namespace TaskManagementApi.Application.Features.Authentication.DTOs
 {
     /// <summary>
     /// Use for HTTP GET
@@ -19,14 +16,5 @@ namespace TaskManagementApi.Application.Features.Authentication.DTOs
 
         DateTime? CreatedAt,
         DateTime? UpdatedAt
-    )
-    {
-        public UserResponseDto(ApplicationUsers users) : this(
-            users.Id,
-            users.UserName ?? string.Empty,
-            users.Email ?? string.Empty,
-            users.CreatedAt,
-            users.UpdatedAt)
-        { }
-    };
+    );
 }

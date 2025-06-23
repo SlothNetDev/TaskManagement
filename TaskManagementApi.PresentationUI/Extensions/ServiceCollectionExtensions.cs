@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 using TaskManagement.Infrastructures.Data;
 using TaskManagement.Infrastructures.Identity;
+using TaskManagement.Infrastructures.Identity.Security;
 using TaskManagementApi.Application.Common.Interfaces.IAuthentication;
 using TaskManagementApi.Application.Common.Settings;
 using TaskManagementApi.Application.Features.Authentication.Commands;
@@ -41,9 +42,9 @@ namespace TaskManagementApi.PresentationUI.Extensions
             services.AddAuthorization();
 
             // CQRS Services (keep only what you actually use)
-            services.AddScoped<IRegisterCommand, RegisterCommand>();
-            /*services.AddScoped<ITokenService, TokenService>();*/
-            // services.AddScoped<ILoginCommand, LoginCommand>();
+            services.AddScoped<IIdentityService, IdentityService>();
+            services.Configure<JwtSettings>(configuration.GetSection("JwtSetting"));
+            services.AddScoped<ITokenService, TokenService>();
 
             return services;
         }
