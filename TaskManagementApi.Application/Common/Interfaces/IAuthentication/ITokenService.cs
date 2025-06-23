@@ -1,5 +1,4 @@
-﻿using TaskManagement.Infrastructures.Identity;
-using TaskManagementApi.Domains.Wrapper;
+﻿using TaskManagementApi.Application.DTOs;
 
 namespace TaskManagementApi.Application.Common.Interfaces.IAuthentication
 {
@@ -8,6 +7,6 @@ namespace TaskManagementApi.Application.Common.Interfaces.IAuthentication
     /// </summary>
     public interface ITokenService
     {
-        Task<string> GenerateTokenAsync(ApplicationUsers user);
+        Task<string> GenerateTokenAsync(TokenUserDto user);
     }
 }

@@ -3,7 +3,7 @@ using TaskManagementApi.Domains.Wrapper;
 
 namespace TaskManagementApi.Application.ApplicationHelpers
 {
-    internal class ModelValidation
+    public class ModelValidation
     {
         public static List<string?> ModelValidationResponse<T>(T instance)
         {
