@@ -1,5 +1,4 @@
-﻿using Azure;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using TaskManagement.Infrastructures.Identity;
 using TaskManagementApi.Application.ApplicationHelpers;
@@ -17,12 +16,13 @@ namespace TaskManagementApi.Application.Features.Authentication.Commands
         private readonly UserManager<ApplicationUsers> _userManager;
         private readonly RoleManager<ApplicationRole> _roleManager;
         private readonly ITokenService _tokenService;
-        public RegisterCommand(ITokenService tokenService,UserManager<ApplicationUsers> userManager,RoleManager<ApplicationRole> roleManager,ILogger logger)
+        public RegisterCommand(ITokenService tokenService,UserManager<ApplicationUsers> userManager,RoleManager<ApplicationRole> roleManager,ILogger logger,IdentitySettings identitySettings)
         {                                              
             _tokenService = tokenService;
             _roleManager = roleManager;
             _userManager = userManager;
             _logger = logger;
+            _identitySettings = identitySettings;
         }
         
 
