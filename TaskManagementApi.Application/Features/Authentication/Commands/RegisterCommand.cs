@@ -94,7 +94,7 @@ namespace TaskManagementApi.Application.Features.Authentication.Commands
             var token = await _tokenService.GenerateTokenAsync(user);
 
             //7.Expired Time
-            DateTime expireAt = DateTime.UtcNow.AddYears(1);
+            DateTime expireAt = DateTime.UtcNow.AddDays(7);
 
             try
             {
