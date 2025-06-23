@@ -30,6 +30,11 @@ namespace TaskManagementApi.PresentationUI.Extensions
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             services.AddOpenApi();
 
+             // CQRS Services (keep only what you actually use)
+            services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));
+            services.AddScoped<IIdentityService, IdentityService>();          
+            services.AddScoped<ITokenService, TokenService>();
+
             // Identity
             services.AddCustomIdentity();
 
@@ -40,12 +45,11 @@ namespace TaskManagementApi.PresentationUI.Extensions
             //Authentication/Autherization
             services.AddAuthentication();
             services.AddAuthorization();
+         
 
-            // CQRS Services (keep only what you actually use)
-            services.AddScoped<IIdentityService, IdentityService>();
-            services.Configure<JwtSettings>(configuration.GetSection("JwtSetting"));
-            services.AddScoped<ITokenService, TokenService>();
-
+            //swagger end points
+            services.AddEndpointsApiExplorer();
+            services.AddSwaggerGen();
             return services;
         }
 
@@ -61,6 +65,7 @@ namespace TaskManagementApi.PresentationUI.Extensions
                 options.SerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
 
             });
+           
         }
 
         private static void AddCustomIdentity(this IServiceCollection services)

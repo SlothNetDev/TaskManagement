@@ -13,6 +13,7 @@ namespace TaskManagementApi.PresentationUI.Extensions
             if (app.Environment.IsDevelopment())
             {
                 app.MapOpenApi();
+                app.UseSwaggerUI();
             }
 
             //Seed Roles for request

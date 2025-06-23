@@ -1,3 +1,4 @@
+using TaskManagementApi.Application.Common.Settings;
 using TaskManagementApi.PresentationUI.Extensions;
 
 namespace TaskManagementApi.PresentationUI
@@ -11,7 +12,7 @@ namespace TaskManagementApi.PresentationUI
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-            
+
             //Calling Service Extention
             builder.Services.AddPresentationService(builder.Configuration);
 
