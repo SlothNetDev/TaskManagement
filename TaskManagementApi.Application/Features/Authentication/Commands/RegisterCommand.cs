@@ -1,10 +1,8 @@
-﻿using Microsoft.AspNetCore.Identity;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Azure;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
 using TaskManagement.Infrastructures.Identity;
+using TaskManagementApi.Application.ApplicationHelpers;
 using TaskManagementApi.Application.Features.Authentication.DTOs;
 using TaskManagementApi.Application.Interfaces;
 using TaskManagementApi.Application.Interfaces.IAuthentication;
@@ -14,14 +12,16 @@ namespace TaskManagementApi.Application.Features.Authentication.Commands
 {
     public class RegisterCommand : IRegisterCommand
     {
+        private readonly ILogger _logger;
         private readonly UserManager<ApplicationUsers> _userManager;
         private readonly RoleManager<ApplicationRole> _roleManager;
         private readonly ITokenService _tokenService;
-        public RegisterCommand(ITokenService tokenService,UserManager<ApplicationUsers> userManager,RoleManager<ApplicationRole> roleManager)
+        public RegisterCommand(ITokenService tokenService,UserManager<ApplicationUsers> userManager,RoleManager<ApplicationRole> roleManager,ILogger logger)
         {                                              
             _tokenService = tokenService;
             _roleManager = roleManager;
             _userManager = userManager;
+            _logger = logger;
         }
         
 
@@ -35,11 +35,23 @@ namespace TaskManagementApi.Application.Features.Authentication.Commands
         {
             ResponseType<AuthResultDto> response = new();
 
+            var validationErrors = ModelValidation.ModelValidationResponse(registerDto);
+            if (validationErrors.Any())
+            {
+                _logger.LogWarning("Validation Failed for {Email}. Invalid fields: {@validationError}",
+                     registerDto.Email,validationErrors);
+                response.Success = false;
+                response.Message = "There are Model Validation Occurred";
+                return response;
+
+            }
+
+
             //1. Checking if User email is already Exist or created
             var existingUser = await _userManager.FindByEmailAsync(registerDto.Email);
-
             if(existingUser != null)
             {
+                _logger.LogError("Login attempt for Existing email: {Email}", registerDto.Email);
                 response.Success = false;
                 response.Message = "Invalid Email";
                 response.Errors?.Add("Email is Already Exist");
@@ -60,6 +72,7 @@ namespace TaskManagementApi.Application.Features.Authentication.Commands
             if (!result.Succeeded)
             {
                 //Collect all errors and throw it
+                _logger.LogWarning("Error Occured When Creating user Manager, Reason: {@Error}", result.Errors);
                 var errors = string.Join(",", result.Errors.Select(x => x.Description));
                 response.Success = false;
                 response.Errors?.Add(errors);
@@ -71,6 +84,7 @@ namespace TaskManagementApi.Application.Features.Authentication.Commands
                 var roleResult = await _roleManager.CreateAsync(new ApplicationRole { Name = role });
                 if (!roleResult.Succeeded)
                 {
+                    _logger.LogWarning("Creating Role is has an Error: {Error}", result.Errors);
                     response.Success = false;
                     response.Message = "Failed to create role";
                     return response;
@@ -81,6 +95,7 @@ namespace TaskManagementApi.Application.Features.Authentication.Commands
             var roleAssign = await _userManager.AddToRoleAsync(user, role);
             if (!roleAssign.Succeeded)
             {
+                _logger.LogWarning("Assigning Role Failed, Reason: {Error}", roleAssign.Errors);
                  response.Success = false;
                  response.Message = "Failed to assign role to user.";
                  return response;
@@ -92,10 +107,20 @@ namespace TaskManagementApi.Application.Features.Authentication.Commands
             //7.Expired Time
             DateTime expireAt = DateTime.UtcNow.AddYears(1);
 
-            response.Success = true;
-            response.Message = "Successfully Register your Account";
-            response.Data = new AuthResultDto(token,expireAt,user.UserName,role);
-            return response;
+            try
+            {
+                response.Success = true;
+                response.Message = "Successfully Register your Account";
+                response.Data = new AuthResultDto(token,expireAt,user.UserName,role);
+                return response;
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError(ex, "Register failed for account. Reason: {ErrorMessage}", ex.Message);
+                response.Success = false;
+                response.Message = ex.Message;
+                return response;
+            }
         }
     }
 }
