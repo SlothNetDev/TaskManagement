@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace TaskManagementApi.Application.Features.Authentication.DTOs
 {
     public record AuthResultDto(
-        string Tokenn,
+        string Token,
         DateTime ExpiresAt,
         string UserName,
         string Role

@@ -17,7 +17,7 @@ namespace TaskManagementApi.PresentationUI
 
             //Calling Service Extention
             // Add services to the container
-            builder.AddCustomSerilog() // This comes first to capture startup logs
+            builder.AddCleanSerilog() // This comes first to capture startup logs
                    .Services
                    .AddPresentationService(builder.Configuration);
 

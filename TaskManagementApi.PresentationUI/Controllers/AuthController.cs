@@ -21,15 +21,22 @@ namespace TaskManagementApi.PresentationUI.Controllers
         public async Task<IActionResult> Register([FromBody] UserRegisterRequestDto request)
         {
             var result = await _mediator.Send(new RegisterCommand(request));
+        
             if (!result.Success)
             {
-                _logger.LogInformation("Register Failed, Ruquest is Null");
-                return BadRequest(result);
+                _logger.LogWarning(" Register failed for {Email}", request.Email);
+                return BadRequest(new { errors = result.Errors });
             }
-            return Ok(result);
-                
-            
+        
+            _logger.LogInformation(" User registered: {User}", result.Data?.UserName);
+            return Ok(new AuthResultDto(
+                result.Data.Token,
+                result.Data.ExpiresAt,
+                result.Data.UserName,
+                result.Data.Role
+            ));
         }
+
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] UserLoginRequestDto request)
         {
