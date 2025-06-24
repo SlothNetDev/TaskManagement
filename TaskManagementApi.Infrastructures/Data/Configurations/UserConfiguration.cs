@@ -9,11 +9,11 @@ namespace TaskManagement.Infrastructures.Data.Configuration
         {
             builder.ToTable("User_Type");
 
-            builder.HasKey(x => x.DomainUserId);
-
             builder.Property(x => x.CreatedAt)
                 .HasDefaultValueSql("GETUTCDATE()")
                 .IsRequired(false);
+
+            builder.HasKey(x => x.Id);
 
             builder.HasOne(x => x.DomainUser)
                 .WithOne()
