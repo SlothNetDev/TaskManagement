@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http.Json;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
+using Serilog.Events;
 using System.Text.Json.Serialization;
 using TaskManagement.Infrastructures.Data;
 using TaskManagement.Infrastructures.Identity;
@@ -17,7 +19,7 @@ namespace TaskManagementApi.PresentationUI.Extensions
     public static class ServiceCollectionExtensions
     {
         public static IServiceCollection AddPresentationService(this IServiceCollection services,
-            IConfiguration configuration)
+            IConfiguration configuration )
         {
             //Core service
             services.AddControllers()
@@ -50,6 +52,7 @@ namespace TaskManagementApi.PresentationUI.Extensions
             //swagger end points
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen();
+
             return services;
         }
 
@@ -80,6 +83,22 @@ namespace TaskManagementApi.PresentationUI.Extensions
             })
                 .AddDefaultTokenProviders()
                 .AddEntityFrameworkStores<TaskManagementDbContext>();
+        }
+           
+    }
+    public static class SerilogExtensions
+    {
+        public static WebApplicationBuilder AddCleanSerilog(this WebApplicationBuilder builder)
+        {
+            builder.Logging.ClearProviders();
+            
+            builder.Host.UseSerilog((context, config) =>
+            {
+                config.ReadFrom.Configuration(context.Configuration)
+                      .Enrich.FromLogContext();
+            });
+    
+            return builder;
         }
     }
 }

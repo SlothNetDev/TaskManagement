@@ -1,3 +1,5 @@
+using Serilog;
+using Serilog.Events;
 using TaskManagementApi.Application.Common.Settings;
 using TaskManagementApi.PresentationUI.Extensions;
 
@@ -14,7 +16,10 @@ namespace TaskManagementApi.PresentationUI
             var builder = WebApplication.CreateBuilder(args);
 
             //Calling Service Extention
-            builder.Services.AddPresentationService(builder.Configuration);
+            // Add services to the container
+            builder.AddCustomSerilog() // This comes first to capture startup logs
+                   .Services
+                   .AddPresentationService(builder.Configuration);
 
             var app = builder.Build();
 
@@ -23,5 +28,7 @@ namespace TaskManagementApi.PresentationUI
            
             app?.Run();
         }
+ 
+        
     }
 }
