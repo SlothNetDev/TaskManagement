@@ -12,7 +12,7 @@ using TaskManagement.Infrastructures.Data;
 namespace TaskManagement.Infrastructures.Migrations
 {
     [DbContext(typeof(TaskManagementDbContext))]
-    [Migration("20250624195511_InitialCreate")]
+    [Migration("20250624204552_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -168,7 +168,8 @@ namespace TaskManagement.Infrastructures.Migrations
 
             modelBuilder.Entity("TaskManagement.Infrastructures.Identity.ApplicationUsers", b =>
                 {
-                    b.Property<Guid>("DomainUserId")
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("AccessFailedCount")
@@ -183,15 +184,15 @@ namespace TaskManagement.Infrastructures.Migrations
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETUTCDATE()");
 
+                    b.Property<Guid>("DomainUserId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("Email")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
-
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
@@ -229,7 +230,10 @@ namespace TaskManagement.Infrastructures.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
-                    b.HasKey("DomainUserId");
+                    b.HasKey("Id");
+
+                    b.HasIndex("DomainUserId")
+                        .IsUnique();
 
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");

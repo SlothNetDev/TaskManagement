@@ -84,10 +84,10 @@ namespace TaskManagement.Infrastructures.Migrations
                 name: "User_Type",
                 columns: table => new
                 {
-                    DomainUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: true, defaultValueSql: "GETUTCDATE()"),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    DomainUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -105,7 +105,7 @@ namespace TaskManagement.Infrastructures.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_User_Type", x => x.DomainUserId);
+                    table.PrimaryKey("PK_User_Type", x => x.Id);
                     table.ForeignKey(
                         name: "FK_User_Type_Users_DomainUserId",
                         column: x => x.DomainUserId,
@@ -162,7 +162,7 @@ namespace TaskManagement.Infrastructures.Migrations
                         name: "FK_AspNetUserClaims_User_Type_UserId",
                         column: x => x.UserId,
                         principalTable: "User_Type",
-                        principalColumn: "DomainUserId",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -182,7 +182,7 @@ namespace TaskManagement.Infrastructures.Migrations
                         name: "FK_AspNetUserLogins_User_Type_UserId",
                         column: x => x.UserId,
                         principalTable: "User_Type",
-                        principalColumn: "DomainUserId",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -206,7 +206,7 @@ namespace TaskManagement.Infrastructures.Migrations
                         name: "FK_AspNetUserRoles_User_Type_UserId",
                         column: x => x.UserId,
                         principalTable: "User_Type",
-                        principalColumn: "DomainUserId",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -226,7 +226,7 @@ namespace TaskManagement.Infrastructures.Migrations
                         name: "FK_AspNetUserTokens_User_Type_UserId",
                         column: x => x.UserId,
                         principalTable: "User_Type",
-                        principalColumn: "DomainUserId",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -276,6 +276,12 @@ namespace TaskManagement.Infrastructures.Migrations
                 name: "EmailIndex",
                 table: "User_Type",
                 column: "NormalizedEmail");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_User_Type_DomainUserId",
+                table: "User_Type",
+                column: "DomainUserId",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "UserNameIndex",
