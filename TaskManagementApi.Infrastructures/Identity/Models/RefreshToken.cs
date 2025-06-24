@@ -7,7 +7,7 @@ namespace TaskManagement.Infrastructures.Identity.Models
     /// </summary>
     public class RefreshToken
     {
-         public int Id { get; set; } // Primary key
+         public string Id { get; set; } // Primary key
          public string Token { get; set; } = string.Empty; // Actual refresh token string
          public DateTime Expires { get; set; } // Expiration date
          public bool IsExpired => DateTime.UtcNow >= Expires; //expression embodied property
@@ -21,7 +21,7 @@ namespace TaskManagement.Infrastructures.Identity.Models
          public bool IsActive => Revoked == null && !IsExpired; //returns true if both was true return true
          
          // Navigation
-         public string UserId { get; set; } = string.Empty;
+         public Guid UserId { get; set; }
          public ApplicationUsers User { get; set; } = null!;
     }
 }
