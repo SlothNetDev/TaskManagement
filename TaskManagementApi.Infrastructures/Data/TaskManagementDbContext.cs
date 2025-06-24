@@ -18,12 +18,6 @@ namespace TaskManagement.Infrastructures.Data
         {
             base.OnModelCreating(builder);
 
-            //configure Refresh Token
-            builder.Entity<RefreshToken>()
-                .HasOne(x => x.User)
-                .WithMany(x => x.RefreshTokens)
-                .HasForeignKey(x => x.UserId);
-
             builder.ApplyConfiguration(new CategoriesConfiguration());
             builder.ApplyConfiguration(new TasksConfiguration());
             builder.ApplyConfiguration(new UserConfiguration());
