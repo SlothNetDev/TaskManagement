@@ -6,18 +6,19 @@ using TaskManagementApi.Application.Features.Authentication.DTOs;
 
 namespace TaskManagementApi.PresentationUI.Controllers
 {
-    [Route("api/[controller]")]
+    
     [ApiController]
+    [Route("auth")]
     public class AuthController : ControllerBase
     {
         private readonly IMediator _mediator;
-        private readonly ILogger _logger;
-        public AuthController(IMediator mediator,ILogger logger)
+        private readonly ILogger<AuthController> _logger;
+        public AuthController(IMediator mediator,ILogger<AuthController> logger)
         {
             _mediator = mediator;
             _logger = logger;
         }
-        [HttpPost("register/task")]
+        [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] UserRegisterRequestDto request)
         {
             var result = await _mediator.Send(new RegisterCommand(request));
@@ -37,7 +38,7 @@ namespace TaskManagementApi.PresentationUI.Controllers
             ));
         }
 
-        [HttpPost("login/task")]
+        [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] UserLoginRequestDto request)
         {
             var result = await _mediator.Send(new LoginCommand(request));

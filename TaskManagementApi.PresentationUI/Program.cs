@@ -1,5 +1,6 @@
 using Serilog;
 using Serilog.Events;
+using System.Threading.Tasks;
 using TaskManagementApi.Application.Common.Settings;
 using TaskManagementApi.PresentationUI.Extensions;
 
@@ -11,9 +12,9 @@ namespace TaskManagementApi.PresentationUI
         /// Simplified Program.cs
         /// </summary>
         /// <param name="args"></param>
-        public static void Main(string[] args)
+        public static async Task Main()
         {
-            var builder = WebApplication.CreateBuilder(args);
+            var builder = WebApplication.CreateBuilder();
 
             //Calling Service Extention
             // Add services to the container
@@ -24,7 +25,7 @@ namespace TaskManagementApi.PresentationUI
             var app = builder.Build();
 
             //Calling ApplicationBuilderExtensions 
-            app?.ConfigureApplication();
+            await app.ConfigureApplication();
            
             app?.Run();
         }
