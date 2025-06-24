@@ -12,11 +12,17 @@ namespace TaskManagement.Infrastructures.Data
         public DbSet<ApplicationUsers> UserApplicationDb { get; set; }
         public DbSet<TaskItem> TaskDb { get; set; }
         public DbSet<Category> CategoryDb { get; set; }
-
+        public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
+
+            //configure Refresh Token
+            builder.Entity<RefreshToken>()
+                .HasOne(x => x.User)
+                .WithMany(x => x.RefreshTokens)
+                .HasForeignKey(x => x.UserId);
 
             builder.ApplyConfiguration(new CategoriesConfiguration());
             builder.ApplyConfiguration(new TasksConfiguration());
