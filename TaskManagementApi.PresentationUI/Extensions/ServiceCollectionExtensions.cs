@@ -10,7 +10,6 @@ using TaskManagement.Infrastructures.Identity.Security;
 using TaskManagementApi.Application.Common.Interfaces.IAuthentication;
 using TaskManagementApi.Application.Common.Settings;
 using TaskManagementApi.Application.Features.Authentication.Commands;
-using TaskManagementApi.Application.Features.Authentication.Commands.Login;
 
 namespace TaskManagementApi.PresentationUI.Extensions
 {

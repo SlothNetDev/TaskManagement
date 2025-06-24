@@ -4,7 +4,7 @@ using TaskManagementApi.Application.Common.Interfaces.IAuthentication;
 using TaskManagementApi.Application.Features.Authentication.DTOs;
 using TaskManagementApi.Domains.Wrapper;
 
-namespace TaskManagementApi.Application.Features.Authentication.Commands.Login
+namespace TaskManagementApi.Application.Features.Authentication.Commands
 {
     /// <summary>
     /// Represents a command to initiate a login operation using the provided user credentials.
