@@ -8,23 +8,15 @@ using TaskManagementApi.Application.Features.Authentication.DTOs;
 using TaskManagementApi.Domains.Wrapper;
 using TaskManagementApi.Application.DTOs;
 using Microsoft.Extensions.Options;
+using TaskManagementApi.Domains.Entities;
+using TaskManagement.Infrastructures.Data;
 
 namespace TaskManagementApi.Application.Features.Authentication.Commands
 {
-    public class IdentityService : IIdentityService
+    public class IdentityService(IOptions<IdentitySettings> _identitySettings,ILogger<IdentityService> _logger,
+        UserManager<ApplicationUsers> _userManager,ITokenService _tokenService,TaskManagementDbContext _dbContext) : IIdentityService
     {
-        private readonly IOptions<IdentitySettings> _identitySettings;
-        private readonly ILogger<IdentityService> _logger;
-        private readonly UserManager<ApplicationUsers> _userManager;
-        private readonly ITokenService _tokenService;
-        public IdentityService(ITokenService tokenService,UserManager<ApplicationUsers> userManager,RoleManager<ApplicationRole> roleManager,
-            ILogger<IdentityService> logger,IOptions<IdentitySettings> identitySettings)
-        {                                              
-            _tokenService = tokenService;
-            _userManager = userManager;
-            _logger = logger;
-            _identitySettings = identitySettings;
-        }
+       
         
 
         /// <summary>
@@ -59,16 +51,21 @@ namespace TaskManagementApi.Application.Features.Authentication.Commands
                 return response;
             }
 
-            //2. Create User By new ApplicationUser Object
+            //2. creating domain users 
+            var domainUser = new Users();
+
+
+            //3. Create User By new ApplicationUser Object
             var user = new ApplicationUsers
             {
                 UserName = registerDto.UserName,
                 Email = registerDto.Email,
                 CreatedAt = DateTime.UtcNow,
-                SecurityStamp = Guid.NewGuid().ToString()
+                SecurityStamp = Guid.NewGuid().ToString(),
+                DomainUser = domainUser
             };
 
-            // 3. Create the user using UserManager (this handles password hashing and validations
+            // 4. Create the user using UserManager (this handles password hashing and validations
             var result = await _userManager.CreateAsync(user, registerDto.Password);
             if (!result.Succeeded)
             {
@@ -79,25 +76,25 @@ namespace TaskManagementApi.Application.Features.Authentication.Commands
                 response.Errors?.Add(errors);
             }
 
-            // 4. Determine role based on config, not hardcoded
+            // 5. Determine role based on config, not hardcoded
             var isAdminEmail = _identitySettings.Value.AdminEmails
                 .Any(x => x.Equals(registerDto.Email, StringComparison.CurrentCultureIgnoreCase));
 
             //if role is equal to isAdminEmail then it's admin, if not, then it's User Role
             var role = isAdminEmail ? "Admin" : "User";
 
-            //5. adding role to user based on email
+            //6. adding role to user based on email
             await _userManager.AddToRoleAsync(user, role);
 
 
-            //6. Generate JWT token 
+            //7. Generate JWT token 
             var token = await _tokenService.GenerateTokenAsync(new TokenUserDto(
                 user.Id.ToString(),
                 user.UserName ?? string.Empty,
                 user.Email ?? string.Empty,
                 new List<string>{ "User"}));
 
-            //7.Expired Time
+            //8.Expired Time
             DateTime expireAt = DateTime.UtcNow.AddDays(7);
 
             try
