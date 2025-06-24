@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TaskManagement.Infrastructures.Identity;
+using TaskManagement.Infrastructures.Identity.Models;
 
 namespace TaskManagement.Infrastructures.Data.Seeders
 {

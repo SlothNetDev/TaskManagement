@@ -5,7 +5,7 @@ using Serilog;
 using Serilog.Events;
 using System.Text.Json.Serialization;
 using TaskManagement.Infrastructures.Data;
-using TaskManagement.Infrastructures.Identity;
+using TaskManagement.Infrastructures.Identity.Models;
 using TaskManagement.Infrastructures.Identity.Security;
 using TaskManagementApi.Application.Common.Interfaces.IAuthentication;
 using TaskManagementApi.Application.Common.Settings;

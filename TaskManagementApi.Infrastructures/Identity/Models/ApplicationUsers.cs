@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using TaskManagementApi.Domains.Entities;
-namespace TaskManagement.Infrastructures.Identity
+namespace TaskManagement.Infrastructures.Identity.Models
 {
     //Models for User, User Account 
     public class ApplicationUsers : IdentityUser<Guid> //identity user Id set as Guid

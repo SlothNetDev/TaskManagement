@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using TaskManagement.Infrastructures.Identity;
+using TaskManagement.Infrastructures.Identity.Models;
 namespace TaskManagement.Infrastructures.Data.Configuration
 {
     sealed partial class UserConfiguration : IEntityTypeConfiguration<ApplicationUsers>

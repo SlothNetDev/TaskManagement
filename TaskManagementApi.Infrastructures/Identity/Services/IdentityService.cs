@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
-using TaskManagement.Infrastructures.Identity;
 using TaskManagementApi.Application.ApplicationHelpers;
 using TaskManagementApi.Application.Common.Interfaces.IAuthentication;
 using TaskManagementApi.Application.Common.Settings;
@@ -10,6 +9,7 @@ using TaskManagementApi.Application.DTOs;
 using Microsoft.Extensions.Options;
 using TaskManagementApi.Domains.Entities;
 using TaskManagement.Infrastructures.Data;
+using TaskManagement.Infrastructures.Identity.Models;
 
 namespace TaskManagementApi.Application.Features.Authentication.Commands
 {

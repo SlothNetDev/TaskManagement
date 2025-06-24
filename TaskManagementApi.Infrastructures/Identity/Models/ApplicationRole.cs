@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using System.Text.RegularExpressions;
 
-namespace TaskManagement.Infrastructures.Identity
+namespace TaskManagement.Infrastructures.Identity.Models
 {
     public class ApplicationRole :IdentityRole<Guid>
     {

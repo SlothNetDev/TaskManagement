@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using System.Threading.Tasks;
 using TaskManagement.Infrastructures.Data.Seeders;
-using TaskManagement.Infrastructures.Identity;
+using TaskManagement.Infrastructures.Identity.Models;
 using TaskManagementApi.PresentationUI.Middleware;
 
 namespace TaskManagementApi.PresentationUI.Extensions
