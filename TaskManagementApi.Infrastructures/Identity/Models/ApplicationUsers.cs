@@ -14,6 +14,8 @@ namespace TaskManagement.Infrastructures.Identity.Models
         // If you were to add them here, they would point to your Domain.Entities classes, which is fine,
         // but the recommended way to bridge is via the Domain.Users entity.
 
+        //Add refresh token to track all active/Inactive refresh tokens
+        public ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
 
         //Audit when it was created and when it was updated
         public DateTime? CreatedAt { get; set; }
