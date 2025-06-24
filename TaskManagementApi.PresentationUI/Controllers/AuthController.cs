@@ -17,7 +17,7 @@ namespace TaskManagementApi.PresentationUI.Controllers
             _mediator = mediator;
             _logger = logger;
         }
-        [HttpPost("register")]
+        [HttpPost("register/task")]
         public async Task<IActionResult> Register([FromBody] UserRegisterRequestDto request)
         {
             var result = await _mediator.Send(new RegisterCommand(request));
@@ -37,7 +37,7 @@ namespace TaskManagementApi.PresentationUI.Controllers
             ));
         }
 
-        [HttpPost("login")]
+        [HttpPost("login/task")]
         public async Task<IActionResult> Login([FromBody] UserLoginRequestDto request)
         {
             var result = await _mediator.Send(new LoginCommand(request));

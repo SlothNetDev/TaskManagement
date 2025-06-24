@@ -10,6 +10,7 @@ using TaskManagement.Infrastructures.Identity.Security;
 using TaskManagementApi.Application.Common.Interfaces.IAuthentication;
 using TaskManagementApi.Application.Common.Settings;
 using TaskManagementApi.Application.Features.Authentication.Commands;
+using TaskManagementApi.Application.Features.Authentication.Commands.Login;
 
 namespace TaskManagementApi.PresentationUI.Extensions
 {
@@ -47,7 +48,13 @@ namespace TaskManagementApi.PresentationUI.Extensions
             //Authentication/Autherization
             services.AddAuthentication();
             services.AddAuthorization();
-         
+
+            //mediaR
+            services.AddMediatR(x =>
+            {
+                x.RegisterServicesFromAssembly(typeof(RegisterCommand).Assembly);
+                x.RegisterServicesFromAssembly(typeof(LoginCommand).Assembly);
+            });
 
             //swagger end points
             services.AddEndpointsApiExplorer();

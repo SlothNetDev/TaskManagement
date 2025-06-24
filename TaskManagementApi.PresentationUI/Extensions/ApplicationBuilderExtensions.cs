@@ -12,6 +12,7 @@ namespace TaskManagementApi.PresentationUI.Extensions
              // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
+                app.UseDeveloperExceptionPage();
                 app.UseSwagger(); //changes to UseSwagger
                 app.UseSwaggerUI();
             }
