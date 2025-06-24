@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using TaskManagement.Infrastructures.Data.Seeders;
 using TaskManagement.Infrastructures.Identity;
+using TaskManagementApi.PresentationUI.Middleware;
 
 namespace TaskManagementApi.PresentationUI.Extensions
 {
@@ -25,6 +26,9 @@ namespace TaskManagementApi.PresentationUI.Extensions
 
                 await IdentitySeeder.SeedRolesAsync(roleManager);
             }
+            //adding global middleware
+            app.UseMiddleware<MiddlewareException>();
+
             app.UseHttpsRedirection();
 
 
