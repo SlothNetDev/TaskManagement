@@ -16,7 +16,7 @@ namespace TaskManagementApi.Application.Features.Authentication.Commands
 {
     public class IdentityService(IOptions<IdentitySettings> _identitySettings,ILogger<IdentityService> _logger,
         UserManager<ApplicationUsers> _userManager,ITokenService _tokenService,TaskManagementDbContext _dbContext) : 
-        IIdentityService
+        IIdentityService<RefreshToken>
     {
         
         /// <summary>
@@ -189,9 +189,9 @@ namespace TaskManagementApi.Application.Features.Authentication.Commands
             }
         }
 
-        /*public async Task<ResponseType<RefreshTokenResponseDto>> RefreshTokenAsync(string token, string refreshToken)
+        public async Task<ResponseType<AuthResultDto>> RefreshTokenAsync(string token, string refreshToken)
         {
-            ResponseType<RefreshTokenResponseDto> response = new();
+            ResponseType<AuthResultDto> response = new();
             //1. fine the user based on refresh token
             var storedRefreshToken = await _dbContext.RefreshTokens
                 .Include(rt => rt.User)
@@ -207,21 +207,51 @@ namespace TaskManagementApi.Application.Features.Authentication.Commands
 
             //2. Invalidate old token
             storedRefreshToken.Revoked = DateTime.UtcNow;
+            storedRefreshToken.RevokedByIp = "127.0.0.1";
             _dbContext.RefreshTokens.Update(storedRefreshToken);
 
-            //3. Generate ne tokens
-            var newAccessToken = await _tokenService.cre(storedRefreshToken)
+            var roles = (await _userManager.GetRolesAsync(storedRefreshToken.User)).ToList();
+
+
+            //3. Generate new tokens
+            var newJwtToken  = await _tokenService.GenerateTokenAsync(new TokenUserDto(
+                storedRefreshToken.UserId.ToString(),
+                storedRefreshToken.User.UserName!,
+                storedRefreshToken.User.Email!,
+                roles //Empty for now
+                ));
 
 
 
+            //Generate new RefreshToken
+            var newRefreshToken = _tokenService.GenerateRefreshToken();
+            //Adding new Refresh Token Instance object
+            var newDbToken = new RefreshToken
+            {
+                Id = newRefreshToken.Id,
+                Token = newRefreshToken.Token,
+                Expires = newRefreshToken.Expires,
+                Created = newRefreshToken.Created,
+                CreatedByIp = newRefreshToken.CreatedByIp,
+                UserId = storedRefreshToken.User.Id
+            };
 
-            var newAccessToken = storedRefreshToken.User.Id;
-            await _dbContext.RefreshTokens.AddAsync(storedRefreshToken);
+            //Save changes 
+            await _dbContext.RefreshTokens.AddAsync(newDbToken);
             await _dbContext.SaveChangesAsync();
 
 
+            
+
+            response.Success = true;
+            response.Message = "Successfully Generate and Add RefreshToken";
+            response.Data = new AuthResultDto(newJwtToken.Token, newJwtToken.ExpiresAt, newJwtToken.UserName, newJwtToken.Role);
             return response;
-        }*/
-        
+        }
+
+        public Task<ResponseType<List<RefreshToken>>> GetRefreshTokenAsync(Guid userId)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
