@@ -10,7 +10,7 @@ namespace TaskManagementApi.Application.Features.Authentication.Commands
     public record RegisterCommand(UserRegisterRequestDto dto) : IRequest<ResponseType<AuthResultDto>>;
 
     //Handling Request
-    public class RegisterCommandHandler(IIdentityService _identity) : IRequestHandler<RegisterCommand, ResponseType<AuthResultDto>>
+    public class RegisterCommandHandler(IIdentityService<AuthResultDto> _identity) : IRequestHandler<RegisterCommand, ResponseType<AuthResultDto>>
     {
         public async Task<ResponseType<AuthResultDto>> Handle(RegisterCommand request, CancellationToken cancellationToken)
         {
