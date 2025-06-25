@@ -1,4 +1,7 @@
-﻿using TaskManagementApi.Application.DTOs;
+﻿
+using System.Security.Claims;
+using TaskManagement.Infrastructures.Identity.Models;
+using TaskManagementApi.Application.DTOs;
 
 namespace TaskManagementApi.Application.Common.Interfaces.IAuthentication
 {
@@ -8,5 +11,8 @@ namespace TaskManagementApi.Application.Common.Interfaces.IAuthentication
     public interface ITokenService
     {
         Task<string> GenerateTokenAsync(TokenUserDto user);
+        RefreshToken GenerateRefreshToken(string ipAddress);
+        ClaimsPrincipal? GetPrincipalFromExpiredToken(string token);
+
     }
 }
