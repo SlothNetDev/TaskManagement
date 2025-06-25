@@ -22,20 +22,7 @@
     DateTime? Revoked,
     string? RevokedByIp,
     bool IsActive
-    )
-    {
-        public RefreshTokenResponseDto(string id, string token, DateTime expires, DateTime created, string createdByIp, DateTime? revoked, string? revokedByIp, bool isActive)
-        {
-            Id = id;
-            Token = token;
-            Expires = expires;
-            Created = created;
-            CreatedByIp = createdByIp;
-            Revoked = revoked;
-            RevokedByIp = revokedByIp;
-            IsActive = isActive;
-        }
-    }
+    );
 
     /// <summary>
     /// Represents a response for Refresh tokens but with no value token with it
