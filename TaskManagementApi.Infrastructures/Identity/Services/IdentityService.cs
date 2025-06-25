@@ -249,6 +249,7 @@ namespace TaskManagementApi.Application.Features.Authentication.Commands
                 newDbToken.Id,
                 newDbToken.Token,
                 newDbToken.Expires,
+                newDbToken.IsExpired,
                 newDbToken.Created,
                 newDbToken.CreatedByIp,
                 newDbToken.Revoked,
