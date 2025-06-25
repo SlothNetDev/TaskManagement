@@ -1,13 +1,8 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using TaskManagement.Infrastructures.Data;
 using TaskManagement.Infrastructures.Identity.Models;
 using TaskManagementApi.Application.Common.Interfaces.IAuthentication;
 using TaskManagementApi.Application.Common.Settings;
@@ -19,7 +14,7 @@ namespace TaskManagement.Infrastructures.Identity.Services
 {
     public class TokenService(JwtSettings _settings) : ITokenService
     {
-        public async Task<RefreshTokenResponseDto> GenerateRefreshToken()
+        public RefreshTokenResponseDto GenerateRefreshToken()
         {
             var refreshToken = new RefreshToken
             {
@@ -42,7 +37,7 @@ namespace TaskManagement.Infrastructures.Identity.Services
         );
         }
 
-        public Task<string> GenerateTokenAsync(TokenUserDto user)
+        public Task<AuthResultDto> GenerateTokenAsync(TokenUserDto user)
         {
             var claims = new List<Claim>
             {
@@ -64,7 +59,15 @@ namespace TaskManagement.Infrastructures.Identity.Services
                 claims: claims,
                 signingCredentials: creds);
 
-            return Task.FromResult(new JwtSecurityTokenHandler().WriteToken(token));
+            var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
+
+            var result = new AuthResultDto(
+                tokenString,
+                DateTime.UtcNow.AddMinutes(15),
+                user.UserName,
+                user.Roles.ToString() ?? string.Empty);
+
+            return Task.FromResult(result);
         }
 
 
