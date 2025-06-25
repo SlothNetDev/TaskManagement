@@ -13,11 +13,11 @@ namespace TaskManagementApi.Application.Features.Authentication.Commands
 {
     public record RefreshTokenCommand(string Token,string RefreshToken) : IRequest<ResponseType<RefreshTokenResponseDto>>;
 
-    public class RefreshTokenCommandHandler(IIdentityService _refreshToken) : IRequestHandler<RefreshTokenCommand, ResponseType<RefreshTokenResponseDto>>
+    public class RefreshTokenCommandHandler(IIdentityService<RefreshTokenResponseDto> _identityService) : IRequestHandler<RefreshTokenCommand, ResponseType<RefreshTokenResponseDto>>
     {
         public async Task<ResponseType<RefreshTokenResponseDto>> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
         {
-            return await _refreshToken.RefreshTokenAsync(request.Token,request.RefreshToken);
+            return await _identityService.RefreshTokenAsync(request.Token,request.RefreshToken);
         }
     }
 
