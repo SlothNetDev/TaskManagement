@@ -11,7 +11,7 @@ namespace TaskManagementApi.Application.Common.Interfaces.IAuthentication
     /// </summary>
     public interface ITokenService
     {
-        Task<string> GenerateTokenAsync(TokenUserDto user); 
+        Task<AuthResultDto> GenerateTokenAsync(TokenUserDto user); 
         RefreshTokenResponseDto GenerateRefreshToken();
     }
 }
