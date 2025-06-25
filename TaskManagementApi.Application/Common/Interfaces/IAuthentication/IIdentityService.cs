@@ -8,7 +8,7 @@ using TaskManagementApi.Domains.Wrapper;
 
 namespace TaskManagementApi.Application.Common.Interfaces.IAuthentication
 {
-    public interface IIdentityService<TRefreshTokenDto>
+    public interface IAuthService
     {
         /// <summary>
         /// Interface For Login Account Async
@@ -22,19 +22,6 @@ namespace TaskManagementApi.Application.Common.Interfaces.IAuthentication
         /// <param name="dto"></param>
         /// <returns>AuthResult Dto Response Type</returns>
         Task<ResponseType<AuthResultDto>> RegisterAsync(UserRegisterRequestDto dto);
-
-        /// <summary>
-        /// Generating Refresh Token for an Account
-        /// </summary>
-        /// <param name="token"></param>
-        /// <param name="refreshToken"></param>
-        /// <returns>AuthResponseDto </returns>
-        Task<ResponseType<RefreshTokenResponseDto>> RefreshTokenAsync(string token, string refreshToken);
-        /// <summary>
-        /// Get all RefreshToken of Accounts
-        /// </summary>
-        /// <param name="userId"></param>
-        /// <returns>List of Account RefreshToken</returns>
-        Task<ResponseType<List<TRefreshTokenDto>>> GetRefreshTokenAsync(Guid userId);
+ 
     }
 }
