@@ -14,7 +14,7 @@ namespace TaskManagementApi.Application.Features.Authentication.Commands
     public record LoginCommand(UserLoginRequestDto Dto) : IRequest<ResponseType<AuthResultDto>>;
 
     //Processing Request
-    public class LoginCommandHandler(IIdentityService<AuthResultDto> _identity) : IRequestHandler<LoginCommand, ResponseType<AuthResultDto>>
+    public class LoginCommandHandler(IAuthService _identity) : IRequestHandler<LoginCommand, ResponseType<AuthResultDto>>
     {
         public async Task<ResponseType<AuthResultDto>> Handle(LoginCommand request, CancellationToken cancellationToken)
         {
