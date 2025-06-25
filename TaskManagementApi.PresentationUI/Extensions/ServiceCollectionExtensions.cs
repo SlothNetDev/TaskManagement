@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http.Json;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Serilog;
 using Serilog.Events;
 using System.Text.Json.Serialization;
@@ -10,6 +11,7 @@ using TaskManagement.Infrastructures.Identity.Services;
 using TaskManagementApi.Application.Common.Interfaces.IAuthentication;
 using TaskManagementApi.Application.Common.Settings;
 using TaskManagementApi.Application.Features.Authentication.Commands;
+using TaskManagementApi.Application.Features.Authentication.DTOs;
 
 namespace TaskManagementApi.PresentationUI.Extensions
 {
@@ -33,8 +35,10 @@ namespace TaskManagementApi.PresentationUI.Extensions
             services.AddOpenApi();
 
              // CQRS Services (keep only what you actually use)
-            services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));
-            services.AddScoped<IIdentityService, IdentityService>();          
+            services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"))
+                .AddSingleton(sp => sp.GetRequiredService<IOptions<JwtSettings>>().Value);
+            services.AddScoped<IAuthService, IdentityService>();
+            services.AddScoped<IRefreshTokenService, RefreshTokenService>();
             services.AddScoped<ITokenService, TokenService>();
 
             // Identity

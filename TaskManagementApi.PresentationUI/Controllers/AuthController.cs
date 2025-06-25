@@ -32,6 +32,7 @@ namespace TaskManagementApi.PresentationUI.Controllers
             return Ok(new AuthResultDto(
                 result.Data.Token,
                 result.Data.ExpiresAt,
+                result.Data.RefreshToken,
                 result.Data.UserName,
                 result.Data.Role
             ));
@@ -50,6 +51,16 @@ namespace TaskManagementApi.PresentationUI.Controllers
                 
             
         }
-        
+        [HttpPost("refresh")]
+        public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenCommand command)
+        {
+            var result = await _mediator.Send(command);
+            if (!result.Success)
+            {
+                _logger.LogWarning("Something wrong from Refresh Token");
+                return BadRequest(result.Message);
+            }
+            return Ok(result);
+        }
     }
 }
