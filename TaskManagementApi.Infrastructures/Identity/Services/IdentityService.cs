@@ -1,24 +1,24 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using TaskManagement.Infrastructures.Data;
+using TaskManagement.Infrastructures.Identity.Models;
 using TaskManagementApi.Application.ApplicationHelpers;
 using TaskManagementApi.Application.Common.Interfaces.IAuthentication;
 using TaskManagementApi.Application.Common.Settings;
-using TaskManagementApi.Application.Features.Authentication.DTOs;
-using TaskManagementApi.Domains.Wrapper;
 using TaskManagementApi.Application.DTOs;
-using Microsoft.Extensions.Options;
+using TaskManagementApi.Application.Features.Authentication.DTOs;
 using TaskManagementApi.Domains.Entities;
-using TaskManagement.Infrastructures.Data;
-using TaskManagement.Infrastructures.Identity.Models;
+using TaskManagementApi.Domains.Wrapper;
 
 namespace TaskManagementApi.Application.Features.Authentication.Commands
 {
     public class IdentityService(IOptions<IdentitySettings> _identitySettings,ILogger<IdentityService> _logger,
-        UserManager<ApplicationUsers> _userManager,ITokenService _tokenService,TaskManagementDbContext _dbContext) : IIdentityService
+        UserManager<ApplicationUsers> _userManager,ITokenService _tokenService,TaskManagementDbContext _dbContext) : 
+        IIdentityService
     {
-       
         
-
         /// <summary>
         /// Registers a new user with a given role.
         /// </summary>
@@ -189,5 +189,39 @@ namespace TaskManagementApi.Application.Features.Authentication.Commands
             }
         }
 
+        /*public async Task<ResponseType<RefreshTokenResponseDto>> RefreshTokenAsync(string token, string refreshToken)
+        {
+            ResponseType<RefreshTokenResponseDto> response = new();
+            //1. fine the user based on refresh token
+            var storedRefreshToken = await _dbContext.RefreshTokens
+                .Include(rt => rt.User)
+                .FirstOrDefaultAsync(rt => rt.Token == refreshToken);
+
+            if(storedRefreshToken == null || !storedRefreshToken.IsActive)
+            {
+                _logger.LogInformation("Refresh token {Token} is not Available", storedRefreshToken);
+                response.Success = false;
+                response.Message = "Invalid or expired refresh token.";
+                return response;
+            }
+
+            //2. Invalidate old token
+            storedRefreshToken.Revoked = DateTime.UtcNow;
+            _dbContext.RefreshTokens.Update(storedRefreshToken);
+
+            //3. Generate ne tokens
+            var newAccessToken = await _tokenService.cre(storedRefreshToken)
+
+
+
+
+            var newAccessToken = storedRefreshToken.User.Id;
+            await _dbContext.RefreshTokens.AddAsync(storedRefreshToken);
+            await _dbContext.SaveChangesAsync();
+
+
+            return response;
+        }*/
+        
     }
 }

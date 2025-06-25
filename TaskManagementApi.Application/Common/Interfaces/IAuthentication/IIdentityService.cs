@@ -10,7 +10,9 @@ namespace TaskManagementApi.Application.Common.Interfaces.IAuthentication
 {
     public interface IIdentityService
     {
+        Task<ResponseType<RefreshTokenResponseDto>> RefreshTokenAsync(string token, string refreshToken);
         Task<ResponseType<AuthResultDto>> LoginAsync(UserLoginRequestDto dto);
         Task<ResponseType<AuthResultDto>> RegisterAsync(UserRegisterRequestDto dto);
+
     }
 }
