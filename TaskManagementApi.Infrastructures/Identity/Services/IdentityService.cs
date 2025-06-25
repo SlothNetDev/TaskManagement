@@ -189,9 +189,9 @@ namespace TaskManagementApi.Application.Features.Authentication.Commands
             }
         }
 
-        public async Task<ResponseType<AuthResultDto>> RefreshTokenAsync(string token, string refreshToken)
+        public async Task<ResponseType<RefreshTokenResponseDto>> RefreshTokenAsync(string token, string refreshToken)
         {
-            ResponseType<AuthResultDto> response = new();
+            ResponseType<RefreshTokenResponseDto> response = new();
             //1. fine the user based on refresh token
             var storedRefreshToken = await _dbContext.RefreshTokens
                 .Include(rt => rt.User)
@@ -245,7 +245,15 @@ namespace TaskManagementApi.Application.Features.Authentication.Commands
 
             response.Success = true;
             response.Message = "Successfully Generate and Add RefreshToken";
-            response.Data = new AuthResultDto(newJwtToken.Token, newJwtToken.ExpiresAt, newJwtToken.UserName, newJwtToken.Role);
+            response.Data = new RefreshTokenResponseDto(
+                newDbToken.Id,
+                newDbToken.Token,
+                newDbToken.Expires,
+                newDbToken.Created,
+                newDbToken.CreatedByIp,
+                newDbToken.Revoked,
+                newDbToken.RevokedByIp,
+                newDbToken.IsActive);
             return response;
         }
 
