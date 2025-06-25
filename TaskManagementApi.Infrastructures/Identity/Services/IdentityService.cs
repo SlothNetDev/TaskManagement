@@ -101,7 +101,7 @@ namespace TaskManagementApi.Application.Features.Authentication.Commands
             {
                 response.Success = true;
                 response.Message = "Successfully Register your Account";
-                response.Data = new AuthResultDto(token,expireAt,user.UserName ?? string.Empty,role);
+                response.Data = new AuthResultDto(token.Token,expireAt,user.UserName ?? string.Empty,role);
                 return response;
             }
             catch(Exception ex)
@@ -177,7 +177,7 @@ namespace TaskManagementApi.Application.Features.Authentication.Commands
                 _logger.LogInformation("User {UserId} logged in successfully. Role: {UserRole}", user.Id, userRole);
                 response.Success = true;
                 response.Message = "Successfully Login your Account";
-                response.Data = new AuthResultDto(token, expireAt, user.UserName ?? string.Empty , userRole);
+                response.Data = new AuthResultDto(token.Token, expireAt, user.UserName ?? string.Empty , userRole);
                 return response;
             }
             catch(Exception ex)
