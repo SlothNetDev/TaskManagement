@@ -28,8 +28,8 @@ namespace TaskManagementApi.Application.Common.Interfaces.IAuthentication
         /// </summary>
         /// <param name="token"></param>
         /// <param name="refreshToken"></param>
-        /// <returns>RefreshTokenResponseDto </returns>
-        Task<ResponseType<AuthResultDto>> RefreshTokenAsync(string token, string refreshToken);
+        /// <returns>AuthResponseDto </returns>
+        Task<ResponseType<RefreshTokenResponseDto>> RefreshTokenAsync(string token, string refreshToken);
         /// <summary>
         /// Get all RefreshToken of Accounts
         /// </summary>
