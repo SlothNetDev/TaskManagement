@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using TaskManagement.Infrastructures.Data.Configuration;
+using TaskManagement.Infrastructures.Data.Configurations;
 using TaskManagement.Infrastructures.Identity.Models;
 using TaskManagementApi.Domains.Entities;
 
@@ -19,6 +20,7 @@ namespace TaskManagement.Infrastructures.Data
             base.OnModelCreating(builder);
 
             builder.ApplyConfiguration(new CategoriesConfiguration());
+            builder.ApplyConfiguration(new RefreshTokenConfiguration());
             builder.ApplyConfiguration(new TasksConfiguration());
             builder.ApplyConfiguration(new UserConfiguration());
         }
