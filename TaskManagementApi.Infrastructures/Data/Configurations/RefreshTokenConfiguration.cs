@@ -8,7 +8,7 @@ namespace TaskManagement.Infrastructures.Data.Configurations
     {
         public void Configure(EntityTypeBuilder<RefreshToken> builder)
         {
-            builder.ToTable("Refresh Toke"); //table name
+            builder.ToTable("Refresh Token"); //table name
             builder.HasKey(x => x.Id); //setting as id
 
             //relationships
