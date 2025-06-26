@@ -1,14 +1,19 @@
-﻿using Microsoft.AspNetCore.Http.Json;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Http.Json;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using Serilog;
 using Serilog.Events;
+using System.Text;
 using System.Text.Json.Serialization;
 using TaskManagement.Infrastructures.Data;
 using TaskManagement.Infrastructures.Identity.Models;
 using TaskManagement.Infrastructures.Identity.Services;
 using TaskManagementApi.Application.Common.Interfaces.IAuthentication;
+using TaskManagementApi.Application.Common.Interfaces.IUser;
 using TaskManagementApi.Application.Common.Settings;
 using TaskManagementApi.Application.Features.Authentication.Commands;
 using TaskManagementApi.Application.Features.Authentication.DTOs;
@@ -40,6 +45,7 @@ namespace TaskManagementApi.PresentationUI.Extensions
             services.AddScoped<IAuthService, IdentityService>();
             services.AddScoped<IRefreshTokenService, RefreshTokenService>();
             services.AddScoped<ITokenService, TokenService>();
+            services.AddScoped<IUserService, UserService>();
 
             // Identity
             services.AddCustomIdentity();
@@ -48,8 +54,11 @@ namespace TaskManagementApi.PresentationUI.Extensions
             services.Configure<IdentitySettings>(
                 configuration.GetSection("IdentitySettings"));
 
-            //Authentication/Autherization
-            services.AddAuthentication();
+            //Adding swaggers config
+            Swaggers(services);
+
+            //add authnetication
+            AddAuthentication(services, configuration);
             services.AddAuthorization();
             services.AddHttpContextAccessor();
             //mediaR
@@ -94,6 +103,64 @@ namespace TaskManagementApi.PresentationUI.Extensions
                 .AddDefaultTokenProviders()
                 .AddEntityFrameworkStores<TaskManagementDbContext>();
         }
+
+        private static void Swaggers(IServiceCollection services)
+        {
+            services.AddSwaggerGen(options =>
+            {
+                // Add JWT Authentication to Swagger
+                options.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+                {
+                    Name = "Authorization",
+                    Type = Microsoft.OpenApi.Models.SecuritySchemeType.ApiKey,
+                    Scheme = "Bearer",
+                    BearerFormat = "JWT",
+                    In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+                    Description = "Enter your JWT token below with `Bearer` prefix. Example: `Bearer eyJhbGci...`"
+                });
+
+                options.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
+                {
+                    {
+                        new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+                        {
+                            Reference = new Microsoft.OpenApi.Models.OpenApiReference
+                            {
+                                Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            }
+                        },
+                        Array.Empty<string>()
+                    }
+                });
+            });
+
+        }
+
+        private static void AddAuthentication(IServiceCollection services,IConfiguration configuration)
+        {
+            //Authentication/Authorization
+            services.AddAuthentication(options =>
+            {
+                //  Force default to JWT Bearer instead of Identity.Application (cookie)
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
+            {
+                var jwtSettings = configuration.GetSection("JwtSettings").Get<JwtSettings>();
+            
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = jwtSettings.Issuer,
+                    ValidAudience = jwtSettings.Audience,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Key))
+                };
+            });
+        }
            
     }
     public static class SerilogExtensions
@@ -111,4 +178,6 @@ namespace TaskManagementApi.PresentationUI.Extensions
             return builder;
         }
     }
+
+   
 }
