@@ -51,7 +51,7 @@ namespace TaskManagementApi.PresentationUI.Extensions
             //Authentication/Autherization
             services.AddAuthentication();
             services.AddAuthorization();
-
+            services.AddHttpContextAccessor();
             //mediaR
             services.AddMediatR(x =>
             {
