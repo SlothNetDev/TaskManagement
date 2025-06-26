@@ -25,9 +25,9 @@ namespace TaskManagementApi.Application.Features.Authentication.Commands
         /// <param name="dto">The user's registration data.</param>
         /// <param name="role">The role to assign to the user (e.g. "User").</param>
         /// <returns>A DTO containing token and user info if registration succeeds.</returns>
-        public async Task<ResponseType<AuthResultDto>> RegisterAsync(UserRegisterRequestDto registerDto)
+        public async Task<ResponseType<string>> RegisterAsync(UserRegisterRequestDto registerDto)
         {
-            ResponseType<AuthResultDto> response = new();
+            ResponseType<string> response = new();
 
             var validationErrors = ModelValidation.ModelValidationResponse(registerDto);
             if (validationErrors.Any())
@@ -87,21 +87,11 @@ namespace TaskManagementApi.Application.Features.Authentication.Commands
             await _userManager.AddToRoleAsync(user, role);
 
 
-            //7. Generate JWT token 
-            var token = await _tokenService.GenerateTokenAsync(new TokenUserDto(
-                user.Id.ToString(),
-                user.UserName ?? string.Empty,
-                user.Email ?? string.Empty,
-                new List<string>{ "User"}));
-
-            //8.Expired Time
-            DateTime expireAt = DateTime.UtcNow.AddDays(7);
-
             try
             {
+                _logger.LogInformation("Successfully Register Account Email {id}", user.Email);
                 response.Success = true;
-                response.Message = "Successfully Register your Account";
-                response.Data = new AuthResultDto(token.Token,expireAt,token.RefreshToken,user.UserName ?? string.Empty,role);
+                response.Message = "Successfully Register your Account";     
                 return response;
             }
             catch(Exception ex)
