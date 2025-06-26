@@ -45,4 +45,21 @@
     string? RevokedByIp,
     bool IsActive
     );
+
+
+    /// <summary>
+    /// Response Type for User Dto
+    /// </summary>
+    /// <param name="Token"></param>
+    /// <param name="ExpiresAt"></param>
+    /// <param name="RefreshToken"></param>
+    /// <param name="UserName"></param>
+    /// <param name="Role"></param>
+    public record AuthResultDto(
+    string Token,
+    DateTime ExpiresAt,
+    string RefreshToken,
+    string UserName,
+    string Role
+    );
 }
