@@ -1,8 +1,11 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using TaskManagement.Infrastructures.Data;
 using TaskManagement.Infrastructures.Identity.Models;
 using TaskManagementApi.Application.Common.Interfaces.IAuthentication;
 using TaskManagementApi.Application.Common.Settings;
@@ -12,66 +15,87 @@ using TaskManagementApi.Domains.Wrapper;
 
 namespace TaskManagement.Infrastructures.Identity.Services
 {
-    public class TokenService(JwtSettings _settings) : ITokenService
+    public class TokenService(
+    JwtSettings _settings,
+    TaskManagementDbContext _dbContext,
+    IHttpContextAccessor _httpContextAccessor) : ITokenService
     {
-        public RefreshTokenResponseDto GenerateRefreshToken()
-        {
-            var refreshToken = new RefreshToken
-            {
-                Id = Guid.NewGuid().ToString(),
-                Token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)),
-                Expires = DateTime.UtcNow.AddDays(7),
-                Created = DateTime.UtcNow,
-                CreatedByIp = "127.0.0.1"
-            };
-            return new RefreshTokenResponseDto(
-            refreshToken.Id,
-            refreshToken.Token,
-            refreshToken.Expires,
-            refreshToken.IsExpired,
-            refreshToken.Created,
-            refreshToken.CreatedByIp,
-            refreshToken.Revoked,
-            refreshToken.RevokedByIp,
-            refreshToken.IsActive
-        );
-        }
-
-        public Task<AuthResultDto> GenerateTokenAsync(TokenUserDto user)
+        public async Task<AuthResultDto> GenerateTokenAsync(TokenUserDto user)
         {
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.NameIdentifier, user.UserId),
-                new Claim(ClaimTypes.Name, user.UserName),
-                new Claim(ClaimTypes.Email, user.Email),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+                new(ClaimTypes.NameIdentifier, user.UserId),
+                new(ClaimTypes.Name, user.UserName),
+                new(ClaimTypes.Email, user.Email),
+                new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
-
-            claims.AddRange(user.Roles.Select(r => new Claim(ClaimTypes.Role, r)));
-
+    
+            claims.AddRange(user.Roles.Select(role => new Claim(ClaimTypes.Role, role)));
+    
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_settings.Key));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-            var token = new JwtSecurityToken(
+    
+            var jwtToken = new JwtSecurityToken(
                 issuer: _settings.Issuer,
                 audience: _settings.Audience,
-                expires: DateTime.UtcNow.AddDays(7),
+                expires: DateTime.UtcNow.AddMinutes(15),
                 claims: claims,
                 signingCredentials: creds);
-
-            var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
-
-            var result = new AuthResultDto(
+    
+            var tokenString = new JwtSecurityTokenHandler().WriteToken(jwtToken);
+            var refreshTokenDto = GenerateRefreshToken(user.UserId, GetIpAddress());
+    
+            var refreshToken = MapToEntity(refreshTokenDto, Guid.Parse(user.UserId));
+            await _dbContext.RefreshTokens.AddAsync(refreshToken);
+            await _dbContext.SaveChangesAsync();
+    
+            return new AuthResultDto(
                 tokenString,
-                DateTime.UtcNow.AddMinutes(15),
+                jwtToken.ValidTo,
+                refreshTokenDto.Token,
                 user.UserName,
-                user.Roles.ToString() ?? string.Empty);
-
-            return Task.FromResult(result);
+                string.Join(",", user.Roles));
         }
+    
+        public RefreshTokenResponseDto GenerateRefreshToken(string userId, string ipAddress)
+        {
+            var token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
+            var created = DateTime.UtcNow;
+    
+            return new RefreshTokenResponseDto(
+                Guid.NewGuid().ToString(),
+                token,
+                created.AddDays(7),
+                false,
+                created,
+                ipAddress,
+                null,
+                null,
+                true
+            );
+        }
+    
+        private RefreshToken MapToEntity(RefreshTokenResponseDto dto, Guid userId) =>
+            new()
+            {
+                Id = dto.Id,
+                Token = dto.Token,
+                Expires = dto.Expires,
+                Created = dto.Created,
+                CreatedByIp = dto.CreatedByIp,
+                UserId = userId,
+                Revoked = dto.Revoked,
+                RevokedByIp = dto.RevokedByIp
+            };
+    
+        private string GetIpAddress() =>
+            _httpContextAccessor.HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? "Unknown";
+
+      
+    }
 
 
         
-    }
+    
 
 }
