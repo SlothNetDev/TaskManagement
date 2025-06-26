@@ -21,7 +21,7 @@ namespace TaskManagementApi.Application.Common.Interfaces.IAuthentication
         /// </summary>
         /// <param name="dto"></param>
         /// <returns>AuthResult Dto Response Type</returns>
-        Task<ResponseType<AuthResultDto>> RegisterAsync(UserRegisterRequestDto dto);
+        Task<ResponseType<string>> RegisterAsync(UserRegisterRequestDto dto);
  
     }
 }
