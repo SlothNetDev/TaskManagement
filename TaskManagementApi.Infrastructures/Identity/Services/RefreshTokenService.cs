@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
@@ -8,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TaskManagement.Infrastructures.Data;
 using TaskManagement.Infrastructures.Identity.Models;
+using TaskManagement.Infrastructures.InfrustructureHelper;
 using TaskManagementApi.Application.Common.Interfaces.IAuthentication;
 using TaskManagementApi.Application.DTOs;
 using TaskManagementApi.Application.Features.Authentication.DTOs;
@@ -19,7 +21,8 @@ namespace TaskManagement.Infrastructures.Identity.Services
     TaskManagementDbContext _dbContext,
     UserManager<ApplicationUsers> _userManager,
     ILogger<RefreshTokenService> _logger,
-    ITokenService _tokenService) : IRefreshTokenService
+    ITokenService _tokenService,
+    IHttpContextAccessor _httpContextAccessor) : IRefreshTokenService
     {
         public async Task<ResponseType<RefreshTokenResponseDto>> RefreshTokenAsync(string token, string refreshToken)
         {
@@ -70,6 +73,37 @@ namespace TaskManagement.Infrastructures.Identity.Services
         public Task<ResponseType<List<RefreshTokenResponseDto>>> GetRefreshTokenAsync(Guid userId)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<ResponseType<string>> LogoutAsync(LogOutRequestDto dto)
+        {
+            var IpAddress = new IPadressHelper(_httpContextAccessor);
+            var response = new ResponseType<string>();
+
+            //Finding the refresh Token in database first
+            var token = _dbContext.RefreshTokens
+                .FirstOrDefault(x => x.Token == dto.Token);
+
+            if(token == null || token.IsExpired || token.Revoked != null)
+            {
+                _logger.LogWarning("Attempt to logout with invalid or already revoked refresh token.");
+                response.Success = false;
+                response.Message = "Invalid or already revoked refresh token.";
+                return response;
+            }
+
+            //Mark the token as Revoked
+            token.Revoked = DateTime.UtcNow;
+            token.RevokedByIp = IpAddress.GetIpAddress();
+
+            //Update to database
+            _dbContext.Update(token);
+            await _dbContext.SaveChangesAsync();
+
+             _logger.LogInformation("Refresh token: {tokens} successfully revoked for logout.",token.Token);
+            response.Success = true;
+            response.Message = "Logout successful. Refresh token revoked.";
+            return response;
         }
     }
 
