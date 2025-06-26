@@ -24,6 +24,12 @@ namespace TaskManagement.Infrastructures.Identity.Services
     ITokenService _tokenService,
     IHttpContextAccessor _httpContextAccessor) : IRefreshTokenService
     {
+        /// <summary>
+        /// Creating Refresh Token
+        /// </summary>
+        /// <param name="token"></param>
+        /// <param name="refreshToken"></param>
+        /// <returns>Refresh Token ResponseDto</returns>
         public async Task<ResponseType<RefreshTokenResponseDto>> RefreshTokenAsync(string token, string refreshToken)
         {
             var response = new ResponseType<RefreshTokenResponseDto>();
@@ -69,12 +75,46 @@ namespace TaskManagement.Infrastructures.Identity.Services
             return response;
     
         }
-    
-        public Task<ResponseType<List<RefreshTokenResponseDto>>> GetRefreshTokenAsync(Guid userId)
+        
+        //Implementing GetAll list of Refresh Token
+        public async Task<ResponseType<List<RefreshTokenResponseDto>>> GetRefreshTokenAsync(Guid userId)
         {
-            throw new NotImplementedException();
+            ResponseType<List<RefreshTokenResponseDto>> response = new();
+
+            if(await _dbContext.RefreshTokens.CountAsync() <= 0)
+            {
+                _logger.LogInformation($"Current Post {_dbContext.RefreshTokens.Count()}");
+                response.Success = false;
+                response.Message = "No Blogs Found Found, Create One First";
+                return response;
+            }
+            try
+            {
+                var tokenAsQuery = await _dbContext.RefreshTokens
+                    .Select(token => new RefreshTokenResponseDto(
+                        token.Id, token.Token, token.Expires, token.IsExpired, token.Created, token.CreatedByIp,
+                    token.Revoked, token.RevokedByIp, token.IsActive)).ToListAsync();
+                    
+                _logger.LogInformation($"Successfully Display All Blogs ");
+                response.Success = true;
+                response.Data = tokenAsQuery;
+                response.Message = "Successfully Display all Blogs";
+                return response;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"{ex} Cannot Get All Blogs");
+                response.Success = false;
+                response.Message = ex.Message;
+                return response;
+            }
         }
 
+        /// <summary>
+        /// Logging out Services
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns>string as response</returns>
         public async Task<ResponseType<string>> LogoutAsync(LogOutRequestDto dto)
         {
             var IpAddress = new IPadressHelper(_httpContextAccessor);
@@ -100,7 +140,7 @@ namespace TaskManagement.Infrastructures.Identity.Services
             _dbContext.Update(token);
             await _dbContext.SaveChangesAsync();
 
-             _logger.LogInformation("Refresh token: {tokens} successfully revoked for logout.",token.Token);
+            _logger.LogInformation("Refresh token: {tokens} successfully revoked for logout.",token.Token);
             response.Success = true;
             response.Message = "Logout successful. Refresh token revoked.";
             return response;
