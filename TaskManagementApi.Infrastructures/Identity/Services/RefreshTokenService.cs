@@ -33,7 +33,7 @@ namespace TaskManagement.Infrastructures.Identity.Services
         public async Task<ResponseType<RefreshTokenResponseDto>> RefreshTokenAsync(string token, string refreshToken)
         {
             var response = new ResponseType<RefreshTokenResponseDto>();
-    
+            var IpAddress = new IPadressHelper(_httpContextAccessor);
             var storedToken = await _dbContext.RefreshTokens
                 .Include(r => r.User)
                 .FirstOrDefaultAsync(r => r.Token == refreshToken);
@@ -46,7 +46,7 @@ namespace TaskManagement.Infrastructures.Identity.Services
             }
     
             storedToken.Revoked = DateTime.UtcNow;
-            storedToken.RevokedByIp = "127.0.0.1"; // Optional: Capture actual IP
+            storedToken.RevokedByIp = IpAddress.GetIpAddress(); // Optional: Capture actual IP
             _dbContext.RefreshTokens.Update(storedToken);
     
             var roles = (await _userManager.GetRolesAsync(storedToken.User)).ToList();
@@ -59,7 +59,7 @@ namespace TaskManagement.Infrastructures.Identity.Services
             ));
     
             await _dbContext.SaveChangesAsync();
-    
+            response.Success = true;
             response.Message = "Successfully Refresh The Token";
             response.Data = (new RefreshTokenResponseDto(
                 storedToken.Id,
