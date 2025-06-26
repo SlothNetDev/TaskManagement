@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TaskManagementApi.Application.Features.Authentication.Commands;
 using TaskManagementApi.Application.Features.Authentication.DTOs;
@@ -8,15 +9,18 @@ namespace TaskManagementApi.PresentationUI.Controllers
     
     [ApiController]
     [Route("auth")]
-    public class AuthController : ControllerBase
+    [Authorize]
+    public class DashboardController : ControllerBase
     {
         private readonly IMediator _mediator;
-        private readonly ILogger<AuthController> _logger;
-        public AuthController(IMediator mediator,ILogger<AuthController> logger)
+        private readonly ILogger<DashboardController> _logger;
+        public DashboardController(IMediator mediator,ILogger<DashboardController> logger)
         {
             _mediator = mediator;
             _logger = logger;
         }
+
+        [AllowAnonymous]
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterRequestDto request)
         {
@@ -29,9 +33,10 @@ namespace TaskManagementApi.PresentationUI.Controllers
             }
         
             _logger.LogInformation("User registered Successfully");
-            return Ok(request);
+            return Ok(result);
         }
 
+        [AllowAnonymous]
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequestDto request)
         {
@@ -45,6 +50,8 @@ namespace TaskManagementApi.PresentationUI.Controllers
                 
             
         }
+
+        [Authorize]
         [HttpPost("refresh")]
         public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenCommand command)
         {
@@ -57,6 +64,8 @@ namespace TaskManagementApi.PresentationUI.Controllers
             }
             return Ok(result);
         }
+
+        [Authorize]
         [HttpPost("logOut")]
         public async Task<IActionResult> LogOut([FromBody] LogOutCommand command)
         {
