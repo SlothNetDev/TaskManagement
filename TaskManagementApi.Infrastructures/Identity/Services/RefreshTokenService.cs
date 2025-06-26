@@ -2,6 +2,11 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using TaskManagement.Infrastructures.Data;
 using TaskManagement.Infrastructures.Identity.Models;
 using TaskManagement.Infrastructures.InfrustructureHelper;
@@ -9,7 +14,6 @@ using TaskManagementApi.Application.Common.Interfaces.IAuthentication;
 using TaskManagementApi.Application.DTOs;
 using TaskManagementApi.Application.Features.Authentication.DTOs;
 using TaskManagementApi.Domains.Wrapper;
-using static TaskManagementApi.Application.Features.Authentication.DTOs.UserDto;
 
 namespace TaskManagement.Infrastructures.Identity.Services
 {
