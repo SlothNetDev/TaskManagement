@@ -52,7 +52,7 @@ namespace TaskManagementApi.Application.Features.Authentication.Commands
             }
 
             //2. creating domain users 
-            var domainUser = new Users();
+            var domainUser = new TaskUsers();
 
 
             //3. Create User By new ApplicationUser Object
