@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TaskManagementApi.Application.Features.Authentication.DTOs;
 using TaskManagementApi.Domains.Wrapper;
+using static TaskManagementApi.Application.Features.Authentication.DTOs.UserDto;
 
 namespace TaskManagementApi.Application.Common.Interfaces.IAuthentication
 {
