@@ -63,5 +63,17 @@ namespace TaskManagementApi.PresentationUI.Controllers
             }
             return Ok(result);
         }
+        [HttpPost("logOut")]
+        public async Task<IActionResult> LogOut([FromBody] LogOutCommand command)
+        {
+            var result = await _mediator.Send(command);
+            if (!result.Success)
+            {
+                _logger.LogWarning("Cannot Logout Account Id: {ID}", result.Data);
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
+        
     }
 }
