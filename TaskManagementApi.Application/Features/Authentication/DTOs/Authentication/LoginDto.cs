@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TaskManagementApi.Application.Features.Authentication.DTOs
+namespace TaskManagementApi.Application.Features.Authentication.DTOs.Authentication
 {
-     public record UserLoginRequestDto(
+     public record LoginRequestDto(
         [Required(ErrorMessage = "Email is Required")] // Or use Email if you allow login by email
         string Email,
 

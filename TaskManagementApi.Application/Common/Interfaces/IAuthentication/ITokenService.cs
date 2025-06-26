@@ -1,7 +1,7 @@
 ﻿
 using System.Security.Claims;
 using TaskManagementApi.Application.DTOs;
-using TaskManagementApi.Application.Features.Authentication.DTOs;
+using TaskManagementApi.Application.Features.Authentication.DTOs.Authentication;
 using TaskManagementApi.Domains.Wrapper;
 
 namespace TaskManagementApi.Application.Common.Interfaces.IAuthentication

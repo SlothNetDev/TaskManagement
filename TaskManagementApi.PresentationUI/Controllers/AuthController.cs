@@ -1,7 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using TaskManagementApi.Application.Features.Authentication.Commands;
-using TaskManagementApi.Application.Features.Authentication.DTOs;
+using TaskManagementApi.Application.Features.Authentication.DTOs.Authentication;
 
 namespace TaskManagementApi.PresentationUI.Controllers
 {
@@ -18,7 +18,7 @@ namespace TaskManagementApi.PresentationUI.Controllers
             _logger = logger;
         }
         [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] UserRegisterRequestDto request)
+        public async Task<IActionResult> Register([FromBody] RegisterRequestDto request)
         {
             var result = await _mediator.Send(new RegisterCommand(request));
         
@@ -33,7 +33,7 @@ namespace TaskManagementApi.PresentationUI.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] UserLoginRequestDto request)
+        public async Task<IActionResult> Login([FromBody] LoginRequestDto request)
         {
             var result = await _mediator.Send(new LoginCommand(request));
             if (!result.Success)

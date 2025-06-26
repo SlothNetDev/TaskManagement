@@ -8,7 +8,7 @@ using TaskManagementApi.Application.ApplicationHelpers;
 using TaskManagementApi.Application.Common.Interfaces.IAuthentication;
 using TaskManagementApi.Application.Common.Settings;
 using TaskManagementApi.Application.DTOs;
-using TaskManagementApi.Application.Features.Authentication.DTOs;
+using TaskManagementApi.Application.Features.Authentication.DTOs.Authentication;
 using TaskManagementApi.Domains.Entities;
 using TaskManagementApi.Domains.Wrapper;
 
@@ -25,7 +25,7 @@ namespace TaskManagementApi.Application.Features.Authentication.Commands
         /// <param name="dto">The user's registration data.</param>
         /// <param name="role">The role to assign to the user (e.g. "User").</param>
         /// <returns>A DTO containing token and user info if registration succeeds.</returns>
-        public async Task<ResponseType<string>> RegisterAsync(UserRegisterRequestDto registerDto)
+        public async Task<ResponseType<string>> RegisterAsync(RegisterRequestDto registerDto)
         {
             ResponseType<string> response = new();
 
@@ -107,7 +107,7 @@ namespace TaskManagementApi.Application.Features.Authentication.Commands
         /// </summary>
         /// <param name="loginDto"></param>
         /// <returns>A DTO containing token and user info if Login succeeds.</returns>
-        public async Task<ResponseType<AuthResultDto>> LoginAsync(UserLoginRequestDto loginDto)
+        public async Task<ResponseType<AuthResultDto>> LoginAsync(LoginRequestDto loginDto)
         {
             var response = new ResponseType<AuthResultDto>();
 
