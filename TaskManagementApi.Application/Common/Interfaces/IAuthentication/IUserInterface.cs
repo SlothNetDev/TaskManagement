@@ -10,6 +10,6 @@ namespace TaskManagementApi.Application.Common.Interfaces.IAuthentication
 {
     public interface IUserInterface
     {
-        Task<ResponseType<UserProfileDto>> UserProfile();
+        Task<ResponseType<UserProfileDto>> UserProfileAsync();
     }
 }
