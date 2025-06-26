@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace TaskManagementApi.Application.Features.Authentication.DTOs.Users
+namespace TaskManagementApi.Application.Features.Users.DTOs
 {
     /// <summary>
     /// Used for HTTPatch 

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TaskManagementApi.Application.Features.Authentication.DTOs.Authentication
+namespace TaskManagementApi.Application.Features.Authentication.DTOs
 {
     /// <summary>
     /// Logging out Request

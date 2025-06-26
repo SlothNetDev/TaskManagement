@@ -1,4 +1,4 @@
-﻿namespace TaskManagementApi.Application.Features.Authentication.DTOs.Authentication
+﻿namespace TaskManagementApi.Application.Features.Authentication.DTOs
 {
     /// <summary>
     /// Represents the response for Refresh token Response

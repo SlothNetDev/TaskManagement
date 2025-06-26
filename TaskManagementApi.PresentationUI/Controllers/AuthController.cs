@@ -1,7 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using TaskManagementApi.Application.Features.Authentication.Commands;
-using TaskManagementApi.Application.Features.Authentication.DTOs.Authentication;
+using TaskManagementApi.Application.Features.Authentication.DTOs;
 
 namespace TaskManagementApi.PresentationUI.Controllers
 {

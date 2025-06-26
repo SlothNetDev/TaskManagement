@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TaskManagementApi.Application.Features.Authentication.DTOs.Users
+namespace TaskManagementApi.Application.Features.Users.DTOs
 {
 
     /// <summary>

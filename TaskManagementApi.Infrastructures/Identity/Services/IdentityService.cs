@@ -8,7 +8,7 @@ using TaskManagementApi.Application.ApplicationHelpers;
 using TaskManagementApi.Application.Common.Interfaces.IAuthentication;
 using TaskManagementApi.Application.Common.Settings;
 using TaskManagementApi.Application.DTOs;
-using TaskManagementApi.Application.Features.Authentication.DTOs.Authentication;
+using TaskManagementApi.Application.Features.Authentication.DTOs;
 using TaskManagementApi.Domains.Entities;
 using TaskManagementApi.Domains.Wrapper;
 
