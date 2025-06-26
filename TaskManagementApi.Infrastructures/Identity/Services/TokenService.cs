@@ -45,7 +45,7 @@ namespace TaskManagement.Infrastructures.Identity.Services
                 signingCredentials: creds);
     
             var tokenString = new JwtSecurityTokenHandler().WriteToken(jwtToken);
-            var refreshTokenDto = GenerateRefreshToken(user.UserId, IpAddress.GetIpAddress();
+            var refreshTokenDto = GenerateRefreshToken(user.UserId, IpAddress.GetIpAddress());
     
             var refreshToken = MapToEntity(refreshTokenDto, Guid.Parse(user.UserId));
             await _dbContext.RefreshTokens.AddAsync(refreshToken);
