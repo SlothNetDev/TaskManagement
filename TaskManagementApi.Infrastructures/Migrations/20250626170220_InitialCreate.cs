@@ -29,14 +29,14 @@ namespace TaskManagement.Infrastructures.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Users",
+                name: "TaskUsers",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Users", x => x.Id);
+                    table.PrimaryKey("PK_TaskUsers", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -73,9 +73,9 @@ namespace TaskManagement.Infrastructures.Migrations
                 {
                     table.PrimaryKey("PK_Categories", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Categories_Users_UserId",
+                        name: "FK_Categories_TaskUsers_UserId",
                         column: x => x.UserId,
-                        principalTable: "Users",
+                        principalTable: "TaskUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -107,9 +107,9 @@ namespace TaskManagement.Infrastructures.Migrations
                 {
                     table.PrimaryKey("PK_User_Type", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_User_Type_Users_DomainUserId",
+                        name: "FK_User_Type_TaskUsers_DomainUserId",
                         column: x => x.DomainUserId,
-                        principalTable: "Users",
+                        principalTable: "TaskUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -138,9 +138,9 @@ namespace TaskManagement.Infrastructures.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Tasks_Users_UserId",
+                        name: "FK_Tasks_TaskUsers_UserId",
                         column: x => x.UserId,
-                        principalTable: "Users",
+                        principalTable: "TaskUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -230,6 +230,30 @@ namespace TaskManagement.Infrastructures.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "Refresh Token",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Token = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Expires = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Created = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedByIp = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Revoked = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    RevokedByIp = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Refresh Token", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Refresh Token_User_Type_UserId",
+                        column: x => x.UserId,
+                        principalTable: "User_Type",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
@@ -260,6 +284,11 @@ namespace TaskManagement.Infrastructures.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Categories_UserId",
                 table: "Categories",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Refresh Token_UserId",
+                table: "Refresh Token",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
@@ -310,6 +339,9 @@ namespace TaskManagement.Infrastructures.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "Refresh Token");
+
+            migrationBuilder.DropTable(
                 name: "Tasks");
 
             migrationBuilder.DropTable(
@@ -322,7 +354,7 @@ namespace TaskManagement.Infrastructures.Migrations
                 name: "Categories");
 
             migrationBuilder.DropTable(
-                name: "Users");
+                name: "TaskUsers");
         }
     }
 }

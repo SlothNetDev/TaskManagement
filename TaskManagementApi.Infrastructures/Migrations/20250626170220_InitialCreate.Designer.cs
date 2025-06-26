@@ -12,7 +12,7 @@ using TaskManagement.Infrastructures.Data;
 namespace TaskManagement.Infrastructures.Migrations
 {
     [DbContext(typeof(TaskManagementDbContext))]
-    [Migration("20250624204552_InitialCreate")]
+    [Migration("20250626170220_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -128,7 +128,7 @@ namespace TaskManagement.Infrastructures.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("TaskManagement.Infrastructures.Identity.ApplicationRole", b =>
+            modelBuilder.Entity("TaskManagement.Infrastructures.Identity.Models.ApplicationRole", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -166,7 +166,7 @@ namespace TaskManagement.Infrastructures.Migrations
                     b.ToTable("AspNetRoles", (string)null);
                 });
 
-            modelBuilder.Entity("TaskManagement.Infrastructures.Identity.ApplicationUsers", b =>
+            modelBuilder.Entity("TaskManagement.Infrastructures.Identity.Models.ApplicationUsers", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -246,6 +246,41 @@ namespace TaskManagement.Infrastructures.Migrations
                     b.ToTable("User_Type", (string)null);
                 });
 
+            modelBuilder.Entity("TaskManagement.Infrastructures.Identity.Models.RefreshToken", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedByIp")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("Expires")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("Revoked")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("RevokedByIp")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Refresh Token", (string)null);
+                });
+
             modelBuilder.Entity("TaskManagementApi.Domains.Entities.Category", b =>
                 {
                     b.Property<Guid>("Id")
@@ -315,7 +350,7 @@ namespace TaskManagement.Infrastructures.Migrations
                     b.ToTable("Tasks", (string)null);
                 });
 
-            modelBuilder.Entity("TaskManagementApi.Domains.Entities.Users", b =>
+            modelBuilder.Entity("TaskManagementApi.Domains.Entities.TaskUsers", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -323,12 +358,12 @@ namespace TaskManagement.Infrastructures.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users");
+                    b.ToTable("TaskUsers");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
-                    b.HasOne("TaskManagement.Infrastructures.Identity.ApplicationRole", null)
+                    b.HasOne("TaskManagement.Infrastructures.Identity.Models.ApplicationRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -337,7 +372,7 @@ namespace TaskManagement.Infrastructures.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Guid>", b =>
                 {
-                    b.HasOne("TaskManagement.Infrastructures.Identity.ApplicationUsers", null)
+                    b.HasOne("TaskManagement.Infrastructures.Identity.Models.ApplicationUsers", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -346,7 +381,7 @@ namespace TaskManagement.Infrastructures.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<System.Guid>", b =>
                 {
-                    b.HasOne("TaskManagement.Infrastructures.Identity.ApplicationUsers", null)
+                    b.HasOne("TaskManagement.Infrastructures.Identity.Models.ApplicationUsers", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -355,13 +390,13 @@ namespace TaskManagement.Infrastructures.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<System.Guid>", b =>
                 {
-                    b.HasOne("TaskManagement.Infrastructures.Identity.ApplicationRole", null)
+                    b.HasOne("TaskManagement.Infrastructures.Identity.Models.ApplicationRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("TaskManagement.Infrastructures.Identity.ApplicationUsers", null)
+                    b.HasOne("TaskManagement.Infrastructures.Identity.Models.ApplicationUsers", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -370,27 +405,38 @@ namespace TaskManagement.Infrastructures.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Guid>", b =>
                 {
-                    b.HasOne("TaskManagement.Infrastructures.Identity.ApplicationUsers", null)
+                    b.HasOne("TaskManagement.Infrastructures.Identity.Models.ApplicationUsers", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("TaskManagement.Infrastructures.Identity.ApplicationUsers", b =>
+            modelBuilder.Entity("TaskManagement.Infrastructures.Identity.Models.ApplicationUsers", b =>
                 {
-                    b.HasOne("TaskManagementApi.Domains.Entities.Users", "DomainUser")
+                    b.HasOne("TaskManagementApi.Domains.Entities.TaskUsers", "DomainUser")
                         .WithOne()
-                        .HasForeignKey("TaskManagement.Infrastructures.Identity.ApplicationUsers", "DomainUserId")
+                        .HasForeignKey("TaskManagement.Infrastructures.Identity.Models.ApplicationUsers", "DomainUserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("DomainUser");
                 });
 
+            modelBuilder.Entity("TaskManagement.Infrastructures.Identity.Models.RefreshToken", b =>
+                {
+                    b.HasOne("TaskManagement.Infrastructures.Identity.Models.ApplicationUsers", "User")
+                        .WithMany("RefreshTokens")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("TaskManagementApi.Domains.Entities.Category", b =>
                 {
-                    b.HasOne("TaskManagementApi.Domains.Entities.Users", "User")
+                    b.HasOne("TaskManagementApi.Domains.Entities.TaskUsers", "User")
                         .WithMany("Categories")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -407,7 +453,7 @@ namespace TaskManagement.Infrastructures.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("TaskManagementApi.Domains.Entities.Users", "User")
+                    b.HasOne("TaskManagementApi.Domains.Entities.TaskUsers", "User")
                         .WithMany("Tasks")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -418,12 +464,17 @@ namespace TaskManagement.Infrastructures.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("TaskManagement.Infrastructures.Identity.Models.ApplicationUsers", b =>
+                {
+                    b.Navigation("RefreshTokens");
+                });
+
             modelBuilder.Entity("TaskManagementApi.Domains.Entities.Category", b =>
                 {
                     b.Navigation("Tasks");
                 });
 
-            modelBuilder.Entity("TaskManagementApi.Domains.Entities.Users", b =>
+            modelBuilder.Entity("TaskManagementApi.Domains.Entities.TaskUsers", b =>
                 {
                     b.Navigation("Categories");
 
