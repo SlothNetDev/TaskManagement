@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 using TaskManagementApi.Application.Features.Users.DTOs;
 using TaskManagementApi.Domains.Wrapper;
 
-namespace TaskManagementApi.Application.Common.Interfaces.IAuthentication
+namespace TaskManagementApi.Application.Common.Interfaces.IUser
 {
-    public interface IUserInterface
+    public interface IUserService
     {
         Task<ResponseType<UserProfileDto>> UserProfileAsync();
     }
