@@ -54,6 +54,7 @@ namespace TaskManagementApi.PresentationUI.Controllers
         [HttpPost("refresh")]
         public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenCommand command)
         {
+
             var result = await _mediator.Send(command);
             if (!result.Success)
             {
