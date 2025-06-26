@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace TaskManagementApi.Domains.Entities
 {
-    public class Users
+    public class TaskUsers
     {
         [Key]
         public Guid Id { get; set; }

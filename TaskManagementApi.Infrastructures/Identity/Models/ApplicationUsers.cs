@@ -24,7 +24,7 @@ namespace TaskManagement.Infrastructures.Identity.Models
        
         // The critical link to your Domain User:
         public Guid DomainUserId { get; set; } // Foreign key to the Domain.Users Id
-        public Users DomainUser { get; set; } = null!; // Navigation property to your Domain.Users entity
+        public TaskUsers DomainUser { get; set; } = null!; // Navigation property to your Domain.Users entity
     }
 
 }
