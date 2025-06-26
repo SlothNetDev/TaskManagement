@@ -28,14 +28,8 @@ namespace TaskManagementApi.PresentationUI.Controllers
                 return BadRequest(new { errors = result.Errors });
             }
         
-            _logger.LogInformation(" User registered: {User}", result.Data?.UserName);
-            return Ok(new AuthResultDto(
-                result.Data.Token,
-                result.Data.ExpiresAt,
-                result.Data.RefreshToken,
-                result.Data.UserName,
-                result.Data.Role
-            ));
+            _logger.LogInformation("User registered Successfully");
+            return Ok(request);
         }
 
         [HttpPost("login")]
