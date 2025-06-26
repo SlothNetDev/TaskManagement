@@ -7,6 +7,7 @@ using System.Security.Cryptography;
 using System.Text;
 using TaskManagement.Infrastructures.Data;
 using TaskManagement.Infrastructures.Identity.Models;
+using TaskManagement.Infrastructures.InfrustructureHelper;
 using TaskManagementApi.Application.Common.Interfaces.IAuthentication;
 using TaskManagementApi.Application.Common.Settings;
 using TaskManagementApi.Application.DTOs;
@@ -22,6 +23,7 @@ namespace TaskManagement.Infrastructures.Identity.Services
     {
         public async Task<AuthResultDto> GenerateTokenAsync(TokenUserDto user)
         {
+            var IpAddress = new IPadressHelper(_httpContextAccessor);
             var claims = new List<Claim>
             {
                 new(ClaimTypes.NameIdentifier, user.UserId),
@@ -43,7 +45,7 @@ namespace TaskManagement.Infrastructures.Identity.Services
                 signingCredentials: creds);
     
             var tokenString = new JwtSecurityTokenHandler().WriteToken(jwtToken);
-            var refreshTokenDto = GenerateRefreshToken(user.UserId, GetIpAddress());
+            var refreshTokenDto = GenerateRefreshToken(user.UserId, IpAddress.GetIpAddress();
     
             var refreshToken = MapToEntity(refreshTokenDto, Guid.Parse(user.UserId));
             await _dbContext.RefreshTokens.AddAsync(refreshToken);
@@ -88,8 +90,7 @@ namespace TaskManagement.Infrastructures.Identity.Services
                 RevokedByIp = dto.RevokedByIp
             };
     
-        private string GetIpAddress() =>
-            _httpContextAccessor.HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? "Unknown";
+        
 
       
     }
