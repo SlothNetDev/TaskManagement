@@ -1,5 +1,5 @@
 ﻿using MediatR;
-using TaskManagementApi.Application.Common.Interfaces.ITask;
+using TaskManagementApi.Application.Common.Interfaces.ITask.TaskCommand;
 using TaskManagementApi.Application.DTOs.TaskDto;
 using TaskManagementApi.Domains.Wrapper;
 namespace TaskManagementApi.Application.Features.Task.Commands
