@@ -12,7 +12,6 @@ namespace TaskManagementApi.Application.Features.Authentication.DTOs
     /// <param name="Token"></param>
     /// <param name="RefreshToken"></param>
     public record LogOutRequestDto(
-        string Token,
         string RefreshToken
         );
 
