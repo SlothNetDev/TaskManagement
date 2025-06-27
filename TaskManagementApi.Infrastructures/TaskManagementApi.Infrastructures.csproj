@@ -9,8 +9,16 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="Authentication\" />
-      <Folder Include="Repositorty\" />
+      <Compile Remove="Authentication\**" />
+      <Compile Remove="Repositorty\**" />
+      <EmbeddedResource Remove="Authentication\**" />
+      <EmbeddedResource Remove="Repositorty\**" />
+      <None Remove="Authentication\**" />
+      <None Remove="Repositorty\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Services\" />
     </ItemGroup>
 
     <ItemGroup>
