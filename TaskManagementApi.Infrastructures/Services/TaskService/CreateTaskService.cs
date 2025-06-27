@@ -26,6 +26,9 @@ namespace TaskManagement.Infrastructures.Services.TaskService
                 _logger.LogWarning("Request validation failed for {Endpoint}. Errors: {@ValidationErrors}", 
                 "POST /login", 
                 validationErrors);
+                response.Success = false;
+                response.Message = "Field Request for Models has an Error";
+                return response;
             }
 
             //2. Get user ID from Jwt
