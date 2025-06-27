@@ -122,13 +122,29 @@ namespace TaskManagement.Infrastructures.Identity.Services
 
             //Finding the refresh Token in database first
             var token = _dbContext.RefreshTokens
-                .FirstOrDefault(x => x.Token == dto.Token);
+                .FirstOrDefault(x => x.Token == dto.RefreshToken);
 
-            if(token == null || token.IsExpired || token.Revoked != null)
+            if(token == null  )
             {
-                _logger.LogWarning("Attempt to logout with invalid or already revoked refresh token.");
+                _logger.LogWarning("Attempt to logout with invalid token is null.");
                 response.Success = false;
-                response.Message = "Invalid or already revoked refresh token.";
+                response.Message = "Token is Empty.";
+                return response;
+            }
+
+            if (token.IsExpired)
+            {
+                 _logger.LogWarning("Attempt to logout with invalid, Token is expired.");
+                response.Success = false;
+                response.Message = "Token was expired.";
+                return response;
+            }
+
+            if(token.Revoked != null)
+            {
+                 _logger.LogWarning("Attempt to logout with invalid, token is revoked.");
+                response.Success = false;
+                response.Message = "Token was revoked.";
                 return response;
             }
 
