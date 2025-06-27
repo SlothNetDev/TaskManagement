@@ -7,7 +7,7 @@ using TaskManagementApi.Application.DTOs.TaskDto;
 using TaskManagementApi.Domains.Entities;
 using TaskManagementApi.Domains.Wrapper;
 
-namespace TaskManagementApi.Application.Common.Interfaces.ITask
+namespace TaskManagementApi.Application.Common.Interfaces.ITask.TaskCommand
 {
     public interface ICreateTask
     {
