@@ -12,7 +12,9 @@ using System.Text.Json.Serialization;
 using TaskManagement.Infrastructures.Data;
 using TaskManagement.Infrastructures.Identity.Models;
 using TaskManagement.Infrastructures.Identity.Services;
+using TaskManagement.Infrastructures.Services.TaskService;
 using TaskManagementApi.Application.Common.Interfaces.IAuthentication;
+using TaskManagementApi.Application.Common.Interfaces.ITask.TaskCommand;
 using TaskManagementApi.Application.Common.Interfaces.IUser;
 using TaskManagementApi.Application.Common.Settings;
 using TaskManagementApi.Application.Features.Authentication.Commands;
@@ -39,14 +41,8 @@ namespace TaskManagementApi.PresentationUI.Extensions
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             services.AddOpenApi();
 
-             // CQRS Services (keep only what you actually use)
-            services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"))
-                .AddSingleton(sp => sp.GetRequiredService<IOptions<JwtSettings>>().Value);
-            services.AddScoped<IAuthService, IdentityService>();
-            services.AddScoped<IRefreshTokenService, RefreshTokenService>();
-            services.AddScoped<ITokenService, TokenService>();
-            services.AddScoped<IUserService, UserService>();
-
+            //Dependency Injection 
+            DependencyInjection(services, configuration);
             // Identity
             services.AddCustomIdentity();
 
@@ -73,6 +69,17 @@ namespace TaskManagementApi.PresentationUI.Extensions
             services.AddSwaggerGen();
 
             return services;
+        }
+        private static void DependencyInjection(this IServiceCollection services, IConfiguration configuration)
+        {
+             // CQRS Services (keep only what you actually use)
+            services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"))
+                .AddSingleton(sp => sp.GetRequiredService<IOptions<JwtSettings>>().Value);
+            services.AddScoped<IAuthService, IdentityService>();
+            services.AddScoped<IRefreshTokenService, RefreshTokenService>();
+            services.AddScoped<ITokenService, TokenService>();
+            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<ICreateTask, CreateTaskService>();
         }
 
         private static void ConfigureJsonOptions(this IMvcBuilder builder)
@@ -161,7 +168,7 @@ namespace TaskManagementApi.PresentationUI.Extensions
                 };
             });
         }
-           
+        
     }
     public static class SerilogExtensions
     {
