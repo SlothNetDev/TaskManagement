@@ -5,21 +5,21 @@ using TaskManagementApi.Domains.Enums;
 
 namespace TaskManagementApi.Application.DTOs.TaskDto
 {
-    public record TaskUpdateDto(
+    public class TaskUpdateDto
+    {
         [Required(ErrorMessage = "Id is Required")]
-        Guid Id,
-
+        public Guid Id { get; set; }
+    
         [Required(ErrorMessage = "Title is Required")]
         [StringLength(120, ErrorMessage = "Title Cannot exceed 120 characters")]
-        string? Title,
-        Priority? Priority,
-        Status? Status)
-    {
-        [JsonConverter(typeof(JsonStringEnumConverter))]
-        public Priority? Priority { get; } = Priority;
+        public string? Title { get; set; }
     
         [JsonConverter(typeof(JsonStringEnumConverter))]
-        public Status? Status { get; init; } = Status;
-        
-    };
+        public Priority? Priority { get; set; }
+    
+        [JsonConverter(typeof(JsonStringEnumConverter))]
+        public Status? Status { get; set; }
+
+    }
+
 }
