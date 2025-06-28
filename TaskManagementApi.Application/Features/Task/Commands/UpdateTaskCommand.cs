@@ -11,6 +11,6 @@ namespace TaskManagementApi.Application.Features.Task.Commands
         public async Task<ResponseType<TaskResponseDto>> Handle(UpdateTaskCommand request, CancellationToken cancellationToken)
         {
             return await service.UpdateTaskAsync(request.dto);
-        }
+        }   
     }
 }
