@@ -7,7 +7,7 @@ using TaskManagementApi.Application.Common.Interfaces.ITaskItem.TaskQuery;
 using TaskManagementApi.Application.DTOs.TaskDto;
 using TaskManagementApi.Domains.Wrapper;
 
-namespace TaskManagement.Infrastructures.Services.TaskService
+namespace TaskManagement.Infrastructures.Services.TaskService.Query
 {
     public class GetAllTaskService(IHttpContextAccessor _httpContextAccessor,
         TaskManagementDbContext _dbContext,
