@@ -8,7 +8,7 @@ using TaskManagementApi.Application.Common.Interfaces.ITask.TaskCommand;
 using TaskManagementApi.Application.DTOs.TaskDto;
 using TaskManagementApi.Domains.Entities;
 using TaskManagementApi.Domains.Wrapper;
-
+using TaskManagementApi.Domains.Enums;
 namespace TaskManagement.Infrastructures.Services.TaskService
 {
     public class CreateTaskService(TaskManagementDbContext _dbContext,
@@ -74,7 +74,7 @@ namespace TaskManagement.Infrastructures.Services.TaskService
                 Id = Guid.NewGuid(),
                 Title = request.Title,
                 Priority = request.Priority,
-                Status = TaskManagementApi.Domains.Enums.Status.InProgress,
+                Status = Status.InProgress,
                 CreatedAt = DateTime.UtcNow,
                 UserId = parseId,
                 CategoryId = category.Id,
@@ -89,7 +89,7 @@ namespace TaskManagement.Infrastructures.Services.TaskService
             {
                 _logger.LogInformation("Task Created Successfully from user {user}", createTask.Id);
                 response.Success = true;
-                response.Message = "Successfully Created Task";
+                response.Message = "Task Created Successfully";
                 return response;
             }
             catch(Exception ex)
