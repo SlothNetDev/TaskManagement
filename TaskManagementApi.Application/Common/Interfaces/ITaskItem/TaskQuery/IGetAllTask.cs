@@ -10,6 +10,6 @@ namespace TaskManagementApi.Application.Common.Interfaces.ITaskItem.TaskQuery
 {
     public interface IGetAllTask
     {
-        Task<ResponseType<TaskResponseDto>> GetAllTaskAsync();
+        Task<ResponseType<List<TaskResponseDto>>> GetAllTaskAsync();
     }
 }
