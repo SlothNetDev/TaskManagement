@@ -27,8 +27,4 @@
     <ProjectReference Include="..\TaskManagementApi.Domains\TaskManagementApi.Core.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Common\Interfaces\ITaskItem\TaskQuery\" />
-  </ItemGroup>
-
 </Project>
