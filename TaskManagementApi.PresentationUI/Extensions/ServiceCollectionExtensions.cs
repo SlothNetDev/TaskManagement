@@ -15,6 +15,7 @@ using TaskManagement.Infrastructures.Identity.Services;
 using TaskManagement.Infrastructures.Services.TaskService;
 using TaskManagementApi.Application.Common.Interfaces.IAuthentication;
 using TaskManagementApi.Application.Common.Interfaces.ITask.TaskCommand;
+using TaskManagementApi.Application.Common.Interfaces.ITaskItem.TaskCommand;
 using TaskManagementApi.Application.Common.Interfaces.IUser;
 using TaskManagementApi.Application.Common.Settings;
 using TaskManagementApi.Application.Features.Authentication.Commands;
@@ -80,6 +81,7 @@ namespace TaskManagementApi.PresentationUI.Extensions
             services.AddScoped<ITokenService, TokenService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<ICreateTask, CreateTaskService>();
+            services.AddScoped<IUpdateTaskService, UpdateTaskService>();
         }
 
         private static void ConfigureJsonOptions(this IMvcBuilder builder)
