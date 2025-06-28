@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System.Security.Claims;
 using TaskManagement.Infrastructures.Data;
 using TaskManagementApi.Application.Common.Interfaces.ITaskItem.TaskQuery;
 using TaskManagementApi.Application.DTOs.TaskDto;
@@ -16,32 +17,47 @@ namespace TaskManagement.Infrastructures.Services.TaskService
         {
             var response = new ResponseType<List<TaskResponseDto>>();
 
-            if(await _dbContext.TaskDb.CountAsync() <= 0)
+             // 1. Validate user Id
+            var userId = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
             {
-                _logger.LogInformation($"Current Post {_dbContext.TaskDb.Count()}");
+                _logger.LogWarning("Invalid or unauthorized user.");
                 response.Success = false;
-                response.Message = "No Task Found Found, Create One First";
+                response.Message = "Unauthorized.";
                 return response;
             }
 
             try
             {
-                var taskAsQuery =await  _dbContext.TaskDb
+                //2. Query Tasks for this user
+                var userTasks = await _dbContext.TaskDb
+                    .Where(ac => ac.UserId == parsedUserId)
                     .OrderBy(t => t.CreatedAt)
                     .Select(t => new TaskResponseDto(t.Id, t.Title,
-                    t.Priority.ToString(), t.Status.ToString() ?? string.Empty,
+                    t.Priority.ToString(),
+                    t.Status.ToString() ?? string.Empty,
                     t.CreatedAt, t.DueDate, t.UpdatedAt))
                     .ToListAsync();
 
+                if (!userTasks.Any())
+                {
+                    _logger.LogInformation("No tasks found for user {UserId}", parsedUserId);
+                    response.Success = false;
+                    response.Message = "You have no tasks. Create one first.";
+                    return response;
+                }
+
+                //3. return response result
                 response.Success = true;
-                response.Data = taskAsQuery;
+                response.Data = userTasks;
                 response.Message = "Successfully Display all Blogs";
                 return response;  
-            }catch(Exception ex)
+            }
+            catch(Exception ex)
             {
-                _logger.LogError(" Cannot Retrieve All Blogs, Reason: {error}",ex.Message);
+                _logger.LogError(ex, "Failed to retrieve tasks for user.");
                 response.Success = false;
-                response.Message = ex.Message;
+                response.Message = "An error occurred while retrieving tasks.";
                 return response;
             }
         }
