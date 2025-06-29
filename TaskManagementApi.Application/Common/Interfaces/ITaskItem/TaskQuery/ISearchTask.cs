@@ -5,6 +5,6 @@ namespace TaskManagementApi.Application.Common.Interfaces.ITaskItem.TaskQuery
 {
     public interface ISearchTask
     {
-        Task<ResponseType<List<TaskResponseDto>>> SearchTaskAsync();
+        Task<ResponseType<List<TaskResponseDto>>> SearchTaskAsync(string search);
     }
 }
