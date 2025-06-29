@@ -86,6 +86,7 @@ namespace TaskManagementApi.PresentationUI.Extensions
             services.AddScoped<IUpdateTaskService, UpdateTaskService>();
             services.AddScoped<IGetAllTask, GetAllTaskService>();
             services.AddScoped<ISearchTask, SearchTaskServices>();
+            services.AddScoped<IDeleteTaskService, DeleteTaskService>();
         }
 
         private static void ConfigureJsonOptions(this IMvcBuilder builder)
