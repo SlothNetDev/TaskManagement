@@ -10,13 +10,13 @@ using TaskManagementApi.Domains.Wrapper;
 
 namespace TaskManagementApi.Application.Features.Task.Query
 {
-    public record SearchTaskQuery() : IRequest<ResponseType<List<TaskResponseDto>>>;
+    public record SearchTaskQuery(string search) : IRequest<ResponseType<List<TaskResponseDto>>>;
 
     public class SearchTaskQueryHandler(ISearchTask task) : IRequestHandler<SearchTaskQuery, ResponseType<List<TaskResponseDto>>>
     {
         public async Task<ResponseType<List<TaskResponseDto>>> Handle(SearchTaskQuery request, CancellationToken cancellationToken)
         {
-            return await task.SearchTaskAsync();
+            return await task.SearchTaskAsync(request.search);
         }
     }
 }
