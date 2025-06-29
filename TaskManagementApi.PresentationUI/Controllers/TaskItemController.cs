@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using MediatR;
 using TaskManagementApi.Application.DTOs.TaskDto;
 using TaskManagementApi.Application.Features.Task.Commands;
+using TaskManagementApi.Application.Features.Task.Query;
 
 namespace TaskManagementApi.PresentationUI.Controllers
 {
@@ -33,6 +34,29 @@ namespace TaskManagementApi.PresentationUI.Controllers
             if (!result.Success)
             {
                 _logger.LogWarning("Updating Task Titled {title}", result.Data.Title);
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
+
+        [HttpGet("search")]
+        public async Task<IActionResult> SearchTask(string search)
+        {
+            var result = await _mediaR.Send(new SearchTaskQuery(search));
+            if (!result.Success)
+            {
+                _logger.LogWarning("Searching Task {item} Failed", search);
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
+        [HttpGet("GetAllTask")]
+        public async Task<IActionResult> GetAllTask()
+        {
+            var result = await _mediaR.Send(new GetAllTaskQuery());
+            if (!result.Success)
+            {
+                _logger.LogWarning("Get All Task Failed, Reason: {reason}",result.Message);
                 return BadRequest(result);
             }
             return Ok(result);
