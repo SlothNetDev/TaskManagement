@@ -12,6 +12,7 @@ using System.Text.Json.Serialization;
 using TaskManagement.Infrastructures.Data;
 using TaskManagement.Infrastructures.Identity.Models;
 using TaskManagement.Infrastructures.Identity.Services;
+using TaskManagement.Infrastructures.Services.Categories.Command;
 using TaskManagement.Infrastructures.Services.Categories.Query;
 using TaskManagement.Infrastructures.Services.TaskService.Command;
 using TaskManagement.Infrastructures.Services.TaskService.Query;
@@ -90,8 +91,8 @@ namespace TaskManagementApi.PresentationUI.Extensions
             services.AddScoped<IGetAllTask, GetAllTaskService>();
             services.AddScoped<ISearchTask, SearchTaskServices>();
             services.AddScoped<IDeleteTaskService, DeleteTaskService>();
-            services.AddScoped<IPaganationTaskService, IPaganationTaskService>();
-            services.AddScoped<ICreateCategoryService, ICreateCategoryService>();
+            services.AddScoped<IPaganationTaskService, PaganationService>();
+            services.AddScoped<ICreateCategoryService, CreateCategoryService>();
             services.AddScoped<IGetAllCategories, GetAllCategoriesService>();
         }
 
