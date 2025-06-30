@@ -19,19 +19,39 @@ namespace TaskManagement.Infrastructures.Services.TaskService.Query
 
              // 1. Validate user Id
             var userId = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parseUserId))
             {
                 _logger.LogWarning("Invalid or unauthorized user.");
                 response.Success = false;
                 response.Message = "Unauthorized.";
                 return response;
             }
+             // macth the applicationUsert to TaskUser(Domain)
+            var matchingApplicationUser = await _dbContext.UserApplicationDb
+                .FirstOrDefaultAsync(ac => ac.Id == parseUserId);
 
+            if (matchingApplicationUser == null)
+            {
+                _logger.LogWarning("No matching ApplicationUser found for userId {id}.", userId);
+                response.Success = false;
+                response.Message = "Invalid User.";
+                return response;
+            }
+            // combine 
+            var taskUserIdToUse = matchingApplicationUser.DomainUserId;
+            if (taskUserIdToUse == Guid.Empty)
+            {
+                _logger.LogWarning("User {id} has an empty DomainUserId.", userId);
+                response.Success = false;
+                response.Message = "Invalid User.";
+                return response;
+            }
+            
             try
             {
                 //2. Query Tasks for this user
                 var userTasks = await _dbContext.TaskDb
-                    .Where(ac => ac.UserId == parsedUserId)
+                    .Where(ac => ac.UserId == taskUserIdToUse)
                     .OrderBy(t => t.CreatedAt)
                     .Select(t => new TaskResponseDto(t.Id, t.Title,
                     t.Priority.ToString(),
@@ -41,7 +61,7 @@ namespace TaskManagement.Infrastructures.Services.TaskService.Query
 
                 if (!userTasks.Any())
                 {
-                    _logger.LogInformation("No tasks found for user {UserId}", parsedUserId);
+                    _logger.LogInformation("No tasks found for user {UserId}", taskUserIdToUse);
                     response.Success = false;
                     response.Message = "You have no tasks. Create one first.";
                     return response;

@@ -26,18 +26,38 @@ namespace TaskManagement.Infrastructures.Services.TaskService.Query
     
             // 1. Validate User
             var userId = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parseUserId))
             {
                 _logger.LogWarning("Invalid or unauthorized user.");
                 response.Success = false;
                 response.Message = "Unauthorized.";
                 return response;
             }
-    
+             // macth the applicationUsert to TaskUser(Domain)
+            var matchingApplicationUser = await _dbContext.UserApplicationDb
+                .FirstOrDefaultAsync(ac => ac.Id == parseUserId);
+            
+            if (matchingApplicationUser == null)
+            {
+                _logger.LogWarning("No matching ApplicationUser found for userId {id}.", userId);
+                response.Success = false;
+                response.Message = "Invalid User.";
+                return response;
+            }
+            // combine 
+            var taskUserIdToUse = matchingApplicationUser.DomainUserId;
+            if (taskUserIdToUse == Guid.Empty)
+            {
+                _logger.LogWarning("User {id} has an empty DomainUserId.", userId);
+                response.Success = false;
+                response.Message = "Invalid User.";
+                return response;
+            }
+            
             // 2. Prepare query
             var query = _dbContext.TaskDb
                 .Include(t => t.Category)
-                .Where(x => x.UserId == parsedUserId);
+                .Where(x => x.UserId == taskUserIdToUse);
     
             var lowerSearch = search?.ToLower().Trim();
     

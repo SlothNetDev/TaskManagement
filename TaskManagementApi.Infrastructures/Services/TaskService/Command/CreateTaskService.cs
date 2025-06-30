@@ -35,7 +35,7 @@ namespace TaskManagement.Infrastructures.Services.TaskService.Command
             var userId = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             //validate userId
-            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parseId))
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parseUserId))
             {
                _logger.LogWarning("Failed to extract valid user ID {id} from JWT.",userId);
                response.Success = false;
@@ -44,7 +44,7 @@ namespace TaskManagement.Infrastructures.Services.TaskService.Command
             }
 
             //3. Validate category if there was even category in user before task will created
-            var hasCategory = _dbContext.CategoryDb.Any(x => x.UserId == parseId);
+            var hasCategory = _dbContext.CategoryDb.Any(x => x.UserId == parseUserId);
             if (!hasCategory)
             {
                 _logger.LogWarning("No category found for user.");
@@ -52,10 +52,32 @@ namespace TaskManagement.Infrastructures.Services.TaskService.Command
                 response.Message = "No category found for the user. Please create a category first.";
                 return response;
             }
+             //3 macth the applicationUsert to TaskUser(Domain)
+            var matchingApplicationUser = await _dbContext.UserApplicationDb
+                .FirstOrDefaultAsync(ac => ac.Id == parseUserId);
 
+            // --- ADD THIS LOGGING ---
+            _logger.LogInformation("Attempting to create category for UserId: {UserId}", parseUserId);
+             //4. Create Category
+            if (matchingApplicationUser == null)
+            {
+                _logger.LogWarning("No matching ApplicationUser found for userId {id}.", userId);
+                response.Success = false;
+                response.Message = "Invalid User.";
+                return response;
+            }
+            //5. combine 
+            var taskUserIdToUse = matchingApplicationUser.DomainUserId;
+            if (taskUserIdToUse == Guid.Empty)
+            {
+                _logger.LogWarning("User {id} has an empty DomainUserId.", userId);
+                response.Success = false;
+                response.Message = "Invalid User.";
+                return response;
+            }
             //get category if it was exist in user
             var category = await _dbContext.CategoryDb
-                .FirstOrDefaultAsync(x => x.UserId == parseId);
+                .FirstOrDefaultAsync(x => x.UserId == taskUserIdToUse);
 
             //validate category
             if(category is null)
@@ -76,7 +98,7 @@ namespace TaskManagement.Infrastructures.Services.TaskService.Command
                 Priority = request.Priority,
                 Status = Status.InProgress,
                 CreatedAt = DateTime.UtcNow,
-                UserId = parseId,
+                UserId = parseUserId,
                 CategoryId = category.Id,
                 DueDate = request.DueDate
             };

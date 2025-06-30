@@ -28,20 +28,40 @@ namespace TaskManagement.Infrastructures.Services.TaskService.Query
 
              // 1. Validate user Id
             var userId = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parseUserId))
             {
                 _logger.LogWarning("Invalid or unauthorized user.");
                 response.Success = false;
                 response.Message = "Unauthorized.";
                 return response;
             }
+             // macth the applicationUsert to TaskUser(Domain)
+            var matchingApplicationUser = await _dbContext.UserApplicationDb
+                .FirstOrDefaultAsync(ac => ac.Id == parseUserId);
 
+            if (matchingApplicationUser == null)
+            {
+                _logger.LogWarning("No matching ApplicationUser found for userId {id}.", userId);
+                response.Success = false;
+                response.Message = "Invalid User.";
+                return response;
+            }
+            // combine 
+            var taskUserIdToUse = matchingApplicationUser.DomainUserId;
+            if (taskUserIdToUse == Guid.Empty)
+            {
+                _logger.LogWarning("User {id} has an empty DomainUserId.", userId);
+                response.Success = false;
+                response.Message = "Invalid User.";
+                return response;
+            }
+            
             var totalCount = await _dbContext.TaskDb
-                .CountAsync(t => t.UserId == parsedUserId, cancellationToken);
+                .CountAsync(t => t.UserId == taskUserIdToUse, cancellationToken);
 
             //Paganation 
             var task = await _dbContext.TaskDb
-                .Where(t => t.UserId == parsedUserId)
+                .Where(t => t.UserId == parseUserId)
                 .OrderByDescending(t => t.CreatedAt)
                 .Skip((request.PageNumber - 1) * request.PageSize)
                 .Take(request.PageSize)

@@ -37,7 +37,7 @@ namespace TaskManagement.Infrastructures.Services.TaskService.Command
             var userId = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             //validate userId
-            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parseId))
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parseUserId))
             {
                _logger.LogWarning("Failed to extract valid user ID {id} from JWT.",userId);
                response.Success = false;
@@ -45,11 +45,33 @@ namespace TaskManagement.Infrastructures.Services.TaskService.Command
                return response;
             }
 
+             //3 macth the applicationUsert to TaskUser(Domain)
+            var matchingApplicationUser = await _dbContext.UserApplicationDb
+                .FirstOrDefaultAsync(ac => ac.Id == parseUserId);
+                        // --- ADD THIS LOGGING ---
+            _logger.LogInformation("Attempting to create category for UserId: {UserId}", parseUserId);
+             //4. Create Category
+            if (matchingApplicationUser == null)
+            {
+                _logger.LogWarning("No matching ApplicationUser found for userId {id}.", userId);
+                response.Success = false;
+                response.Message = "Invalid User.";
+                return response;
+            }
+            //5. combine 
+            var taskUserIdToUse = matchingApplicationUser.DomainUserId;
+            if (taskUserIdToUse == Guid.Empty)
+            {
+                _logger.LogWarning("User {id} has an empty DomainUserId.", userId);
+                response.Success = false;
+                response.Message = "Invalid User.";
+                return response;
+            }
             //3. connect the user Id and Id that will user provide
-            var taskToDelete = await _dbContext.TaskDb.FirstOrDefaultAsync(x => x.UserId == parseId && x.UserId == id);
+            var taskToDelete = await _dbContext.TaskDb.FirstOrDefaultAsync(x => x.UserId == taskUserIdToUse && x.UserId == id);
             if(taskToDelete is null)
             {
-                _logger.LogWarning("No task found with ID {Id} for user {UserId}.", id, parseId);
+                _logger.LogWarning("No task found with ID {Id} for user {UserId}.", id, parseUserId);
                 response.Success = false;
                 response.Message = "Task not found.";
                 return response;

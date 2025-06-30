@@ -37,7 +37,7 @@ namespace TaskManagement.Infrastructures.Services.TaskService.Command
             var userId = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             //check if User id was empty or fake 
-            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out Guid parseId))
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out Guid parseUserId))
             {
                 _logger.LogWarning("No category found for user id {userId}.",userId);
                 response.Success = false;
@@ -46,7 +46,7 @@ namespace TaskManagement.Infrastructures.Services.TaskService.Command
             }
 
             //3. Validate if task has category
-            var hasCategory = await _dbContext.CategoryDb.AnyAsync(x => x.UserId == parseId);
+            var hasCategory = await _dbContext.CategoryDb.AnyAsync(x => x.UserId == parseUserId);
             //check if your account has any category
             if (!hasCategory)
             {
@@ -55,11 +55,30 @@ namespace TaskManagement.Infrastructures.Services.TaskService.Command
                 response.Message = "No category found for the user. Please create a category first.";
                 return response;
             }
+             // macth the applicationUsert to TaskUser(Domain)
+            var matchingApplicationUser = await _dbContext.UserApplicationDb
+                .FirstOrDefaultAsync(ac => ac.Id == parseUserId);
 
+            if (matchingApplicationUser == null)
+            {
+                _logger.LogWarning("No matching ApplicationUser found for userId {id}.", userId);
+                response.Success = false;
+                response.Message = "Invalid User.";
+                return response;
+            }
+            // combine 
+            var taskUserIdToUse = matchingApplicationUser.DomainUserId;
+            if (taskUserIdToUse == Guid.Empty)
+            {
+                _logger.LogWarning("User {id} has an empty DomainUserId.", userId);
+                response.Success = false;
+                response.Message = "Invalid User.";
+                return response;
+            }
             
 
             //4. get User Id
-            var updateTask = await _dbContext.TaskDb.FirstOrDefaultAsync(x => x.UserId == parseId);
+            var updateTask = await _dbContext.TaskDb.FirstOrDefaultAsync(x => x.UserId == parseUserId);
             //check if id was exist
             if(updateTask is null)
             {
