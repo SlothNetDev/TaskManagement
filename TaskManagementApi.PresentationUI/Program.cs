@@ -6,28 +6,38 @@ using TaskManagementApi.PresentationUI.Extensions;
 
 namespace TaskManagementApi.PresentationUI
 {
-    public class Program
+    public class Program(Logger<Program> _logger)
     {
         /// <summary>
         /// Simplified Program.cs
         /// </summary>
         /// <param name="args"></param>
-        public static async Task Main()
+        public  static async Task Main()
         {
             var builder = WebApplication.CreateBuilder();
 
             //Calling Service Extention
             // Add services to the container
-            builder.AddCleanSerilog() // This comes first to capture startup logs
+            try
+            {
+                 builder.AddCleanSerilog() // This comes first to capture startup logs
                    .Services
                    .AddPresentationService(builder.Configuration);
+                var app = builder.Build();
 
-            var app = builder.Build();
-
-            //Calling ApplicationBuilderExtensions 
-            await app.ConfigureApplication();
+                //Calling ApplicationBuilderExtensions 
+                await app.ConfigureApplication();
            
-            app?.Run();
+                app.Run();
+            }
+            catch(Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("Error: {errror}",ex.Message);
+                Console.ResetColor();
+            }
+
+            
         }
  
         
