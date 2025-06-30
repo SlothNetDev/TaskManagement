@@ -64,7 +64,7 @@ namespace TaskManagement.Infrastructures.Services.Categories.Query
 
                 var query = await categoryQuery.ToListAsync();
 
-                if (categoryQuery.Any())
+                if (!query.Any())
                 {
                     _logger.LogInformation("No Category found for user {UserId}", parseUserId);
                     response.Success = false;
