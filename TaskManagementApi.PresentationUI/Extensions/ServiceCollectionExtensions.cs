@@ -95,6 +95,7 @@ namespace TaskManagementApi.PresentationUI.Extensions
             services.AddScoped<ICreateCategoryService, CreateCategoryService>();
             services.AddScoped<IGetAllCategories, GetAllCategoriesService>();
             services.AddScoped<IUpdateCategoryService, UpdateCategoryService>();
+            services.AddScoped<IDeleteCategoryService, DeleteCategoryService>();
         }
 
         private static void ConfigureJsonOptions(this IMvcBuilder builder)
