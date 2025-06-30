@@ -12,7 +12,15 @@ namespace TaskManagementApi.Application.Features.CategoryFeature.CategoriesDto
     public record CategoryResponseDto(
         Guid Id,      
         string CategoryName,   
-        string Description);
+        string Description)
+    {
+        public CategoryResponseDto(Category category) : this(
+            category.Id,
+            category.CategoryName,
+            category.Description ?? string.Empty
+            )
+        { }
+    };
     public record CategoryResponseDtoWithTask(
         Guid Id,      
         string CategoryName,   
