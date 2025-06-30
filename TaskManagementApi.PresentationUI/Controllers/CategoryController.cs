@@ -47,13 +47,13 @@ namespace TaskManagementApi.PresentationUI.Controllers
             }
             return Ok(result);
         }
-        [HttpPost("delete-category")]
+        [HttpDelete("delete-category")]
         public async Task<IActionResult> DeleteCategoriesAsync([FromBody] Guid Id)
         {
             var result = await _mediaR.Send(new DeleteCategoryCommand(Id));
             if (!result.Success)
             {
-                _logger.LogWarning("Deleting Task Titled {name} Failed", result.Data.CategoryName);
+                _logger.LogWarning("Deleting Task Titled {name} Failed", result.Data);
                 return NotFound(result);
             }
             return Ok(result);
