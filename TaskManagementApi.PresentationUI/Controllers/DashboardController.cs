@@ -9,7 +9,6 @@ namespace TaskManagementApi.PresentationUI.Controllers
     
     [ApiController]
     [Route("auth")]
-    [Authorize]
     public class DashboardController : ControllerBase
     {
         private readonly IMediator _mediator;

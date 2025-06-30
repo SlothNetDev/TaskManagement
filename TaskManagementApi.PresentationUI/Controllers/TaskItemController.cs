@@ -74,7 +74,7 @@ namespace TaskManagementApi.PresentationUI.Controllers
             }
             return Ok(result);
         }
-        [HttpPost("delete-task")]
+        [HttpPost("delete")]
         public async Task<IActionResult> DeleteTaskAsync(Guid id)
         {
             var result = await _mediaR.Send(new DeleteTaskCommand(id));

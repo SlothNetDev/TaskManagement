@@ -14,18 +14,18 @@ namespace TaskManagementApi.PresentationUI.Controllers
     public class CategoryController(ILogger<CategoryController> _logger,
         IMediator _mediaR) : ControllerBase
     {
-        [HttpPost("create-category")]
+        [HttpPost("create")]
         public async Task<IActionResult> CreateCategoryAsync([FromBody] CategoryRequestDto request)
         {
             var result = await _mediaR.Send(new CreateCategoryCommand(request));
             if (!result.Success)
             {
-                _logger.LogWarning("Creating {categoryName} Failed", result.Data.CategoryName);
+                _logger.LogWarning("Creating {categoryName} Failed", result.Data?.CategoryName);
                 return BadRequest(result);
             }
             return Ok(result);
         }
-        [HttpGet("getAll-category")]
+        [HttpGet("getAllCategories")]
         public async Task<IActionResult> GetAllCategoryAsync()
         {
             var result = await _mediaR.Send(new GetAllCategoriesQuery());
@@ -36,24 +36,24 @@ namespace TaskManagementApi.PresentationUI.Controllers
             }
             return Ok(result);
         }
-        [HttpPatch("update-category")]
+        [HttpPatch("update")]
         public async Task<IActionResult> UpdateCategoryAsync([FromBody] CategoryUpdateDto request)
         {
             var result = await _mediaR.Send(new UpdateCategoryCommand(request));
             if (!result.Success)
             {
-                _logger.LogWarning("Updating {categoryName} Failed", result.Data.CategoryName);
+                _logger.LogWarning("Updating {categoryName} Failed", result.Data?.CategoryName);
                 return BadRequest(result);
             }
             return Ok(result);
         }
-        [HttpDelete("delete-category")]
+        [HttpDelete("delete")]
         public async Task<IActionResult> DeleteCategoriesAsync([FromBody] Guid Id)
         {
             var result = await _mediaR.Send(new DeleteCategoryCommand(Id));
             if (!result.Success)
             {
-                _logger.LogWarning("Deleting Task Titled {name} Failed", result.Data);
+                _logger.LogWarning("Deleting CategoryName {name} Failed", result.Data?.CategoryName);
                 return NotFound(result);
             }
             return Ok(result);
