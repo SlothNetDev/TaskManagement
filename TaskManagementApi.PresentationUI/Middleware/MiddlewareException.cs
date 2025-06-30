@@ -5,32 +5,33 @@ using System.Text.Json;
 namespace TaskManagementApi.PresentationUI.Middleware
 {
     /// <summary>
-    /// Cateches Unhandle exceptions globally and logs them
-    /// With C# 12 Primary Constructor, explicitly storing in fields
+    /// Catches unhandled exceptions globally and logs them.
+    /// With C# 12 Primary Constructor, explicitly storing in fields.
     /// </summary>
-    public class MiddlewareException(RequestDelegate _next,ILogger<ExceptionHandlerMiddleware> _logger)
+    public class MiddlewareException(RequestDelegate _next, ILogger<ExceptionHandlerMiddleware> _logger)
     {
         public async Task InvokeAsync(HttpContext context)
         {
             try
             {
-                // Pass through to the next middleware
                 await _next(context);
             }
             catch (Exception ex)
             {
-                // Log the full exception
                 _logger.LogError(ex, "🚨 Unhandled exception caught in middleware");
 
-                // Return a 500 response
                 context.Response.ContentType = "application/json";
                 context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
 
                 var response = new
                 {
                     status = context.Response.StatusCode,
-                    message = "An unexpected error occurred.",
-                    detail = ex.Message // ⚠️ include more detail only in dev
+                    message = "Sorry, something went wrong. Please try again later.",
+#if DEBUG
+                    detail = ex.Message
+#else
+                        detail = "Internal server error."
+#endif
                 };
 
                 var json = JsonSerializer.Serialize(response);
