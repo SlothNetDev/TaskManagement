@@ -48,8 +48,29 @@ namespace TaskManagement.Infrastructures.Services.Categories.Command
                 response.Message = "Unauthorized or invalid user.";
                 return response;
             }
+             //3 macth the applicationUsert to TaskUser(Domain)
+             var matchingApplicationUser = await _dbContext.UserApplicationDb
+                 .FirstOrDefaultAsync(ac => ac.Id == parseUserId);
+            
+            //4. Create Category
+             if (matchingApplicationUser == null)
+             {
+                 _logger.LogWarning("No matching ApplicationUser found for userId {id}.", userId);
+                 response.Success = false;
+                 response.Message = "Invalid User.";
+                 return response;
+             }
+             //5. combine 
+             var taskUserIdToUse = matchingApplicationUser.DomainUserId;
+             if (taskUserIdToUse == Guid.Empty)
+             {
+                 _logger.LogWarning("User {id} has an empty DomainUserId.", userId);
+                 response.Success = false;
+                 response.Message = "Invalid User.";
+                 return response;
+             }
             //check id categories if exist
-            var updateCategory = await _dbContext.CategoryDb.FirstOrDefaultAsync(id => id.UserId == parseUserId);
+            var updateCategory = await _dbContext.CategoryDb.FirstOrDefaultAsync(id => id.UserId == taskUserIdToUse);
             //check if categoryId is exist
             if(updateCategory is null)
             {
@@ -58,6 +79,7 @@ namespace TaskManagement.Infrastructures.Services.Categories.Command
                 response.Message = "Blog not found";
                 return response;
             }
+
             try
             {
                 //update category
