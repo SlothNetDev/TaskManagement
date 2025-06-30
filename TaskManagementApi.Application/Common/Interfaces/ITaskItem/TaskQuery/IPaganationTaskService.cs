@@ -12,6 +12,6 @@ namespace TaskManagementApi.Application.Common.Interfaces.ITaskItem.TaskQuery
 {
     public interface IPaganationTaskService
     {
-        Task<ResponseType<PaganationResponse<TaskResponseDto>>> PaganationAsync(PaganationDto request);
+        Task<ResponseType<PaganationResponse<TaskResponseDto>>> PaganationAsync(PaganationDto request,CancellationToken cancellationToken);
     }
 }
