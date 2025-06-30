@@ -11,7 +11,7 @@ namespace TaskManagementApi.PresentationUI.Controllers
     [Route("category")]
     [ApiController]
     [Authorize]
-    public class CategoryController(ILogger<TaskItemController> _logger,
+    public class CategoryController(ILogger<CategoryController> _logger,
         Mediator _mediaR) : ControllerBase
     {
         [HttpPost("create-category")]
