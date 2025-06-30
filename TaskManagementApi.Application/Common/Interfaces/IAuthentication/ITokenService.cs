@@ -1,6 +1,5 @@
 ﻿
 using System.Security.Claims;
-using TaskManagementApi.Application.DTOs;
 using TaskManagementApi.Application.Features.Authentication.DTOs;
 using TaskManagementApi.Domains.Wrapper;
 
