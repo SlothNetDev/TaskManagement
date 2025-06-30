@@ -44,17 +44,7 @@ namespace TaskManagement.Infrastructures.Services.TaskService.Command
                 response.Message = "Unauthorized or invalid user.";
                 return response;
             }
-
-            //3. Validate if task has category
-            var hasCategory = await _dbContext.CategoryDb.AnyAsync(x => x.UserId == parseUserId);
-            //check if your account has any category
-            if (!hasCategory)
-            {
-                _logger.LogWarning("No category found for user.");
-                response.Success = false;
-                response.Message = "No category found for the user. Please create a category first.";
-                return response;
-            }
+   
              // macth the applicationUsert to TaskUser(Domain)
             var matchingApplicationUser = await _dbContext.UserApplicationDb
                 .FirstOrDefaultAsync(ac => ac.Id == parseUserId);
@@ -75,10 +65,20 @@ namespace TaskManagement.Infrastructures.Services.TaskService.Command
                 response.Message = "Invalid User.";
                 return response;
             }
-            
+            //3. Validate if task has category
+            var hasCategory = await _dbContext.CategoryDb.AnyAsync(x => x.UserId == taskUserIdToUse);
+            //check if your account has any category
+            if (hasCategory is false)
+            {
+                _logger.LogWarning("No category found for user.");
+                response.Success = false;
+                response.Message = "No category found for the user. Please create a category first.";
+                return response;
+            }
 
             //4. get User Id
-            var updateTask = await _dbContext.TaskDb.FirstOrDefaultAsync(x => x.UserId == parseUserId);
+            var updateTask = await _dbContext.TaskDb
+                .FirstOrDefaultAsync(x => x.UserId == taskUserIdToUse);
             //check if id was exist
             if(updateTask is null)
             {
@@ -87,6 +87,7 @@ namespace TaskManagement.Infrastructures.Services.TaskService.Command
                 response.Message = "Blog not found";
                 return response;
             }
+
             try
             {
                 //update field
