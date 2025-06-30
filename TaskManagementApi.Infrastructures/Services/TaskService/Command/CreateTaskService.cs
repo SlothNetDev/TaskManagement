@@ -32,36 +32,25 @@ namespace TaskManagement.Infrastructures.Services.TaskService.Command
             }
 
             //2. Get user ID from Jwt
-            var userId = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userIdJwt = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             //validate userId
-            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parseUserId))
+            if (string.IsNullOrWhiteSpace(userIdJwt) || !Guid.TryParse(userIdJwt, out var parseUserId))
             {
-               _logger.LogWarning("Failed to extract valid user ID {id} from JWT.",userId);
+               _logger.LogWarning("Failed to extract valid user ID {id} from JWT.",userIdJwt);
                response.Success = false;
                response.Message = "Unauthorized or invalid user.";
                return response;
             }
-
-            //3. Validate category if there was even category in user before task will created
-            var hasCategory = _dbContext.CategoryDb.Any(x => x.UserId == parseUserId);
-            if (!hasCategory)
-            {
-                _logger.LogWarning("No category found for user.");
-                response.Success = false;
-                response.Message = "No category found for the user. Please create a category first.";
-                return response;
-            }
+   
              //3 macth the applicationUsert to TaskUser(Domain)
             var matchingApplicationUser = await _dbContext.UserApplicationDb
                 .FirstOrDefaultAsync(ac => ac.Id == parseUserId);
 
-            // --- ADD THIS LOGGING ---
-            _logger.LogInformation("Attempting to create category for UserId: {UserId}", parseUserId);
              //4. Create Category
             if (matchingApplicationUser == null)
             {
-                _logger.LogWarning("No matching ApplicationUser found for userId {id}.", userId);
+                _logger.LogWarning("No matching ApplicationUser found for userId {id}.", matchingApplicationUser.DomainUserId);
                 response.Success = false;
                 response.Message = "Invalid User.";
                 return response;
@@ -70,20 +59,29 @@ namespace TaskManagement.Infrastructures.Services.TaskService.Command
             var taskUserIdToUse = matchingApplicationUser.DomainUserId;
             if (taskUserIdToUse == Guid.Empty)
             {
-                _logger.LogWarning("User {id} has an empty DomainUserId.", userId);
+                _logger.LogWarning("User {id} has an empty DomainUserId.", taskUserIdToUse);
                 response.Success = false;
                 response.Message = "Invalid User.";
                 return response;
             }
+            //3. Validate category if there was even category in user before task will created
+            var hasCategory = _dbContext.CategoryDb.Any(x => x.UserId == taskUserIdToUse);
+            if (hasCategory is false)
+            {
+                _logger.LogWarning("No category found for user.");
+                response.Success = false;
+                response.Message = "No category found for the user. Please create a category first.";
+                return response;
+            }
             //get category if it was exist in user
             var category = await _dbContext.CategoryDb
-                .FirstOrDefaultAsync(x => x.UserId == taskUserIdToUse);
+                .AnyAsync(x => x.UserId == request.CategoryId);
 
             //validate category
-            if(category is null)
+            if (category is true)
             {
-                _logger.LogError("Expected {Category} was null when processing {Create}", 
-                 category, 
+                _logger.LogError("Expected {Category} was null when processing {Create}",
+                 category,
                  "Create Task");
                 response.Success = false;
                 response.Message = "Category don't exist to user Account";
@@ -98,20 +96,21 @@ namespace TaskManagement.Infrastructures.Services.TaskService.Command
                 Priority = request.Priority,
                 Status = Status.InProgress,
                 CreatedAt = DateTime.UtcNow,
-                UserId = parseUserId,
-                CategoryId = category.Id,
+                UserId = taskUserIdToUse,
+                CategoryId = request.CategoryId,
                 DueDate = request.DueDate
             };
 
             //5. Save changes
             await _dbContext.AddAsync(createTask);
-            _dbContext.SaveChanges();
+            await _dbContext.SaveChangesAsync();
 
             try
             {
                 _logger.LogInformation("Task Created Successfully from user {user}", createTask.Id);
                 response.Success = true;
                 response.Message = "Task Created Successfully";
+                response.Data = new TaskResponseDto(createTask);
                 return response;
             }
             catch(Exception ex)
