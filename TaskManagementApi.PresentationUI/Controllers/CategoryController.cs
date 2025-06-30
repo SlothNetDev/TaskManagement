@@ -25,13 +25,24 @@ namespace TaskManagementApi.PresentationUI.Controllers
             }
             return Ok(result);
         }
-        [HttpPost("getAll-category")]
+        [HttpGet("getAll-category")]
         public async Task<IActionResult> GetAllCategoryAsync()
         {
             var result = await _mediaR.Send(new GetAllCategoriesQuery());
             if (!result.Success)
             {
                 _logger.LogWarning("Successfully Retrieve all Categories");
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
+        [HttpPost("update-category")]
+        public async Task<IActionResult> UpdateCategoryAsync([FromBody] CategoryUpdateDto request)
+        {
+            var result = await _mediaR.Send(new UpdateCategoryCommand(request));
+            if (!result.Success)
+            {
+                _logger.LogWarning("Updating {categoryName} Failed", result.Data.CategoryName);
                 return BadRequest(result);
             }
             return Ok(result);
