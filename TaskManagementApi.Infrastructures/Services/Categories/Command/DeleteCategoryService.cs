@@ -1,17 +1,9 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
 using TaskManagement.Infrastructures.Data;
-using TaskManagement.Infrastructures.Services.TaskService.Command;
-using TaskManagementApi.Application.ApplicationHelpers;
 using TaskManagementApi.Application.Common.Interfaces.ICategory.CategoryCommand;
-using TaskManagementApi.Application.DTOs.TaskDto;
 using TaskManagementApi.Application.Features.CategoryFeature.CategoriesDto;
 using TaskManagementApi.Domains.Wrapper;
 
@@ -37,7 +29,28 @@ namespace TaskManagement.Infrastructures.Services.Categories.Command
                 return response;
             }
 
-            var deleteCategory = await _dbContext.CategoryDb.FirstOrDefaultAsync(d => d.UserId == parseUserId && d.UserId == Id);
+             // macth the applicationUsert to TaskUser(Domain)
+            var matchingApplicationUser = await _dbContext.UserApplicationDb
+                .FirstOrDefaultAsync(ac => ac.Id == parseUserId);
+
+             //4. Create Category
+            if (matchingApplicationUser == null)
+            {
+                _logger.LogWarning("No matching ApplicationUser found for userId {id}.", userId);
+                response.Success = false;
+                response.Message = "Invalid User.";
+                return response;
+            }
+            //5. combine and main Id
+            var taskUserIdToUse = matchingApplicationUser.DomainUserId;
+            if (taskUserIdToUse == Guid.Empty)
+            {
+                _logger.LogWarning("User {id} has an empty DomainUserId.", userId);
+                response.Success = false;
+                response.Message = "Invalid User.";
+                return response;
+            }
+            var deleteCategory = await _dbContext.CategoryDb.FirstOrDefaultAsync(d => d.UserId == taskUserIdToUse && d.UserId == Id);
 
             if(deleteCategory is null)
             {
