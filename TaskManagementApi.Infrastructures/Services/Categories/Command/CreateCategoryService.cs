@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.Security.Claims;
 using TaskManagement.Infrastructures.Data;
@@ -14,7 +15,7 @@ namespace TaskManagement.Infrastructures.Services.Categories.Command
 {
     public class CreateCategoryService(
         TaskManagementDbContext _dbContext,
-        ILogger<CreateTaskService> _logger,
+        ILogger<CreateCategoryService> _logger,
         IHttpContextAccessor _httpContextAccessor) : ICreateCategoryService
     {
         public async Task<ResponseType<CategoryResponseDto>> CreateCategoryAsync(CategoryRequestDto requestDto)
@@ -45,10 +46,25 @@ namespace TaskManagement.Infrastructures.Services.Categories.Command
                 return response;
             }
 
+            //3 macth the applicationUsert to TaskUser(Domain)
+            var matchingApplicationUser = await _dbContext.UserApplicationDb
+                .FirstOrDefaultAsync(ac => ac.Id == parseUserId);
+            // --- ADD THIS LOGGING ---
+            _logger.LogInformation("Attempting to create category for UserId: {UserId}", parseUserId);
             //3. Create Category
+            var taskUserIdToUse = matchingApplicationUser.DomainUserId;
+            if(string.IsNullOrWhiteSpace(taskUserIdToUse.ToString()))
+            {
+                _logger.LogWarning("User {id} Is empty.",userId);
+                response.Success = false;
+                response.Message = "Invalid User.";
+                return response;
+            }
+
             var category = new Category
             {
-                Id = parseUserId,
+                UserId = taskUserIdToUse,
+                Id = Guid.NewGuid(),
                 CategoryName = requestDto.CategoryName,
                 Description = requestDto.Description
             };
@@ -60,6 +76,7 @@ namespace TaskManagement.Infrastructures.Services.Categories.Command
                 _logger.LogInformation("Category Created Successfully from user {user}", category.Id);
                 response.Success = true;
                 response.Message = "Category Created Successfully";
+                response.Data = new CategoryResponseDto(category);                                                                              
                 return response;
             }
             catch(Exception ex)
