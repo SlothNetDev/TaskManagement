@@ -27,7 +27,7 @@ namespace TaskManagementApi.PresentationUI.Controllers
             }
             return Ok(result);
         }
-        [HttpPut("update")]
+        [HttpPatch("update")]
         public async Task<IActionResult> UpdateTaskAsync([FromBody] TaskUpdateDto requestDto)
         {
             var result = await _mediaR.Send(new UpdateTaskCommand(requestDto));
