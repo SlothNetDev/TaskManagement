@@ -19,7 +19,7 @@ namespace TaskManagement.Infrastructures.Services.Categories.Command
 {
     public class DeleteCategoryService(
         TaskManagementDbContext _dbContext,
-        ILogger<CreateTaskService> _logger,
+        ILogger<DeleteCategoryService> _logger,
         IHttpContextAccessor _httpContextAccessor) : IDeleteCategoryService
     {
         public async Task<ResponseType<CategoryResponseDto>> DeleteCategoryAsync(Guid Id)

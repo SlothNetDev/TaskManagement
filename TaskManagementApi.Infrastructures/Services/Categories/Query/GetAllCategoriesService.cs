@@ -12,7 +12,7 @@ using TaskManagementApi.Domains.Wrapper;
 namespace TaskManagement.Infrastructures.Services.Categories.Query
 {
     public class GetAllCategoriesService(TaskManagementDbContext _dbContext,
-        ILogger<CreateTaskService> _logger,
+        ILogger<GetAllCategoriesService> _logger,
         IHttpContextAccessor _httpContextAccessor) : IGetAllCategories
     {
         public async Task<ResponseType<List<CategoryResponseDtoWithTask>>> GetAllCategoriesAsync()

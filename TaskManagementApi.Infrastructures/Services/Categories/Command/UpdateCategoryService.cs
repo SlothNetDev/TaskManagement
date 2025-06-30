@@ -18,7 +18,7 @@ namespace TaskManagement.Infrastructures.Services.Categories.Command
 {
     public class UpdateCategoryService(
         TaskManagementDbContext _dbContext,
-        ILogger<CreateTaskService> _logger,
+        ILogger<UpdateCategoryService> _logger,
         IHttpContextAccessor _httpContextAccessor) : IUpdateCategoryService
     {
         public async Task<ResponseType<CategoryResponseDto>> UpdateCategoriesAsync(CategoryUpdateDto requestDto)

@@ -17,7 +17,7 @@ namespace TaskManagement.Infrastructures.Services.TaskService.Command
 {
     public class DeleteTaskService(
         TaskManagementDbContext _dbContext,
-        ILogger<CreateTaskService> _logger,
+        ILogger<DeleteTaskService> _logger,
         IHttpContextAccessor _httpContextAccessor) : IDeleteTaskService
     {
         public async Task<ResponseType<TaskResponseDto>> DeleteTaskAsync(Guid id)
