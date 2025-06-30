@@ -5,6 +5,7 @@ using MediatR;
 using TaskManagementApi.Application.DTOs.TaskDto;
 using TaskManagementApi.Application.Features.Task.Commands;
 using TaskManagementApi.Application.Features.Task.Query;
+using TaskManagementApi.Application.Features.Task.TaskDto;
 
 namespace TaskManagementApi.PresentationUI.Controllers
 {
@@ -21,7 +22,7 @@ namespace TaskManagementApi.PresentationUI.Controllers
 
             if (!result.Success)
             {
-                _logger.LogWarning("Creating Task Titled {title}", result.Data.Title);
+                _logger.LogWarning("Creating Task Titled {title} Failed", result.Data.Title);
                 return BadRequest(result);
             }
             return Ok(result);
@@ -33,7 +34,7 @@ namespace TaskManagementApi.PresentationUI.Controllers
 
             if (!result.Success)
             {
-                _logger.LogWarning("Updating Task Titled {title}", result.Data.Title);
+                _logger.LogWarning("Updating Task Titled {title} Failed", result.Data.Title);
                 return BadRequest(result);
             }
             return Ok(result);
@@ -57,6 +58,30 @@ namespace TaskManagementApi.PresentationUI.Controllers
             if (!result.Success)
             {
                 _logger.LogWarning("Get All Task Failed, Reason: {reason}",result.Message);
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
+        [HttpGet("paganation")]
+        public async Task<IActionResult> GetPaganatedAsync(PaganationDto request,CancellationToken token)
+        {
+            var result = await _mediaR.Send(new GetPaganationTasksQuery(request, token));
+
+            if (!result.Success)
+            {
+                _logger.LogInformation("Get All Task Failed, Reason: {reason}", result.Message);
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
+        [HttpPost("delete-task")]
+        public async Task<IActionResult> DeleteTaskAsync(Guid id)
+        {
+            var result = await _mediaR.Send(new DeleteTaskCommand(id));
+
+            if (!result.Success)
+            {
+                _logger.LogWarning("Deleting Task Titled {title} Failed", result.Data.Title);
                 return BadRequest(result);
             }
             return Ok(result);
