@@ -13,7 +13,7 @@ namespace TaskManagementApi.PresentationUI.Controllers
     [ApiController]
     [Authorize]
     public class TaskItemController(ILogger<TaskItemController> _logger,
-        Mediator _mediaR) : ControllerBase
+        IMediator _mediaR) : ControllerBase
     {
         [HttpPost("create")]
         public async Task<IActionResult> CreateTaskAsync([FromBody] TaskRequestDto requestDto)

@@ -12,7 +12,7 @@ namespace TaskManagementApi.PresentationUI.Controllers
     [ApiController]
     [Authorize]
     public class CategoryController(ILogger<CategoryController> _logger,
-        Mediator _mediaR) : ControllerBase
+        IMediator _mediaR) : ControllerBase
     {
         [HttpPost("create-category")]
         public async Task<IActionResult> CreateCategoryAsync([FromBody] CategoryRequestDto request)
