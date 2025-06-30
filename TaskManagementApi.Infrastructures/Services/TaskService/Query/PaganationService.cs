@@ -17,7 +17,7 @@ using TaskManagementApi.Domains.Wrapper;
 
 namespace TaskManagement.Infrastructures.Services.TaskService.Query
 {
-    internal class PaganationService(
+    public class PaganationService(
         IHttpContextAccessor _httpContextAccessor,
         TaskManagementDbContext _dbContext,
         ILogger<GetAllTaskService> _logger) : IPaganationTaskService
