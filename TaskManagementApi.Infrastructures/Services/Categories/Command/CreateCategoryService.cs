@@ -49,13 +49,22 @@ namespace TaskManagement.Infrastructures.Services.Categories.Command
             //3 macth the applicationUsert to TaskUser(Domain)
             var matchingApplicationUser = await _dbContext.UserApplicationDb
                 .FirstOrDefaultAsync(ac => ac.Id == parseUserId);
+
             // --- ADD THIS LOGGING ---
             _logger.LogInformation("Attempting to create category for UserId: {UserId}", parseUserId);
-            //3. Create Category
-            var taskUserIdToUse = matchingApplicationUser.DomainUserId;
-            if(string.IsNullOrWhiteSpace(taskUserIdToUse.ToString()))
+             //4. Create Category
+            if (matchingApplicationUser == null)
             {
-                _logger.LogWarning("User {id} Is empty.",userId);
+                _logger.LogWarning("No matching ApplicationUser found for userId {id}.", userId);
+                response.Success = false;
+                response.Message = "Invalid User.";
+                return response;
+            }
+            //5. combine 
+            var taskUserIdToUse = matchingApplicationUser.DomainUserId;
+            if (taskUserIdToUse == Guid.Empty)
+            {
+                _logger.LogWarning("User {id} has an empty DomainUserId.", userId);
                 response.Success = false;
                 response.Message = "Invalid User.";
                 return response;
