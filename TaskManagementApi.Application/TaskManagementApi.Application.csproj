@@ -28,9 +28,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Common\Interfaces\ICategory\CategoryQuery\" />
     <Folder Include="DTOs\" />
-    <Folder Include="Features\CategoryFeature\Queries\" />
   </ItemGroup>
 
 </Project>
