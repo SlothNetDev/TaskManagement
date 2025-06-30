@@ -36,7 +36,7 @@ namespace TaskManagementApi.PresentationUI.Controllers
             }
             return Ok(result);
         }
-        [HttpPost("update-category")]
+        [HttpPatch("update-category")]
         public async Task<IActionResult> UpdateCategoryAsync([FromBody] CategoryUpdateDto request)
         {
             var result = await _mediaR.Send(new UpdateCategoryCommand(request));
