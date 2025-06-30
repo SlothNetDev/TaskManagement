@@ -12,13 +12,13 @@ using TaskManagementApi.Domains.Wrapper;
 
 namespace TaskManagementApi.Application.Features.Task.Query
 {
-    public record GetPaganationTasksQuery(PaganationDto dto) :IRequest<ResponseType<PaganationResponse<TaskResponseDto>>>;
+    public record GetPaganationTasksQuery(PaganationDto dto,CancellationToken cancellationToken) :IRequest<ResponseType<PaganationResponse<TaskResponseDto>>>;
 
     public class GetPaganationTasksQueryHandler(IPaganationTaskService service) : IRequestHandler<GetPaganationTasksQuery, ResponseType<PaganationResponse<TaskResponseDto>>>
     {
         public Task<ResponseType<PaganationResponse<TaskResponseDto>>> Handle(GetPaganationTasksQuery request, CancellationToken cancellationToken)
         {
-            return service.PaganationAsync(request.dto);
+            return service.PaganationAsync(request.dto,request.cancellationToken);
         }
     }
 }
