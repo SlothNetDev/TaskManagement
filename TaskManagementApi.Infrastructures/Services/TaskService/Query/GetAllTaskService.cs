@@ -50,7 +50,7 @@ namespace TaskManagement.Infrastructures.Services.TaskService.Query
                 //3. return response result
                 response.Success = true;
                 response.Data = userTasks;
-                response.Message = "Successfully Display all Blogs";
+                response.Message = "Successfully Display all tasks";
                 return response;  
             }
             catch(Exception ex)
