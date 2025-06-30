@@ -29,11 +29,32 @@ namespace TaskManagement.Infrastructures.Services.Categories.Query
                 response.Message = "Unauthorized or invalid user.";
                 return response;
             }
+             // macth the applicationUsert to TaskUser(Domain)
+            var matchingApplicationUser = await _dbContext.UserApplicationDb
+                .FirstOrDefaultAsync(ac => ac.Id == parseUserId);
+            
+            if (matchingApplicationUser == null)
+            {
+                _logger.LogWarning("No matching ApplicationUser found for userId {id}.", userId);
+                response.Success = false;
+                response.Message = "Invalid User.";
+                return response;
+            }
+            // combine 
+            var taskUserIdToUse = matchingApplicationUser.DomainUserId;
+            if (taskUserIdToUse == Guid.Empty)
+            {
+                _logger.LogWarning("User {id} has an empty DomainUserId.", userId);
+                response.Success = false;
+                response.Message = "Invalid User.";
+                return response;
+            }
+            
             try
             {
                 //query the category with task
                 var categoryQuery = _dbContext.CategoryDb
-                    .Where(t => t.UserId == parseUserId)
+                    .Where(t => t.UserId == taskUserIdToUse)
                     .Include(t => t.Tasks)
                     .Select(c => new CategoryResponseDtoWithTask(c.Id,
                               c.CategoryName,
