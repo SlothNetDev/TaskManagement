@@ -64,7 +64,7 @@ namespace TaskManagement.Infrastructures.Services.Categories.Command
             }
             catch(Exception ex)
             {
-                _logger.LogInformation("Category Created Failed from user {user}, Reason: {reason}", createTask.Id,ex.Message);
+                _logger.LogInformation("Category Created Failed from user {user}, Reason: {reason}", category.Id,ex.Message);
                 response.Success = false;
                 response.Message = "Failed to Create Category";
                 return response;
