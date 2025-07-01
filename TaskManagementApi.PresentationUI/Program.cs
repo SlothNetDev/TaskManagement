@@ -18,24 +18,17 @@ namespace TaskManagementApi.PresentationUI
 
             //Calling Service Extention
             // Add services to the container
-            try
-            {
-                 builder.AddCleanSerilog() // This comes first to capture startup logs
-                   .Services
-                   .AddPresentationService(builder.Configuration);
-                var app = builder.Build();
 
-                //Calling ApplicationBuilderExtensions 
-                await app.ConfigureApplication();
+             builder.AddCleanSerilog() // This comes first to capture startup logs
+               .Services
+               .AddPresentationService(builder.Configuration);
+            var app = builder.Build();
+
+            //Calling ApplicationBuilderExtensions 
+            await app.ConfigureApplication();
            
-                app.Run();
-            }
-            catch(Exception ex)
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("Error: {errror}",ex.Message);
-                Console.ResetColor();
-            }
+            app.Run();
+       
 
             
         }

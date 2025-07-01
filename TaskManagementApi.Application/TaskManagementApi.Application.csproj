@@ -7,8 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="DTOs\**" />
     <Compile Remove="Validators\**" />
+    <EmbeddedResource Remove="DTOs\**" />
     <EmbeddedResource Remove="Validators\**" />
+    <None Remove="DTOs\**" />
     <None Remove="Validators\**" />
   </ItemGroup>
 
@@ -25,10 +28,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\TaskManagementApi.Domains\TaskManagementApi.Core.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="DTOs\" />
   </ItemGroup>
 
 </Project>

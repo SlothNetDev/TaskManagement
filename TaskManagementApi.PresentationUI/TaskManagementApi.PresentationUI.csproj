@@ -25,6 +25,8 @@
     <ProjectReference Include="..\TaskManagementApi.Domains\TaskManagementApi.Core.csproj" />
     <ProjectReference Include="..\TaskManagementApi.Infrastructures\TaskManagementApi.Infrastructures.csproj" />
   </ItemGroup>
-  
+  <PropertyGroup>
+  	<PreserveCompilationContext>true</PreserveCompilationContext>
+  </PropertyGroup>
 
 </Project>
