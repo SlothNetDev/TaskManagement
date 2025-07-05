@@ -18,7 +18,7 @@ namespace TaskManagement.Infrastructures.Services.TaskService.Query
     public class SearchTaskServices(
     ILogger<SearchTaskServices> _logger,
     IHttpContextAccessor _httpContextAccessor,
-    TaskManagementDbContext _dbContext) : ISearchTask
+    ApplicationDbContext _dbContext) : ISearchTask
     {
         public async Task<ResponseType<List<TaskResponseDto>>> SearchTaskAsync(string search)
         {

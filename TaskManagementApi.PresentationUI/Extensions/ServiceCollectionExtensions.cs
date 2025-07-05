@@ -39,7 +39,7 @@ namespace TaskManagementApi.PresentationUI.Extensions
         public static IServiceCollection AddPresentationService(this IServiceCollection services,
             IConfiguration configuration )
         {
-            services.AddDbContext<TaskManagementDbContext>((serviceProvider, options) =>
+            services.AddDbContext<ApplicationDbContext>((serviceProvider, options) =>
             {
                 var env = serviceProvider.GetRequiredService<IHostEnvironment>();
                 var config = serviceProvider.GetRequiredService<IConfiguration>();
@@ -146,7 +146,7 @@ namespace TaskManagementApi.PresentationUI.Extensions
                 options.Password.RequireUppercase = true;
             })
                 .AddDefaultTokenProviders()
-                .AddEntityFrameworkStores<TaskManagementDbContext>();
+                .AddEntityFrameworkStores<ApplicationDbContext>();
         }
 
         private static void Swaggers(IServiceCollection services)

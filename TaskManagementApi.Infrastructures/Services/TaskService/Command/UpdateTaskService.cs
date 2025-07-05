@@ -13,7 +13,7 @@ using TaskManagementApi.Domains.Wrapper;
 namespace TaskManagement.Infrastructures.Services.TaskService.Command
 {
     public class UpdateTaskService(ILogger<UpdateTaskService> _logger,
-        TaskManagementDbContext _dbContext,
+        ApplicationDbContext _dbContext,
         IHttpContextAccessor _httpContextAccessor) : IUpdateTaskService
     {
         public async Task<ResponseType<TaskResponseDto>> UpdateTaskAsync(TaskUpdateDto request)

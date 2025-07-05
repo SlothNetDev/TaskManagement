@@ -10,7 +10,7 @@ using TaskManagementApi.Domains.Wrapper;
 namespace TaskManagement.Infrastructures.Services.Categories.Command
 {
     public class DeleteCategoryService(
-        TaskManagementDbContext _dbContext,
+        ApplicationDbContext _dbContext,
         ILogger<DeleteCategoryService> _logger,
         IHttpContextAccessor _httpContextAccessor) : IDeleteCategoryService
     {

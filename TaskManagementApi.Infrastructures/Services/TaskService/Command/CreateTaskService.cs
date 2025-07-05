@@ -11,7 +11,7 @@ using TaskManagementApi.Domains.Wrapper;
 using TaskManagementApi.Domains.Enums;
 namespace TaskManagement.Infrastructures.Services.TaskService.Command
 {
-    public class CreateTaskService(TaskManagementDbContext _dbContext,
+    public class CreateTaskService(ApplicationDbContext _dbContext,
         ILogger<CreateTaskService> _logger,
         IHttpContextAccessor _httpContextAccessor) : ICreateTask
     {

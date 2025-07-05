@@ -19,7 +19,7 @@ namespace TaskManagement.Infrastructures.Services.TaskService.Query
 {
     public class PaganationService(
         IHttpContextAccessor _httpContextAccessor,
-        TaskManagementDbContext _dbContext,
+        ApplicationDbContext _dbContext,
         ILogger<PaganationService> _logger) : IPaganationTaskService
     {
         public async Task<ResponseType<PaganationResponse<TaskResponseDto>>> PaganationAsync(PaganationDto request,CancellationToken cancellationToken)

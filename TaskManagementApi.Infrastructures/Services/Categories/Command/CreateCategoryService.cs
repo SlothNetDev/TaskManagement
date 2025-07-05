@@ -14,7 +14,7 @@ using TaskManagementApi.Domains.Wrapper;
 namespace TaskManagement.Infrastructures.Services.Categories.Command
 {
     public class CreateCategoryService(
-        TaskManagementDbContext _dbContext,
+        ApplicationDbContext _dbContext,
         ILogger<CreateCategoryService> _logger,
         IHttpContextAccessor _httpContextAccessor) : ICreateCategoryService
     {

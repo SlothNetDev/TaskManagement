@@ -27,7 +27,7 @@ namespace TaskManagement.Test.AuthenticationTest
                 
                 // Remove default DbContext
                 var descriptor = services.SingleOrDefault(
-                    d => d.ServiceType == typeof(DbContextOptions<TaskManagementDbContext>));
+                    d => d.ServiceType == typeof(DbContextOptions<ApplicationDbContext>));
                 if (descriptor != null)
                 {
                     services.Remove(descriptor);
@@ -35,7 +35,7 @@ namespace TaskManagement.Test.AuthenticationTest
                 }
 
                 // Add in-memory database for testing
-                services.AddDbContext<TaskManagementDbContext>(options =>
+                services.AddDbContext<ApplicationDbContext>(options =>
                 {
                     options.UseInMemoryDatabase("InMemoryDbForTesting");
                 });
@@ -81,7 +81,7 @@ namespace TaskManagement.Test.AuthenticationTest
             using var scope = host.Services.CreateScope();
             var scopedServices = scope.ServiceProvider;
 
-            var db = scopedServices.GetRequiredService<TaskManagementDbContext>();
+            var db = scopedServices.GetRequiredService<ApplicationDbContext>();
             var roleManager = scopedServices.GetRequiredService<RoleManager<ApplicationRole>>();
             var userManager = scopedServices.GetRequiredService<UserManager<ApplicationUsers>>();
 

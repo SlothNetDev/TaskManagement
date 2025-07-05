@@ -11,8 +11,8 @@ using TaskManagement.Infrastructures.Data;
 
 namespace TaskManagement.Infrastructures.Migrations
 {
-    [DbContext(typeof(TaskManagementDbContext))]
-    [Migration("20250626170220_InitialCreate")]
+    [DbContext(typeof(ApplicationDbContext))]
+    [Migration("20250705203741_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />

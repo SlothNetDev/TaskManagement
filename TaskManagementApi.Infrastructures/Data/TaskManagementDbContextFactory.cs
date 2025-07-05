@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace TaskManagement.Infrastructures.Data
 {
-    internal class TaskManagementDbContextFactory : IDesignTimeDbContextFactory<TaskManagementDbContext>
+    internal class TaskManagementDbContextFactory : IDesignTimeDbContextFactory<ApplicationDbContext>
     {
-        public TaskManagementDbContext CreateDbContext(string[] args)
+        public ApplicationDbContext CreateDbContext(string[] args)
         {
             var config = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
@@ -25,10 +25,10 @@ namespace TaskManagement.Infrastructures.Data
                 throw new InvalidOperationException("Could not find connection string 'TaskDbConnection'");
             }
 
-            var optionsBuilder = new DbContextOptionsBuilder<TaskManagementDbContext>();
+            var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
             optionsBuilder.UseSqlServer(connectionString);
 
-            return new TaskManagementDbContext(optionsBuilder.Options);
+            return new ApplicationDbContext(optionsBuilder.Options);
         }
     }
 }

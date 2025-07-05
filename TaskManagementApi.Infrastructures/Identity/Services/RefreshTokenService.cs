@@ -18,7 +18,7 @@ using TaskManagementApi.Domains.Wrapper;
 namespace TaskManagement.Infrastructures.Identity.Services
 {
     public class RefreshTokenService(
-    TaskManagementDbContext _dbContext,
+    ApplicationDbContext _dbContext,
     UserManager<ApplicationUsers> _userManager,
     ILogger<RefreshTokenService> _logger,
     ITokenService _tokenService,

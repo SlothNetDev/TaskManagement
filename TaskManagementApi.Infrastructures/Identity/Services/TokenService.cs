@@ -16,7 +16,7 @@ using TaskManagementApi.Domains.Wrapper;
 namespace TaskManagement.Infrastructures.Identity.Services
 {
     public class TokenService(JwtSettings _settings,
-    TaskManagementDbContext _dbContext,
+    ApplicationDbContext _dbContext,
     IHttpContextAccessor _httpContextAccessor) : ITokenService
     {
         public async Task<AuthResultDto> GenerateTokenAsync(TokenUserDto user)

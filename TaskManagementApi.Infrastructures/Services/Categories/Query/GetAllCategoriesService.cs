@@ -11,7 +11,7 @@ using TaskManagementApi.Domains.Wrapper;
 
 namespace TaskManagement.Infrastructures.Services.Categories.Query
 {
-    public class GetAllCategoriesService(TaskManagementDbContext _dbContext,
+    public class GetAllCategoriesService(ApplicationDbContext _dbContext,
         ILogger<GetAllCategoriesService> _logger,
         IHttpContextAccessor _httpContextAccessor) : IGetAllCategories
     {

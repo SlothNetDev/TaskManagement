@@ -16,7 +16,7 @@ using TaskManagementApi.Domains.Wrapper;
 namespace TaskManagement.Infrastructures.Services.TaskService.Command
 {
     public class DeleteTaskService(
-        TaskManagementDbContext _dbContext,
+        ApplicationDbContext _dbContext,
         ILogger<DeleteTaskService> _logger,
         IHttpContextAccessor _httpContextAccessor) : IDeleteTaskService
     {

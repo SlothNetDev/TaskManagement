@@ -17,7 +17,7 @@ using TaskManagementApi.Domains.Wrapper;
 namespace TaskManagement.Infrastructures.Services.Categories.Command
 {
     public class UpdateCategoryService(
-        TaskManagementDbContext _dbContext,
+        ApplicationDbContext _dbContext,
         ILogger<UpdateCategoryService> _logger,
         IHttpContextAccessor _httpContextAccessor) : IUpdateCategoryService
     {

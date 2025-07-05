@@ -7,7 +7,7 @@ using TaskManagementApi.Domains.Entities;
 
 namespace TaskManagement.Infrastructures.Data
 {
-    public class TaskManagementDbContext(DbContextOptions<TaskManagementDbContext> options)
+    public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
         : IdentityDbContext<ApplicationUsers, ApplicationRole, Guid>(options)
     {
         public DbSet<ApplicationUsers> UserApplicationDb { get; set; }

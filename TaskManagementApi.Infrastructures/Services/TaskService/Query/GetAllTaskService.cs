@@ -10,7 +10,7 @@ using TaskManagementApi.Domains.Wrapper;
 namespace TaskManagement.Infrastructures.Services.TaskService.Query
 {
     public class GetAllTaskService(IHttpContextAccessor _httpContextAccessor,
-        TaskManagementDbContext _dbContext,
+        ApplicationDbContext _dbContext,
         ILogger<GetAllTaskService> _logger) : IGetAllTask
     {
         public async Task<ResponseType<List<TaskResponseDto>>> GetAllTaskAsync()

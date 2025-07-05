@@ -10,8 +10,8 @@ using TaskManagement.Infrastructures.Data;
 
 namespace TaskManagement.Infrastructures.Migrations
 {
-    [DbContext(typeof(TaskManagementDbContext))]
-    partial class TaskManagementDbContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(ApplicationDbContext))]
+    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
         {

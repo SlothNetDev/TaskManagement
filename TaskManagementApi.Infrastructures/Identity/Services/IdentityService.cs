@@ -15,7 +15,7 @@ using TaskManagementApi.Domains.Wrapper;
 namespace TaskManagementApi.Application.Features.Authentication.Commands
 {
     public class IdentityService(IOptions<IdentitySettings> _identitySettings,ILogger<IdentityService> _logger,
-        UserManager<ApplicationUsers> _userManager,ITokenService _tokenService,TaskManagementDbContext _dbContext) : 
+        UserManager<ApplicationUsers> _userManager,ITokenService _tokenService,ApplicationDbContext _dbContext) : 
         IAuthService
     {
         
