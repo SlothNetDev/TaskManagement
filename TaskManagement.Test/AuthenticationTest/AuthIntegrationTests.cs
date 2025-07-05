@@ -65,7 +65,7 @@ namespace TaskManagement.Test.AuthenticationTest
         public async Task Swagger_Should_Be_Available()
         {
             // Test if Swagger is available (indicates the app is running)
-            var response = await _client.GetAsync("/swagger");
+            var response = await _client.GetAsync("/scalar/v1");
             Console.WriteLine($"Swagger endpoint response: {response.StatusCode}");
             // Should not be 404 Not Found
             response.StatusCode.Should().NotBe(System.Net.HttpStatusCode.NotFound);
