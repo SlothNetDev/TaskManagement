@@ -15,14 +15,14 @@ using TaskManagementApi.Domains.Wrapper;
 
 namespace TaskManagement.Infrastructures.Identity.Services
 {
-    public class TokenService(
-    JwtSettings _settings,
+    public class TokenService(JwtSettings _settings,
     TaskManagementDbContext _dbContext,
     IHttpContextAccessor _httpContextAccessor) : ITokenService
     {
         public async Task<AuthResultDto> GenerateTokenAsync(TokenUserDto user)
         {
-            var IpAddress = new IPadressHelper(_httpContextAccessor);
+            var ipAddress = GetIpAddress();
+    
             var claims = new List<Claim>
             {
                 new(ClaimTypes.NameIdentifier, user.UserId),
@@ -31,68 +31,73 @@ namespace TaskManagement.Infrastructures.Identity.Services
                 new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
     
-            claims.AddRange(user.Roles.Select(role => new Claim(ClaimTypes.Role, role)));
+            claims.AddRange(user.Roles.Select(r => new Claim(ClaimTypes.Role, r)));
     
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_settings.Key));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
     
-            var jwtToken = new JwtSecurityToken(
+            var jwt = new JwtSecurityToken(
                 issuer: _settings.Issuer,
                 audience: _settings.Audience,
-                expires: DateTime.UtcNow.AddMinutes(15),
+                expires: DateTime.UtcNow.AddMinutes(_settings.ExpiryMinutes),
                 claims: claims,
                 signingCredentials: creds);
     
-            var tokenString = new JwtSecurityTokenHandler().WriteToken(jwtToken);
-            var refreshTokenDto = GenerateRefreshToken(user.UserId, IpAddress.GetIpAddress());
+            var token = new JwtSecurityTokenHandler().WriteToken(jwt);
+            var refreshToken = GenerateRefreshToken(user.UserId, ipAddress);
     
-            var refreshToken = MapToEntity(refreshTokenDto, Guid.Parse(user.UserId));
-            await _dbContext.RefreshTokens.AddAsync(refreshToken);
+            // Store refresh token
+            await _dbContext.RefreshTokens.AddAsync(new RefreshToken
+            {
+                Id = refreshToken.Id,
+                Token = refreshToken.Token,
+                Created = refreshToken.Created,
+                CreatedByIp = ipAddress,
+                Expires = refreshToken.Expires,
+                UserId = Guid.Parse(user.UserId)
+            });
+    
             await _dbContext.SaveChangesAsync();
     
             return new AuthResultDto(
-                tokenString,
-                jwtToken.ValidTo,
-                refreshTokenDto.Token,
+                token,
+                jwt.ValidTo,
+                refreshToken.Token,
                 user.UserName,
                 string.Join(",", user.Roles));
         }
     
         public RefreshTokenResponseDto GenerateRefreshToken(string userId, string ipAddress)
         {
-            var token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
-            var created = DateTime.UtcNow;
+            var refreshToken = new RefreshToken
+            {
+                Id = Guid.NewGuid().ToString(),
+                Token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)),
+                Created = DateTime.UtcNow,
+                Expires = DateTime.UtcNow.AddDays(7),
+                CreatedByIp = ipAddress,
+                UserId = Guid.Parse(userId)
+            };
     
             return new RefreshTokenResponseDto(
-                Guid.NewGuid().ToString(),
-                token,
-                created.AddDays(7),
-                false,
-                created,
-                ipAddress,
-                null,
-                null,
-                true
+                refreshToken.Id,
+                refreshToken.Token,
+                refreshToken.Expires,
+                refreshToken.IsExpired,
+                refreshToken.Created,
+                refreshToken.CreatedByIp,
+                refreshToken.Revoked,
+                refreshToken.RevokedByIp,
+                refreshToken.IsActive
             );
         }
     
-        private RefreshToken MapToEntity(RefreshTokenResponseDto dto, Guid userId) =>
-            new()
-            {
-                Id = dto.Id,
-                Token = dto.Token,
-                Expires = dto.Expires,
-                Created = dto.Created,
-                CreatedByIp = dto.CreatedByIp,
-                UserId = userId,
-                Revoked = dto.Revoked,
-                RevokedByIp = dto.RevokedByIp
-            };
-    
-        
-
-      
+        private string GetIpAddress()
+        {
+            return _httpContextAccessor.HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? "127.0.0.1";
+        }
     }
+
 
 
         
