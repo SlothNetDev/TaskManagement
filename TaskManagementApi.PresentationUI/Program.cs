@@ -28,7 +28,7 @@ namespace TaskManagementApi.PresentationUI
                 app.UseDeveloperExceptionPage();
             }
 
-            //Calling ApplicationBuilderExtensions 
+            //Calling ApplicationBuilderExtension
             await app.ConfigureApplication();
            
             app.Run();
