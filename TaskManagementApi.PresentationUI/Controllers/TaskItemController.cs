@@ -22,7 +22,7 @@ namespace TaskManagementApi.PresentationUI.Controllers
 
             if (!result.Success)
             {
-                _logger.LogWarning("Creating Task Titled {title} Failed", result.Data.Title);
+                _logger.LogWarning("Creating Task Titled {title} Failed", result.Data.Title ?? null);
                 return BadRequest(result);
             }
             return Ok(result);
@@ -34,7 +34,7 @@ namespace TaskManagementApi.PresentationUI.Controllers
 
             if (!result.Success)
             {
-                _logger.LogWarning("Updating Task Titled {title} Failed", result.Data.Title);
+                _logger.LogWarning("Updating Task Titled {title} Failed", result.Data.Title ?? null);
                 return BadRequest(result);
             }
             return Ok(result);
@@ -81,7 +81,7 @@ namespace TaskManagementApi.PresentationUI.Controllers
 
             if (!result.Success)
             {
-                _logger.LogWarning("Deleting Task Titled {title} Failed", result.Data.Title);
+                _logger.LogWarning("Deleting Task Titled {title} Failed", result.Data.Title ?? null);
                 return BadRequest(result);
             }
             return Ok(result);
