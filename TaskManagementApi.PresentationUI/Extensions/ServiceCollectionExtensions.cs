@@ -1,10 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.OpenApi;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using Serilog;
 using Serilog.Events;
 using System.Text;
@@ -62,7 +64,10 @@ namespace TaskManagementApi.PresentationUI.Extensions
                 .ConfigureJsonOptions();  
 
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-            services.AddOpenApi();
+            services.AddOpenApi(options =>
+            {
+                options.AddDocumentTransformer<BearerSecuritySchemeTransformer>();
+            });
 
             //Dependency Injection 
             DependencyInjection(services, configuration);
@@ -88,11 +93,12 @@ namespace TaskManagementApi.PresentationUI.Extensions
             });
 
             //swagger end points
-            services.AddEndpointsApiExplorer();
-            services.AddSwaggerGen();
+           /* services.AddEndpointsApiExplorer();*/
+            /*services.AddSwaggerGen();*/
 
             return services;
         }
+        #region Service Method
         private static void DependencyInjection(this IServiceCollection services, IConfiguration configuration)
         {
              // CQRS Services (keep only what you actually use)
@@ -207,7 +213,7 @@ namespace TaskManagementApi.PresentationUI.Extensions
             });
 
         }
-        
+#endregion
     }
     public static class SerilogExtensions
     {
@@ -222,6 +228,36 @@ namespace TaskManagementApi.PresentationUI.Extensions
             });
     
             return builder;
+        }
+    }
+    internal sealed class BearerSecuritySchemeTransformer(Microsoft.AspNetCore.Authentication.IAuthenticationSchemeProvider authenticationSchemeProvider) : IOpenApiDocumentTransformer
+    {
+        public async Task TransformAsync(OpenApiDocument document, OpenApiDocumentTransformerContext context, CancellationToken cancellationToken)
+        {
+            var authenticationSchemes = await authenticationSchemeProvider.GetAllSchemesAsync();
+            if (authenticationSchemes.Any(authScheme => authScheme.Name == "Bearer"))
+            {
+                var requirements = new Dictionary<string, OpenApiSecurityScheme>
+                {
+                    ["Bearer"] = new OpenApiSecurityScheme
+                    {
+                        Type = SecuritySchemeType.Http,
+                        Scheme = "bearer", 
+                        In = ParameterLocation.Header,
+                        BearerFormat = "Json Web Token"
+                    }
+                };
+                document.Components ??= new OpenApiComponents();
+                document.Components.SecuritySchemes = requirements;
+    
+                foreach (var operation in document.Paths.Values.SelectMany(path => path.Operations))
+                {
+                    operation.Value.Security.Add(new OpenApiSecurityRequirement
+                    {
+                        [new OpenApiSecurityScheme { Reference = new OpenApiReference { Id = "Bearer", Type = ReferenceType.SecurityScheme } }] = Array.Empty<string>()
+                    });
+                }
+            }
         }
     }
 
