@@ -37,13 +37,29 @@ namespace TaskManagementApi.PresentationUI.Extensions
         public static IServiceCollection AddPresentationService(this IServiceCollection services,
             IConfiguration configuration )
         {
-            //Core service
-            services.AddControllers()
-                .ConfigureJsonOptions();
+            services.AddDbContext<TaskManagementDbContext>((serviceProvider, options) =>
+            {
+                var env = serviceProvider.GetRequiredService<IHostEnvironment>();
+                var config = serviceProvider.GetRequiredService<IConfiguration>();
+                
+                Console.WriteLine($"Environment in AddPresentationService: {env.EnvironmentName}");
+                
+                if (env.IsEnvironment("Testing"))
+                {
+                    Console.WriteLine("Using InMemoryDatabase for Testing");
+                    options.UseInMemoryDatabase("InMemoryDbForTesting");
+                }
+                else
+                {
+                    Console.WriteLine("Using SQL Server for Production");
+                    options.UseSqlServer(config.GetConnectionString("TaskDbConnection"));
+                }
+            });
 
-            //database
-            services.AddDbContext<TaskManagementDbContext>(options =>
-                options.UseSqlServer(configuration.GetConnectionString("TaskDbConnection")));
+            //Core service - Single AddControllers call with both assembly part and JSON configuration
+            services.AddControllers()
+                .AddApplicationPart(typeof(Controllers.DashboardController).Assembly)
+                .ConfigureJsonOptions();  
 
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             services.AddOpenApi();
@@ -162,16 +178,22 @@ namespace TaskManagementApi.PresentationUI.Extensions
 
         private static void AddAuthentication(IServiceCollection services,IConfiguration configuration)
         {
-            //Authentication/Authorization
+            // ✅ First: Configure JwtSettings properly
+            services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));
+            services.AddSingleton(sp => sp.GetRequiredService<IOptions<JwtSettings>>().Value); // Optional but safe
+
+            // ✅ Then: configure JWT scheme
             services.AddAuthentication(options =>
             {
-                //  Force default to JWT Bearer instead of Identity.Application (cookie)
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            }).AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
+            })
+            .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
             {
-                var jwtSettings = configuration.GetSection("JwtSettings").Get<JwtSettings>();
-            
+                // ✅ Read settings from already-registered IOptions
+                var serviceProvider = services.BuildServiceProvider(); // temporary provider
+                var jwtSettings = serviceProvider.GetRequiredService<IOptions<JwtSettings>>().Value;
+
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuer = true,
@@ -183,6 +205,7 @@ namespace TaskManagementApi.PresentationUI.Extensions
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Key))
                 };
             });
+
         }
         
     }

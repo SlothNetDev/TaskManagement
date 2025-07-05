@@ -10,32 +10,34 @@ namespace TaskManagementApi.PresentationUI.Extensions
     {
         public static async Task<WebApplication> ConfigureApplication(this WebApplication app)
         {
-             // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
+            // Configure the HTTP request pipeline.
+            if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("Testing"))
             {
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger(); //changes to UseSwagger
                 app.UseSwaggerUI();
             }
 
-            //Seed Roles for request
-            using(var scope = app.Services.CreateScope())
+            //Seed Roles for request (skip in Testing environment - handled by test factory)
+            if (!app.Environment.IsEnvironment("Testing"))
             {
-                var services = scope.ServiceProvider;
-                var roleManager = services.GetRequiredService<RoleManager<ApplicationRole>>();
+                using(var scope = app.Services.CreateScope())
+                {
+                    var services = scope.ServiceProvider;
+                    var roleManager = services.GetRequiredService<RoleManager<ApplicationRole>>();
 
-                await IdentitySeeder.SeedRolesAsync(roleManager);
+                    await IdentitySeeder.SeedRolesAsync(roleManager);
+                }
             }
+            
             //adding global middleware
             app.UseMiddleware<MiddlewareException>();
 
             app.UseHttpsRedirection();
 
-
             app.UseAuthentication(); // Note: This should come BEFORE UseAuthorization
             app.UseAuthorization();
             
-
             app.MapControllers();
 
             return app;
