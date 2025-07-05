@@ -1,131 +1,105 @@
-﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
+using Microsoft.EntityFrameworkCore.InMemory;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.SqlServer;
 using TaskManagement.Infrastructures.Data;
 using TaskManagement.Infrastructures.Identity.Models;
-using TaskManagementApi.Application.Common.Settings;
-using Microsoft.Extensions.Options;
+using TaskManagementApi.Application.Features.Authentication.DTOs;
 namespace TaskManagement.Test.AuthenticationTest
 {
     public class CustomWebApplicationFactory<TProgram> : WebApplicationFactory<TProgram> where TProgram : class
     {
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
-            Console.WriteLine("Configuring WebHost for Testing...");
-            builder.UseEnvironment("Testing"); // This allows your conditional UseInMemoryDb logic to run
-            Console.WriteLine($"Environment set to: {builder.GetSetting(WebHostDefaults.EnvironmentKey)}");
-            
             builder.ConfigureServices(services =>
             {
-                Console.WriteLine("Configuring services for testing...");
-                
-                // Remove default DbContext
-                var descriptor = services.SingleOrDefault(
-                    d => d.ServiceType == typeof(DbContextOptions<TaskManagementDbContext>));
-                if (descriptor != null)
-                {
-                    services.Remove(descriptor);
-                    Console.WriteLine("Removed existing DbContext configuration");
-                }
+                //remove all dbcontext
+                services.RemoveAll<TaskManagementDbContext>();
+                // Optional: Replace real DB with in-memory for tests
 
-                // Add in-memory database for testing
+
+
+                 // Let's try removing existing Identity registrations first if they exist and causing issues.
+                // This is more aggressive but ensures a clean slate for Identity setup.
+                var identityDescriptor = services.FirstOrDefault(d => d.ServiceType == typeof(UserManager<ApplicationUser>));
+                if (identityDescriptor != null)
+                {
+                    // Remove all services related to Identity and its stores
+                    // This is a bit of a blunt instrument, but often necessary for clean test setup.
+                    services.RemoveAll(typeof(IUserStore<>));
+                    services.RemoveAll(typeof(IRoleStore<>));
+                    services.RemoveAll(typeof(UserManager<>));
+                    services.RemoveAll(typeof(SignInManager<>));
+                    services.RemoveAll(typeof(RoleManager<>));
+                    // Add more if your Identity setup added other specific services.
+                }
+                // Now, add ApplicationDbContext using an in-memory database for testing
                 services.AddDbContext<TaskManagementDbContext>(options =>
                 {
-                    options.UseInMemoryDatabase("InMemoryDbForTesting");
+                    options.UseInMemoryDatabase("TaskDbForTesting"); // Ensure a unique name if you have multiple factories
                 });
-                Console.WriteLine("Added in-memory database configuration");
-
-                // Configure JWT settings for testing
-                services.Configure<JwtSettings>(options =>
+                 // Re-add Identity services for testing, pointing to the in-memory DbContext
+                services.AddIdentity<TaskManagementDbContext, IdentityRole>(options =>
                 {
-                    options.Key = "TestJwtKeyForTestingPurposesOnlyThisShouldBeAtLeast256BitsLong";
-                    options.Issuer = "TaskManagementApi";
-                    options.Audience = "TaskManagementApiUsers";
-                    options.ExpiryMinutes = 60;
-                });
-                services.AddSingleton(sp => sp.GetRequiredService<IOptions<JwtSettings>>().Value);
-                Console.WriteLine("Configured JWT settings for testing");
+                    // Relax password requirements for testing (adjust as needed)
+                    options.Password.RequireDigit = false;
+                    options.Password.RequiredLength = 4;
+                    options.Password.RequireNonAlphanumeric = false;
+                    options.Password.RequireUppercase = false;
+                    options.Password.RequireLowercase = false;
+                    options.Password.RequiredUniqueChars = 0;
 
-                // Log all registered services to debug controller discovery
-                Console.WriteLine("Registered services:");
-                foreach (var service in services.Where(s => s.ServiceType.Name.Contains("Controller") || s.ServiceType.Name.Contains("Action")))
+                    // Disable lockout for testing
+                    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(0);
+                    options.Lockout.MaxFailedAccessAttempts = 999;
+                    options.Lockout.AllowedForNewUsers = false;
+
+                    // Configure user options
+                    options.User.RequireUniqueEmail = true;
+                })
+                .AddEntityFrameworkStores<TaskManagementDbContext>() // Point to the in-memory context
+                .AddDefaultTokenProviders();
+
+                // Build the service provider
+                var sp = services.BuildServiceProvider();
+
+                // Create a scope to obtain a reference to the database contexts
+                using (var scope = sp.CreateScope())
                 {
-                    Console.WriteLine($"  {service.ServiceType.Name} -> {service.ImplementationType?.Name ?? "Factory"}");
+                    var scopedServices = scope.ServiceProvider;
+                    var dbContext = scopedServices.GetRequiredService<TaskManagementDbContext>();
+                    var userManager = scopedServices.GetRequiredService<UserManager<TaskManagementDbContext>>();
+                    var roleManager = scopedServices.GetRequiredService<RoleManager<IdentityRole>>();
+
+                    // Ensure the database is created.
+                    // For in-memory, this creates the schema.
+                    dbContext.Database.EnsureCreated();
+
+                    // Seed the database with test data if necessary
+                    SeedData(dbContext, userManager, roleManager);
                 }
-            });
+        });
+    }
 
-            builder.ConfigureAppConfiguration((context, config) =>
+            // Helper method to seed data for tests
+            private void SeedData(TaskManagementDbContext context, UserManager<TaskManagementDbContext> userManager, RoleManager<IdentityRole> roleManager)
             {
-                Console.WriteLine($"Configuring app configuration. Environment: {context.HostingEnvironment.EnvironmentName}");
-                // Ensure the environment is set correctly
-                config.AddInMemoryCollection(new Dictionary<string, string>
+                // Ensure any roles needed for tests exist
+                if (!roleManager.RoleExistsAsync("Admin").Result)
                 {
-                    ["ASPNETCORE_ENVIRONMENT"] = "Testing"
-                });
-            });
-        }
-
-        protected override IHost CreateHost(IHostBuilder builder)
-        {
-            Console.WriteLine("Creating host...");
-            var host = base.CreateHost(builder);
-            Console.WriteLine($"Host created. Environment: {host.Services.GetRequiredService<IHostEnvironment>().EnvironmentName}");
-            
-            // Seed the database after the host is created
-            using var scope = host.Services.CreateScope();
-            var scopedServices = scope.ServiceProvider;
-
-            var db = scopedServices.GetRequiredService<TaskManagementDbContext>();
-            var roleManager = scopedServices.GetRequiredService<RoleManager<ApplicationRole>>();
-            var userManager = scopedServices.GetRequiredService<UserManager<ApplicationUsers>>();
-
-            db.Database.EnsureCreated();
-            Console.WriteLine("Database created and seeded");
-
-            SeedTestData(userManager, roleManager).GetAwaiter().GetResult();
-            Console.WriteLine("Test data seeded successfully");
-            
-            return host;
-        }
-
-        private async Task SeedTestData(UserManager<ApplicationUsers> userManager, RoleManager<ApplicationRole> roleManager)
-        {
-            // Ensure roles
-            foreach (var role in new[] { "User", "Admin" })
-            {
-                if (!await roleManager.RoleExistsAsync(role))
-                {
-                    await roleManager.CreateAsync(new ApplicationRole { Name = role });
-                    Console.WriteLine($"Created role: {role}");
+                    roleManager.CreateAsync(new IdentityRole("Admin")).Wait();
                 }
-            }
-
-            // Add test user
-            var email = "testuser@gmail.com";
-            if (await userManager.FindByEmailAsync(email) is null)
-            {
-                var user = new ApplicationUsers
+                if (!roleManager.RoleExistsAsync("User").Result) // Example: add a default User role
                 {
-                    UserName = email,
-                    Email = email,
-                    EmailConfirmed = true,
-                    DomainUserId = Guid.NewGuid()
-                };
+                    roleManager.CreateAsync(new IdentityRole("User")).Wait();
+                }
 
-                await userManager.CreateAsync(user, "Test@1234");
-                await userManager.AddToRoleAsync(user, "User");
-                Console.WriteLine($"Created test user: {email}");
+               
             }
-            else
-            {
-                Console.WriteLine($"Test user already exists: {email}");
-            }
-        }
+     
     }
 }
