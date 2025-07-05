@@ -215,16 +215,19 @@ namespace TaskManagementApi.PresentationUI.Extensions
         }
 #endregion
     }
+    /// <summary>
+    /// Serilog Class configuration
+    /// </summary>
     public static class SerilogExtensions
     {
         public static WebApplicationBuilder AddCleanSerilog(this WebApplicationBuilder builder)
         {
             builder.Logging.ClearProviders();
             
-            builder.Host.UseSerilog((context, config) =>
+            builder.Host.UseSerilog((context, services,loggerConfiguration) =>
             {
-                config.ReadFrom.Configuration(context.Configuration)
-                      .Enrich.FromLogContext();
+                loggerConfiguration.ReadFrom.Configuration(context.Configuration)
+                .ReadFrom.Services(services);
             });
     
             return builder;
