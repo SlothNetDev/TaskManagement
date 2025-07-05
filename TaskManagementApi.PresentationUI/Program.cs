@@ -24,7 +24,7 @@ namespace TaskManagementApi.PresentationUI
                .AddPresentationService(builder.Configuration);
             var app = builder.Build();
 
-            //Calling ApplicationBuilderExtensions 
+            //Calling ApplicationBuilderExtension
             await app.ConfigureApplication();
            
             app.Run();

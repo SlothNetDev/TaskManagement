@@ -35,7 +35,8 @@ namespace TaskManagement.Infrastructures.Identity.Services
     
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_settings.Key));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-    
+            
+            //create jwt 
             var jwt = new JwtSecurityToken(
                 issuer: _settings.Issuer,
                 audience: _settings.Audience,
