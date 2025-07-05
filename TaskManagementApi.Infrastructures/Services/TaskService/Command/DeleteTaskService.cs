@@ -49,7 +49,7 @@ namespace TaskManagement.Infrastructures.Services.TaskService.Command
             var matchingApplicationUser = await _dbContext.UserApplicationDb
                 .FirstOrDefaultAsync(ac => ac.Id == parseUserId);
                         // --- ADD THIS LOGGING ---
-            _logger.LogInformation("Attempting to create category for UserId: {UserId}", parseUserId);
+            _logger.LogInformation("Attempting to create task for UserId: {UserId}", parseUserId);
              //4. Create Category
             if (matchingApplicationUser == null)
             {
@@ -68,7 +68,7 @@ namespace TaskManagement.Infrastructures.Services.TaskService.Command
                 return response;
             }
             //3. connect the user Id and Id that will user provide
-            var taskToDelete = await _dbContext.TaskDb.FirstOrDefaultAsync(x => x.UserId == taskUserIdToUse && x.UserId == id);
+            var taskToDelete = await _dbContext.TaskDb.FirstOrDefaultAsync(x => x.UserId == taskUserIdToUse && x.Id == id);
             if(taskToDelete is null)
             {
                 _logger.LogWarning("No task found with ID {Id} for user {UserId}.", id, parseUserId);
@@ -78,10 +78,11 @@ namespace TaskManagement.Infrastructures.Services.TaskService.Command
             }
             try
             {
-                _dbContext.Remove(id);
+                _dbContext.Remove(taskToDelete);
                 await _dbContext.SaveChangesAsync();
                 _logger.LogInformation($"Successfully  Deleted {id}");
                 response.Success = true;
+                response.Message = $" Successfully  Deleted Task {taskToDelete.Title.ToString()}";
                 response.Data = new TaskResponseDto(taskToDelete);
                 return response;
             }
