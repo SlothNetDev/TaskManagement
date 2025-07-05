@@ -10,10 +10,11 @@ namespace TaskManagement.Infrastructures.Data
     public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
         : IdentityDbContext<ApplicationUsers, ApplicationRole, Guid>(options)
     {
-        public DbSet<ApplicationUsers> UserApplicationDb { get; set; }
-        public DbSet<TaskItem> TaskDb { get; set; }
-        public DbSet<Category> CategoryDb { get; set; }
-        public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
+        //set as virtual to make them accessible for mock
+        public virtual DbSet<ApplicationUsers> UserApplicationDb { get; set; }
+        public virtual DbSet<TaskItem> TaskDb { get; set; }
+        public virtual DbSet<Category> CategoryDb { get; set; }
+        public virtual DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
