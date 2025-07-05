@@ -19,13 +19,5 @@ namespace TaskManagementApi.Application.DTOs.TaskDto
 
         [Required(ErrorMessage = "Decide a Due Date")]
         public DateTime DueDate { get; set; }
-
-        public TaskRequestDto(TaskItem item)
-        {
-            CategoryId = item.CategoryId;
-            Title = item.Title;
-            Priority = item.Priority;
-            DueDate = item.DueDate ?? DateTime.UtcNow.AddDays(1); // make due date as 1 day if not given
-        }
     }
 }
