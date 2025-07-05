@@ -29,7 +29,7 @@ namespace TaskManagement.Test.AuthenticationTest
         [Fact]
         public async Task Application_Should_Be_Running()
         {
-            // Test if the application is running by checking a simple endpoint
+            // Test if the application is running by checking a simple endpoints
             var response = await _client.GetAsync("/");
             // Should get some response (might be 404 for root, but not connection error)
             response.Should().NotBeNull();
@@ -72,7 +72,7 @@ namespace TaskManagement.Test.AuthenticationTest
         }
 
         [Fact]
-        public async Task Controllers_Should_Be_Registered()
+        public void Controllers_Should_Be_Registered()
         {
             // Create a new scope to check if controllers are registered
             using var scope = _factory.Services.CreateScope();
@@ -137,8 +137,8 @@ namespace TaskManagement.Test.AuthenticationTest
             var register = new RegisterRequestDto("JohnDoe", "newuser@email.com", "paSSword@#SS551");
     
             var registerResult = await _client.PostAsJsonAsync("/auth/register", register);
-    
-            // Ignore registration errors (already exists)
+            
+            // Ignore registration errors
             if (!registerResult.IsSuccessStatusCode)
             {
                 var error = await registerResult.Content.ReadAsStringAsync();

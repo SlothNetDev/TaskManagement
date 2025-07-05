@@ -41,7 +41,7 @@ namespace TaskManagement.Test.AuthenticationTest
                 });
                 Console.WriteLine("Added in-memory database configuration");
 
-                // Configure JWT settings for testing
+                // Configure JWT settings for testings
                 services.Configure<JwtSettings>(options =>
                 {
                     options.Key = "TestJwtKeyForTestingPurposesOnlyThisShouldBeAtLeast256BitsLong";
