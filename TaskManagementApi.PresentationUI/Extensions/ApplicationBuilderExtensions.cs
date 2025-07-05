@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Scalar.AspNetCore;
 using System.Threading.Tasks;
 using TaskManagement.Infrastructures.Data.Seeders;
 using TaskManagement.Infrastructures.Identity.Models;
@@ -14,8 +15,14 @@ namespace TaskManagementApi.PresentationUI.Extensions
             if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("Testing"))
             {
                 app.UseDeveloperExceptionPage();
-                app.UseSwagger(); //changes to UseSwagger
-                app.UseSwaggerUI();
+                app.MapOpenApi();
+                app.MapScalarApiReference(options =>
+                {
+                    options.Title = "Task Management System";
+                    options.Theme = ScalarTheme.BluePlanet;
+                    options.HideClientButton = true;
+                    options.DefaultHttpClient = new(ScalarTarget.CSharp, ScalarClient.HttpClient);
+                });
             }
 
             //Seed Roles for request (skip in Testing environment - handled by test factory)
