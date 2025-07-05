@@ -6,13 +6,13 @@ using TaskManagementApi.PresentationUI.Extensions;
 
 namespace TaskManagementApi.PresentationUI
 {
-    public class Program(Logger<Program> _logger)
+    public class Program
     {
         /// <summary>
         /// Simplified Program.cs
         /// </summary>
         /// <param name="args"></param>
-        public  static async Task Main()
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder();
 
@@ -23,16 +23,15 @@ namespace TaskManagementApi.PresentationUI
                .Services
                .AddPresentationService(builder.Configuration);
             var app = builder.Build();
+            if (app.Environment.IsDevelopment() || app.Environment.EnvironmentName == "Testing")
+            {
+                app.UseDeveloperExceptionPage();
+            }
 
             //Calling ApplicationBuilderExtensions 
             await app.ConfigureApplication();
            
             app.Run();
-       
-
-            
         }
- 
-        
     }
 }
