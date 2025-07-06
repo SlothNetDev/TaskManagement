@@ -12,12 +12,14 @@ using TaskManagement.Test.HelperTest;
 using TaskManagementApi.Application.DTOs.TaskDto;
 using TaskManagementApi.Domains.Entities;
 using TaskManagementApi.Domains.Enums;
+using Xunit.Abstractions;
 // Add this alias:
 
 namespace TaskManagement.Test.ServiceTest
 {
     public class CreateTaskServiceTest
     {
+        private readonly ITestOutputHelper _output;
         private readonly Mock<ApplicationDbContext> _mockDbContext;
         private readonly Mock<ILogger<CreateTaskService>> _mockLogger = new();
         private readonly Mock<IHttpContextAccessor> _mockHttpContextAccessor = new();
@@ -32,8 +34,9 @@ namespace TaskManagement.Test.ServiceTest
         private readonly ApplicationUsers _applicationUser;
         private readonly Category _category;
     
-        public CreateTaskServiceTest()
+        public CreateTaskServiceTest(ITestOutputHelper output)
         {
+            _output = output;
             // Arrange: test entities
             _applicationUser = new ApplicationUsers
             {
@@ -83,22 +86,25 @@ namespace TaskManagement.Test.ServiceTest
             var context = new DefaultHttpContext { User = new ClaimsPrincipal(new ClaimsIdentity(claims, "jwt")) };
             _mockHttpContextAccessor.Setup(x => x.HttpContext).Returns(context);
         }
-    
+        
+        /// <summary>
+        /// Check if create task was successfull
+        /// </summary>
+        /// <returns></returns>
         [Fact]
         public async Task CreateTaskAsync_ValidRequest_ReturnsSuccess()
         {
+            AsserApiHelpers assert = new(_output);
             // Act
             var result = await _service.CreateTaskAsync(_validRequest);
-    
+
             // Assert
-            Assert.True(result.Success);
-            Assert.Equal("Task Created Successfully", result.Message);
-            Assert.NotNull(result.Data);
-            Assert.Equal(_validRequest.Title, result.Data.Title);
-            Assert.Equal(Priority.High.ToString(), result.Data.Priority);
-            Assert.Equal(Status.InProgress.ToString(), result.Data.Status);
-            Assert.NotEqual(Guid.Empty, result.Data.Id);
-    
+            assert.ShouldSucceed(result, "Task Created Successfully");
+            assert.ShouldMatch(result, data =>
+                data.Title == _validRequest.Title &&
+                data.Priority == _validRequest.Priority.ToString() &&
+                data.DueDate == _validRequest.DueDate);
+
             _mockDbContext.Verify(db => db.AddAsync(It.IsAny<TaskItem>(), It.IsAny<CancellationToken>()), Times.Once);
             _mockDbContext.Verify(db => db.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
         }
