@@ -16,7 +16,7 @@ using Xunit.Abstractions;
 
 namespace TaskManagement.Test.CategoryTest
 {
-    public class CreateCategory
+    public class CreateCategoryTest
     {
         private readonly ITestOutputHelper _output;
         private readonly Mock<ApplicationDbContext> _mockDbContext; //mock the db context of database
@@ -32,7 +32,7 @@ namespace TaskManagement.Test.CategoryTest
         private readonly CategoryRequestDto _validRequest;
         private readonly ApplicationUsers _applicationUser;
 
-        public CreateCategory(ITestOutputHelper output)
+        public CreateCategoryTest(ITestOutputHelper output)
         {
             _output = output;
             //create applicationUser
