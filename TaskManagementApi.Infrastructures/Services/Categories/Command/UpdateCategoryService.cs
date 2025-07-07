@@ -26,13 +26,11 @@ namespace TaskManagement.Infrastructures.Services.Categories.Command
             var response = new ResponseType<CategoryResponseDto>();
 
             //1. Validate user
-            var validationErrors = ModelValidation.ModelValidationResponse(requestDto)
-            ?.Where(e => !string.IsNullOrWhiteSpace(e))
-            ?.ToList();
+            var validationErrors = ModelValidation.ModelValidationResponse(requestDto);
 
 
             //check if all field  request was correct
-            if (validationErrors?.Count > 0)
+            if (validationErrors.Any())
             {
                 _logger.LogWarning("Request validation failed for {Endpoint}. Errors: {@ValidationErrors}", 
                 "POST /login", 
