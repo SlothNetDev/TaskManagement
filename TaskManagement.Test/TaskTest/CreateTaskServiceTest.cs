@@ -59,7 +59,7 @@ namespace TaskManagement.Test.ServiceTest
             };
     
             // Set up fake HttpContext with claims
-            SetupHttpContextWithJwt(_jwtUserId);
+            HttpContextAccessorHelperTest.SetUpHttpContextAccessor(_jwtUserId,_mockHttpContextAccessor);
     
             // Set up DbContextMock with stubbed data
             var dbContextMock = new DbContextMock<ApplicationDbContext>(new DbContextOptions<ApplicationDbContext>());
@@ -77,15 +77,6 @@ namespace TaskManagement.Test.ServiceTest
             );
         }
     
-        private void SetupHttpContextWithJwt(Guid userId)
-        {
-            var claims = new List<Claim> {
-                new Claim(ClaimTypes.NameIdentifier, userId.ToString())
-            };
-    
-            var context = new DefaultHttpContext { User = new ClaimsPrincipal(new ClaimsIdentity(claims, "jwt")) };
-            _mockHttpContextAccessor.Setup(x => x.HttpContext).Returns(context);
-        }
         
         /// <summary>
         /// Check if create task was successfull
