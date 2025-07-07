@@ -4,12 +4,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
 using TaskManagement.Infrastructures.Data;
 using TaskManagement.Infrastructures.Identity.Models;
 using TaskManagement.Infrastructures.Services.Categories.Command;
@@ -51,7 +45,7 @@ namespace TaskManagement.Test.CategoryTest
              _validRequest = new CategoryRequestDto("My love life", "bwahalalaa");
 
             //make jwt token as valid token
-            SetUpHttpContextAccessor(_jwtUserId);
+            HttpContextAccessorHelperTest.SetUpHttpContextAccessor(_jwtUserId, _mockHttpContextAccessor);
 
             // Set up DbContextMock with stubbed data
             var dbContext = new DbContextMock<ApplicationDbContext>(new DbContextOptions<ApplicationDbContext>());
@@ -65,22 +59,6 @@ namespace TaskManagement.Test.CategoryTest
             //assign it into create service
             _create_Service = new CreateCategoryService(_mockDbContext.Object,
                 _mockLogger.Object, _mockHttpContextAccessor.Object);
-        }
-        /// <summary>
-        /// Set up httpContext Accessor for User Loggin
-        /// </summary>
-        /// <param name="userId"></param>
-        private void SetUpHttpContextAccessor(Guid userId)
-        {
-            var claims = new List<Claim> {
-                new Claim(ClaimTypes.NameIdentifier,userId.ToString())
-            };
-
-            var context = new DefaultHttpContext
-            {
-                User = new ClaimsPrincipal(new ClaimsIdentity(claims,"jwt"))
-            };
-            _mockHttpContextAccessor.Setup(x => x.HttpContext).Returns(context);
         }
 
         /// <summary>
