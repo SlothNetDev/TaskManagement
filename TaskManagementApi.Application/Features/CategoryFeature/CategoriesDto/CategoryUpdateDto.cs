@@ -1,21 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TaskManagementApi.Domains.Entities;
+
+using TaskManagementApi.Application.ApplicationHelpers.CostumeValidation;
 
 namespace TaskManagementApi.Application.Features.CategoryFeature.CategoriesDto
 {
-    public record CategoryUpdateDto(
+    public record CategoryUpdateDto
+    {
+        [NotDefaultGuid(ErrorMessage = "Id cannot be empty")]
         [Required(ErrorMessage = "Id is Required")]
-        Guid Id,
-
+        public Guid Id { get; init; }
+    
         [StringLength(120, ErrorMessage = "Category Name Cannot exceed with 120 characters")]
-        string? CategoryName,
-
+        public string? CategoryName { get; init; }
+    
         [StringLength(1000, ErrorMessage = "Descriptions Cannot exceed with 1000 characters")]
-        string? Description
-    );
+        public string? Description { get; init; }
+    }
 }
