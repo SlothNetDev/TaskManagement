@@ -26,10 +26,13 @@ namespace TaskManagement.Infrastructures.Services.Categories.Command
             var response = new ResponseType<CategoryResponseDto>();
 
             //1. Validate user
-            var validationErrors = ModelValidation.ModelValidationResponse(requestDto);
+            var validationErrors = ModelValidation.ModelValidationResponse(requestDto)
+            ?.Where(e => !string.IsNullOrWhiteSpace(e))
+            ?.ToList();
+
 
             //check if all field  request was correct
-            if (validationErrors.Any())
+            if (validationErrors?.Count > 0)
             {
                 _logger.LogWarning("Request validation failed for {Endpoint}. Errors: {@ValidationErrors}", 
                 "POST /login", 
@@ -70,13 +73,13 @@ namespace TaskManagement.Infrastructures.Services.Categories.Command
                  return response;
              }
             //check id categories if exist
-            var updateCategory = await _dbContext.CategoryDb.FirstOrDefaultAsync(id => id.UserId == taskUserIdToUse);
+            var updateCategory = await _dbContext.CategoryDb.FirstOrDefaultAsync(id => id.UserId == taskUserIdToUse && id.Id == requestDto.Id);
             //check if categoryId is exist
             if(updateCategory is null)
             {
-                _logger.LogWarning($"{updateCategory} Id Cannot Found");
+                _logger.LogDebug("Looking for Category with UserId: {UserId}, CategoryId: {CategoryId}", taskUserIdToUse, requestDto.Id);
                 response.Success = false;
-                response.Message = "Blog not found";
+                response.Message = "Category not found";
                 return response;
             }
 
@@ -93,6 +96,7 @@ namespace TaskManagement.Infrastructures.Services.Categories.Command
                     updateCategory.Id,
                     updateCategory.CategoryName,
                     updateCategory.Description);
+                response.Message = "Category Updated Successfully";
                 return response;
             }
             catch(Exception ex)
