@@ -8,11 +8,13 @@ using TaskManagementApi.Domains.Entities;
 
 namespace TaskManagementApi.Application.Features.CategoryFeature.CategoriesDto
 {
-    public record CategoryRequestDto(
+    public record CategoryRequestDto
+    {
         [Required(ErrorMessage = "Category Name is Required")]
         [StringLength(120, ErrorMessage = "Category Name Cannot exceed with 120 characters")]
-        string CategoryName,
+        public string CategoryName { get; init; } = string.Empty;
+
         [StringLength(1000, ErrorMessage = "Descriptions Cannot exceed with 1000 characters")]
-        string? Description
-        );
+        public string? Description { get; init; }
+    }
 }
