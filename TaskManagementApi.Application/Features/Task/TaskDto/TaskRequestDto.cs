@@ -5,19 +5,19 @@ using TaskManagementApi.Domains.Enums;
 
 namespace TaskManagementApi.Application.DTOs.TaskDto
 {
-    public class TaskRequestDto
+    public record TaskRequestDto
     {
         [Required(ErrorMessage = "Category Id is required")]
-        public Guid CategoryId { get; set; }
+        public Guid CategoryId { get; init; }
 
         [Required(ErrorMessage = "Title is Required")]
         [StringLength(120, ErrorMessage = "Title Cannot exceed 120 characters")]
-        public string Title { get; set; } = string.Empty;
+        public string Title { get; init; } = string.Empty;
 
         [Required(ErrorMessage = "Choose Priority")]
-        public Priority Priority { get; set; }
+        public Priority Priority { get; init; }
 
         [Required(ErrorMessage = "Decide a Due Date")]
-        public DateTime DueDate { get; set; }
+        public DateTime DueDate { get; init; }
     }
 }
