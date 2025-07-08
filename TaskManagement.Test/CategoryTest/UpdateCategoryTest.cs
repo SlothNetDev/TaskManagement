@@ -45,7 +45,7 @@ namespace TaskManagement.Test.CategoryTest
             };
     
             // Set up JWT HttpContext
-            HttpContextAccessorHelperTest.SetUpHttpContextAccessor(_jwtUserId, _mockHttpContextAccessor);
+            HelperTestMethod.SetUpHttpContextAccessor(_jwtUserId, _mockHttpContextAccessor);
     
             // Set up DbContextMock
             var dbContext = new DbContextMock<ApplicationDbContext>(new DbContextOptions<ApplicationDbContext>());
