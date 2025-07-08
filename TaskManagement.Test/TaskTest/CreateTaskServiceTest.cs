@@ -59,7 +59,7 @@ namespace TaskManagement.Test.ServiceTest
             };
     
             // Set up fake HttpContext with claims
-            HttpContextAccessorHelperTest.SetUpHttpContextAccessor(_jwtUserId,_mockHttpContextAccessor);
+            HelperTestMethod.SetUpHttpContextAccessor(_jwtUserId,_mockHttpContextAccessor);
     
             // Set up DbContextMock with stubbed data
             var dbContextMock = new DbContextMock<ApplicationDbContext>(new DbContextOptions<ApplicationDbContext>());
