@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using TaskManagement.Infrastructures.Data;
 using TaskManagement.Infrastructures.Identity.Models;
+using TaskManagement.Infrastructures.Identity.Services;
 using TaskManagementApi.Application.ApplicationHelpers;
 using TaskManagementApi.Application.Common.Interfaces.IAuthentication;
 using TaskManagementApi.Application.Common.Settings;
@@ -18,90 +19,95 @@ namespace TaskManagementApi.Application.Features.Authentication.Commands
         UserManager<ApplicationUsers> _userManager,ITokenService _tokenService,ApplicationDbContext _dbContext) : 
         IAuthService
     {
-        
-        /// <summary>
-        /// Registers a new user with a given role.
-        /// </summary>
-        /// <param name="dto">The user's registration data.</param>
-        /// <param name="role">The role to assign to the user (e.g. "User").</param>
-        /// <returns>A DTO containing token and user info if registration succeeds.</returns>
+       
         public async Task<ResponseType<string>> RegisterAsync(RegisterRequestDto registerDto)
         {
-            ResponseType<string> response = new();
-
             var validationErrors = ModelValidation.ModelValidationResponse(registerDto);
             if (validationErrors.Any())
             {
-                _logger.LogWarning("Validation Failed for {Email}. Invalid fields: {@validationError}",
-                     registerDto.Email,validationErrors);
-                response.Success = false;
-                response.Message = "There are Model Validation Occurred";
-                return response;
-
+                _logger.LogWarning("REG_001: Validation Failed for registration of {Email}. Invalid fields: {@validationErrors}",
+                    registerDto.Email, validationErrors);
+                return ResponseType<string>.Fail(
+                    validationErrors,
+                    "Validation failed. Please check the provided data."
+                );
             }
-
-            //1. Checking if User email is already Exist or created
+        
+            // 1. Checking if User email is already Exist or created
             var existingUser = await _userManager.FindByEmailAsync(registerDto.Email);
-            if(existingUser is not null)
+            if (existingUser is not null)
             {
-                _logger.LogError("Login attempt for Existing email: {Email}", registerDto.Email);
-                response.Success = false;
-                response.Message = "Invalid Email";
-                response.Errors?.Add("Email is Already Exist");
-                return response;
+                _logger.LogError("REG_002: Registration attempt for existing email: {Email}", registerDto.Email);
+                return ResponseType<string>.Fail(
+                    "EmailAlreadyExists",
+                    "Registration failed. An account with this email already exists."
+                );
             }
-
-            //2. creating domain users 
-            var domainUser = new TaskUsers();
-
-
-            //3. Create User By new ApplicationUser Object
+        
+            // 2. creating domain users
+            var domainUser = new TaskUsers(); // This should likely be persisted in your _dbContext as well
+        
+            // 3. Create User By new ApplicationUser Object
             var user = new ApplicationUsers
             {
                 UserName = registerDto.UserName,
                 Email = registerDto.Email,
                 CreatedAt = DateTime.UtcNow,
                 SecurityStamp = Guid.NewGuid().ToString(),
-                DomainUser = domainUser
+                DomainUser = domainUser // Ensure DomainUser is configured to be saved with ApplicationUser or separately
             };
-
-            // 4. Create the user using UserManager (this handles password hashing and validations
+        
+            // 4. Create the user using UserManager (this handles password hashing and validations)
             var result = await _userManager.CreateAsync(user, registerDto.Password);
             if (!result.Succeeded)
             {
-                //Collect all errors and throw it
-                _logger.LogWarning("Error Occured When Creating user Manager, Reason: {@Error}", result.Errors);
-                var errors = string.Join(",", result.Errors.Select(x => x.Description));
-                response.Success = false;
-                response.Errors?.Add(errors);
+                var errors = result.Errors.Select(x => x.Description).ToList();
+                _logger.LogWarning("REG_003: Error occurred when creating user through UserManager for {Email}. Errors: {@Errors}",
+                    registerDto.Email, errors);
+                return ResponseType<string>.Fail(
+                    errors,
+                    "Registration failed. Could not create user account."
+                );
             }
-
+        
             // 5. Determine role based on config, not hardcoded
             var isAdminEmail = _identitySettings.Value.AdminEmails
                 .Any(x => x.Equals(registerDto.Email, StringComparison.CurrentCultureIgnoreCase));
-
-            //if role is equal to isAdminEmail then it's admin, if not, then it's User Role
+        
+            // If role is equal to isAdminEmail then it's admin, if not, then it's User Role
             var role = isAdminEmail ? "Admin" : "User";
-
-            //6. adding role to user based on email
-            await _userManager.AddToRoleAsync(user, role);
-
-
-            try
+        
+            // 6. adding role to user based on email
+            // Consider handling the result of AddToRoleAsync as well
+            var roleResult = await _userManager.AddToRoleAsync(user, role);
+            if (!roleResult.Succeeded)
             {
-                _logger.LogInformation("Successfully Register Account Email {id}", user.Email);
-                response.Success = true;
-                response.Message = "Successfully Register your Account";     
-                return response;
+                var errors = roleResult.Errors.Select(x => x.Description).ToList();
+                _logger.LogError("REG_004: Failed to assign role '{Role}' to user {Email}. Errors: {@Errors}",
+                    role, registerDto.Email, errors);
+                // Decide if this should be a critical failure or if the user can still proceed as a default user
+                // For now, we'll treat it as a failure for registration
+                return ResponseType<string>.Fail(
+                    errors,
+                    "Registration successful, but failed to assign user role."
+                );
             }
-            catch(Exception ex)
-            {
-                _logger.LogError(ex, "Register failed for account. Reason: {ErrorMessage}", ex.Message);
-                response.Success = false;
-                response.Message = ex.Message;
-                return response;
-            }
+        
+            // Save changes to DomainUser if it's managed separately by DbContext
+            // If DomainUser is part of ApplicationUsers's aggregate, it might be saved by UserManager.CreateAsync
+            // If TaskUsers requires a separate _dbContext.Add(domainUser) and _dbContext.SaveChangesAsync(), add it here.
+            // For example:
+            // await _dbContext.TaskUsers.AddAsync(domainUser);
+            // await _dbContext.SaveChangesAsync();
+        
+        
+            _logger.LogInformation("REG_005: User {Email} successfully registered with role '{Role}'.", user.Email, role);
+            return ResponseType<string>.SuccessResult(
+                user.Id.ToString(), // Return the user ID as data
+                "Registration successful! Your account has been created."
+            );
         }
+        
         /// <summary>
         /// Login Account Services
         /// </summary>
@@ -109,75 +115,69 @@ namespace TaskManagementApi.Application.Features.Authentication.Commands
         /// <returns>A DTO containing token and user info if Login succeeds.</returns>
         public async Task<ResponseType<AuthResultDto>> LoginAsync(LoginRequestDto loginDto)
         {
-            var response = new ResponseType<AuthResultDto>();
-
-            //0. Check if information by user is correct
+            // 0. Check if information by user is correct
             var validateUser = ModelValidation.ModelValidationResponse(loginDto);
-
-            if (validateUser.Any()) //If any error will catch
+        
+            if (validateUser.Any()) // If any error will catch
             {
-                //logging if there's something wrong in fields by user
-                 _logger.LogWarning("Validation Failed for {Email}. Invalid fields: {@validationError}",
-                     loginDto.Email,validateUser);
-
-                 response.Success = false;
-                 response.Message = "There are Model Validation Occurred";
-                 return response;
+                _logger.LogWarning("LOG_001: Validation Failed for login of {Email}. Invalid fields: {@validationErrors}",
+                    loginDto.Email, validateUser);
+                return ResponseType<AuthResultDto>.Fail(
+                    validateUser,
+                    "Validation failed. Please check your login credentials."
+                );
             }
-
-            //1. finding email if it's exist 
+        
+            // 1. finding email if it's exist
             var user = await _userManager.FindByEmailAsync(loginDto.Email);
-
-            if(user is null)
+        
+            if (user is null)
             {
-                _logger.LogError("Login attempt for non-existent email: {Email}", loginDto.Email);
-                response.Success = false;
-                response.Message = "Invalid login credentials." + $"User {loginDto.Email} not found.";
-                return response;
+                _logger.LogError("LOG_002: Login attempt for non-existent email: {Email}", loginDto.Email);
+                return ResponseType<AuthResultDto>.Fail(
+                    "InvalidCredentials",
+                    "Login failed. Invalid email or password."
+                );
             }
-            //2. check if password was correct by built in method
-            var passwordValid = await _userManager.CheckPasswordAsync(user,loginDto.Password);
-
+        
+            // 2. check if password was correct by built-in method
+            var passwordValid = await _userManager.CheckPasswordAsync(user, loginDto.Password);
+        
             if (!passwordValid)
             {
-                _logger.LogWarning("Invalid password attempt for user {UserId} (Email: {Email})", 
-                user.Id, loginDto.Email);
-
-                response.Success = false;
-                response.Message = "Invalid login credentials." + $"{loginDto.Password} is incorrect";
-                return response;
+                _logger.LogWarning("LOG_003: Invalid password attempt for user {UserId} (Email: {Email})",
+                    user.Id, loginDto.Email);
+                return ResponseType<AuthResultDto>.Fail(
+                    "InvalidCredentials",
+                    "Login failed. Invalid email or password."
+                );
             }
+        
             // 3. Get the roles assigned to the user (could be one or more)
             var roles = await _userManager.GetRolesAsync(user);
-
+        
             // For this simple example, we'll just use the first role (if there's more than one)
-            var userRole = roles.FirstOrDefault() ?? "User";
-
-            //4. generate token a JWT token for user
+            var userRole = roles.FirstOrDefault() ?? "User"; // Default to "User" if no roles found
+        
+            // 4. generate token a JWT token for user
             var token = await _tokenService.GenerateTokenAsync(new TokenUserDto(
                 user.Id.ToString(),
                 user.UserName ?? string.Empty,
                 user.Email ?? string.Empty,
-                new List<string>{ "User"}));
-
-            //5. create a expiration date
-            DateTime expireAt = DateTime.UtcNow.AddYears(1);
-            try
-            {
-                _logger.LogInformation("User {UserId} logged in successfully. Role: {UserRole}", user.Id, userRole);
-                response.Success = true;
-                response.Message = "Successfully Login your Account";
-                response.Data = new AuthResultDto(token.Token, expireAt, token.RefreshToken,user.UserName ?? string.Empty , userRole);
-                return response;
-            }
-            catch(Exception ex)
-            {
-                _logger.LogError(ex, "Login failed for account. Reason: {ErrorMessage}", ex.Message);
-                response.Success = false;
-                response.Message = ex.Message;
-                return response;
-            }
+                roles.ToList() // Pass all roles for token generation
+            ));
+        
+            // 5. Create a expiration date (JWT validity is usually handled by the token service)
+            // This 'expireAt' here usually represents the JWT expiration claim (exp)
+            DateTime expireAt = DateTime.UtcNow.AddYears(1); // Assuming your token is valid for 1 year
+        
+            _logger.LogInformation("LOG_004: User {UserId} (Email: {Email}) logged in successfully with role: {UserRole}", user.Id, user.Email, userRole);
+            return ResponseType<AuthResultDto>.SuccessResult(
+                new AuthResultDto(token.Token, expireAt, token.RefreshToken, user.UserName ?? string.Empty, userRole),
+                "Login successful! Welcome back."
+            );
         }
-
+            
+        
     }
 }

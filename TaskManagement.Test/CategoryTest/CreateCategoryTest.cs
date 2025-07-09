@@ -65,7 +65,7 @@ namespace TaskManagement.Test.CategoryTest
         /// <returns></returns>
         [Fact]
         public async Task CreateCategories_WithValidData_Should_CreateSuccessfully()
-        {
+        { 
             var dto = new CategoryRequestDto
             {
                 CategoryName = "mahana",

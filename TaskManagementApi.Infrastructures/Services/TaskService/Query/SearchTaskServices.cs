@@ -15,8 +15,8 @@ using TaskManagementApi.Domains.Wrapper;
 
 namespace TaskManagement.Infrastructures.Services.TaskService.Query
 {
-    public class SearchTaskService(ApplicationDbContext _dbContext,
-     ILogger<SearchTaskService> _logger,
+    public class SearchTaskServices(ApplicationDbContext _dbContext,
+     ILogger<SearchTaskServices> _logger,
      IHttpContextAccessor _httpContextAccessor) : ISearchTask 
     {
         public async Task<ResponseType<List<TaskResponseDto>>> SearchTaskAsync(string search)

@@ -7,20 +7,17 @@ namespace TaskManagementApi.Application.ApplicationHelpers
     {
         public static List<string?> ModelValidationResponse<T>(T instance)
         {
-            ResponseType<T> response = new();
             if (instance == null)
             {
-                response.Success = false;
-                response.Message = "Models are null";
-                response.Errors?.Add("Models Cannot be Null");
-                return response.Errors ?? new List<string>() {"error"};
+                return new List<string?> { "Models cannot be null" };
             }
-            List<ValidationResult> validationResults = new ();
-
+        
+            List<ValidationResult> validationResults = new();
             var validationContext = new ValidationContext(instance);
-            Validator.TryValidateObject(instance, validationContext, validationResults, true);
+            Validator.TryValidateObject(instance, validationContext, validationResults, validateAllProperties: true);
+        
             return validationResults.Select(x => x.ErrorMessage).ToList();
-
         }
+
     }
 }

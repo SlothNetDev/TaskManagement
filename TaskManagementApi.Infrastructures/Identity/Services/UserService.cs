@@ -24,44 +24,40 @@ namespace TaskManagement.Infrastructures.Identity.Services
         /// </summary>
         public async Task<ResponseType<UserProfileDto>> UserProfileAsync()
         {
-            ResponseType<UserProfileDto> response = new();
-    
             // 1. Extract user ID from JWT claim
             var userId = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
-    
+        
             if (string.IsNullOrEmpty(userId))
             {
                 _logger.LogWarning("User is not authenticated");
-                response.Message = "User is not authenticated";
-                response.Success = false;
-                return response;
+                return ResponseType<UserProfileDto>
+                    .Fail("User is not authenticated");
             }
-    
+        
             // 2. Query the user from database
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
             {
                 _logger.LogWarning("Authenticated user not found in database: {UserId}", userId);
-                response.Message = "User not found";
-                response.Success = false;
-                return response;
+                return ResponseType<UserProfileDto>
+                    .Fail("User not found");
             }
-    
+        
             // 3. Get user roles
             var roles = (await _userManager.GetRolesAsync(user)).ToList();
-    
+        
             // 4. Build and return profile DTO
-            response.Success = true;
-            response.Message = "Successfully retrieved user profile";
-            response.Data = new UserProfileDto(
+            var dto = new UserProfileDto(
                 user.Id.ToString(),
                 user.UserName ?? string.Empty,
                 user.Email ?? string.Empty,
                 roles
             );
-    
-            return response;
+        
+            return ResponseType<UserProfileDto>
+                .SuccessResult(dto, "Successfully retrieved user profile");
         }
+
     }
 
     
