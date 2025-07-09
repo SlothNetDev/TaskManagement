@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.VisualStudio.TestPlatform.Utilities;
 using Moq;
 using System;
 using System.Collections.Generic;
@@ -13,7 +14,9 @@ using TaskManagement.Infrastructures.Data;
 using TaskManagement.Infrastructures.Identity.Models;
 using TaskManagement.Infrastructures.Services.Categories.Command;
 using TaskManagementApi.Application.Common.Interfaces.ICategory.CategoryCommand;
+using TaskManagementApi.Application.Features.CategoryFeature.CategoriesDto;
 using TaskManagementApi.Domains.Entities;
+using Xunit.Abstractions;
 
 namespace TaskManagement.Test.HelperTest
 {
@@ -35,18 +38,6 @@ namespace TaskManagement.Test.HelperTest
             _mockHttpContextAccessor.Setup(x => x.HttpContext).Returns(context);
                 
         }
-        public static Mock<ApplicationDbContext> CreateMockDbContext(ApplicationUsers user)
-        {
-            var dbContext = new DbContextMock<ApplicationDbContext>(new DbContextOptions<ApplicationDbContext>());
-            
-            dbContext.CreateDbSetMock(x => x.CategoryDb, new List<Category>());
-            dbContext.CreateDbSetMock(x => x.UserApplicationDb, new[] { user });
-            
-            dbContext.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()))
-                   .ReturnsAsync(1);
-                   
-            return dbContext;
-        }
         public static ApplicationUsers CreateTestUser(Guid userId)
         {
             return new ApplicationUsers
@@ -55,6 +46,50 @@ namespace TaskManagement.Test.HelperTest
                 DomainUserId = Guid.NewGuid()
             };
         }
-    
+        public static List<Category> CreateListTestCategories(ApplicationUsers _applicationUser, ITestOutputHelper _output,int count = 1)
+        {
+            var category =  Enumerable.Range(1, count).Select(i => new Category
+            {
+                Id = Guid.NewGuid(),
+                UserId = _applicationUser.DomainUserId,
+                CategoryName = $"Category {i}",
+                Description = $"Description {i}",
+                Tasks = new List<TaskItem>()
+            }).ToList();
+
+            _output.WriteLine("List of Categories: \n");
+            foreach(var list in category)
+            {
+                _output.WriteLine($"id: {list.Id}," +
+                    $"UserId: {list.UserId}," +
+                    $"CategoryName: {list.CategoryName}," +
+                    $"Description: {list.Description}," +
+                    $"Task: {list.Tasks.ToList()}");
+            }
+            return category;
+        }
+        public static Category CreateTestCategories(ApplicationUsers _applicationUser,ITestOutputHelper _output,CategoryRequestDto request = null)
+        {
+            var category = new Category
+            {
+                Id = Guid.NewGuid(),
+                UserId = _applicationUser.DomainUserId,
+                CategoryName = request.CategoryName,
+                Description = request.Description,
+                Tasks = new List<TaskItem>()
+            };
+
+            _output.WriteLine("List of Categories: \n");
+
+            _output.WriteLine($"id: {category.Id}," +
+                $"UserId: {category.UserId}," +
+                $"CategoryName: {category.CategoryName}," +
+                $"Description: {category.Description}," +
+                $"Task: {category.Tasks.ToList()}");
+
+            return category;
+        }
+
+
     }
 }
