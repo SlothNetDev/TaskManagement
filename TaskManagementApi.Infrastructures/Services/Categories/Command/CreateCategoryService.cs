@@ -32,7 +32,8 @@ namespace TaskManagement.Infrastructures.Services.Categories.Command
                 "POST /login", 
                 validationErrors);
                 response.Success = false;
-                response.Message = "Field Request for Models has an Error";
+                response.Message = "Invalid input. Please check the provided data";
+                response.Errors.AddRange(validationErrors);
                 return response;
             };
 
