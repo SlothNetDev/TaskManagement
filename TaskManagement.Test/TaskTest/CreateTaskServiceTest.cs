@@ -85,7 +85,7 @@ namespace TaskManagement.Test.ServiceTest
         [Fact]
         public async Task CreateTaskAsync_ValidRequest_ReturnsSuccess()
         {
-            AsserApiHelpers assert = new(_output);
+            AssertApiHelpers assert = new(_output);
             // Act
             var result = await _service.CreateTaskAsync(_validRequest);
 

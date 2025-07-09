@@ -68,7 +68,7 @@ namespace TaskManagement.Test.CategoryTest
 
             var result = await service.GetAllCategoriesAsync();
 
-            var assert = new AsserApiHelpers(_output);
+            var assert = new AssertApiHelpers(_output);
             assert.ShouldSucceed(result, "Successfully retrieved all categories.");
         }
         [Fact]
@@ -77,8 +77,8 @@ namespace TaskManagement.Test.CategoryTest
             var service = GetGetAllCategoriesUnderTest(null);
             var result = await service.GetAllCategoriesAsync();
 
-            var assert = new AsserApiHelpers(_output);
-            assert.ShouldSucceed(result, "No categories found for your account. Consider creating one.");
+            var assert = new AssertApiHelpers(_output);
+            assert.ShouldSucceed(result, "No categories found. Consider creating one.");
         }
         [Fact]
         public async Task GetAll_WithLargeDataset_Should_ReturnCorrectly()
@@ -90,7 +90,7 @@ namespace TaskManagement.Test.CategoryTest
 
             var result = await service.GetAllCategoriesAsync();
 
-            var assert = new AsserApiHelpers(_output);
+            var assert = new AssertApiHelpers(_output);
 
             assert.ShouldSucceed(result, "Successfully retrieved all categories.");            
             
@@ -131,7 +131,7 @@ namespace TaskManagement.Test.CategoryTest
             var result = await service.GetAllCategoriesAsync();
         
             // Assert
-            var assert = new AsserApiHelpers(_output);
+            var assert = new AssertApiHelpers(_output);
             assert.ShouldFail(result, "User profile not found.");
         }
     }

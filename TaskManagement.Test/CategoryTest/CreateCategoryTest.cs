@@ -74,12 +74,12 @@ namespace TaskManagement.Test.CategoryTest
             var createCategory = HelperTestMethod.CreateTestCategories( _applicationUser, _output,dto);
             
             var service = CreateCategoriesUnderTest(createCategory);
-            AsserApiHelpers assert = new(_output);
+            AssertApiHelpers assert = new(_output);
             //create request category
 
             var result = await service.CreateCategoryAsync(dto);
 
-            assert.ShouldSucceed(result, "Category Created Successfully");
+            assert.ShouldSucceed(result, "Category created successfully");
             assert.ShouldMatch(result, data =>
                 data.CategoryName == result.Data.CategoryName &&
                 data.Description == result.Data.Description);
@@ -95,7 +95,7 @@ namespace TaskManagement.Test.CategoryTest
             var createCategory = HelperTestMethod.CreateTestCategories( _applicationUser, _output,dto);
             
             var service = CreateCategoriesUnderTest(createCategory);
-            AsserApiHelpers assert = new(_output);
+            AssertApiHelpers assert = new(_output);
             //create request category
 
             var result = await service.CreateCategoryAsync(dto);

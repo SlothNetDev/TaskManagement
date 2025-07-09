@@ -72,13 +72,13 @@ namespace TaskManagement.Test.CategoryTest
                 CategoryName = "shuwa",
                 Description = "Mona"
             };
-            var assert = new AsserApiHelpers(_output);
+            var assert = new AssertApiHelpers(_output);
     
             // Act
             var result = await _service.UpdateCategoriesAsync(request);
     
             // Assert
-            assert.ShouldSucceed(result, "Category Updated Successfully");
+            assert.ShouldSucceed(result, "Category updated successfully");
             assert.ShouldMatch(result, data =>
                 data.CategoryName == request.CategoryName &&
                 data.Description == request.Description);
@@ -91,7 +91,7 @@ namespace TaskManagement.Test.CategoryTest
         public async Task UpdateCategories_Should_ReturnFail_WhenValidationFails()
         {
             // Arrange
-            var assert = new AsserApiHelpers(_output);
+            var assert = new AssertApiHelpers(_output);
             var invalidRequest = new CategoryUpdateDto
             {
                 Id = Guid.Empty,
@@ -104,14 +104,14 @@ namespace TaskManagement.Test.CategoryTest
             var result = await _service.UpdateCategoriesAsync(invalidRequest);
     
             // Assert
-            assert.ShouldFail(result, "Field Request for Models has an Error");
+            assert.ShouldFail(result, "Invalid input. Please check the provided data");
         }
     
         [Fact]
         public async Task UpdateCategories_Should_ReturnFail_WhenCategoryNotFound()
         {
             // Arrange
-            var assert = new AsserApiHelpers(_output);
+            var assert = new AssertApiHelpers(_output);
             var missingId = Guid.NewGuid(); // Not in Db
             // Arrange
             var request = new CategoryUpdateDto
@@ -135,7 +135,7 @@ namespace TaskManagement.Test.CategoryTest
         public async Task UpdateCategories_Should_ReturnFailed_WhenDomainIdIsEmpty()
         {
             // Arrange
-            var assert = new AsserApiHelpers(_output);
+            var assert = new AssertApiHelpers(_output);
 
              // Create a user with an empty DomainUserId
             var userWithEmptyDomainId = new ApplicationUsers { Id = _jwtUserId, DomainUserId = Guid.Empty };
@@ -159,14 +159,14 @@ namespace TaskManagement.Test.CategoryTest
             var result = await _service.UpdateCategoriesAsync(request);
     
             // Assert
-            assert.ShouldFail(result, "Field Request for Models has an Error");
+            assert.ShouldFail(result, "Invalid input. Please check the provided data");
         }
     
         [Fact]
         public async Task UpdateCategories_Should_ReturnFail_WhenExceptionThrown()
         {
             // Arrange
-            var assert = new AsserApiHelpers(_output);
+            var assert = new AssertApiHelpers(_output);
             // Arrange
             var request = new CategoryUpdateDto
             {
@@ -175,13 +175,13 @@ namespace TaskManagement.Test.CategoryTest
                 Description = "Mona"
             };
     
-            _mockDbContext.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>())).ThrowsAsync(new Exception("Something went wrong"));
+            _mockDbContext.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>())).ThrowsAsync(new Exception("Failed to create category"));
     
             // Act
             var result = await _service.UpdateCategoriesAsync(request);
     
             // Assert
-            assert.ShouldFail(result, "Failed to Update Categories");
+            assert.ShouldFail(result, "Failed to create category");
         }
     }
 

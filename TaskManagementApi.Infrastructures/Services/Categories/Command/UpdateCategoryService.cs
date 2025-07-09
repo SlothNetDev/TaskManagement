@@ -30,7 +30,7 @@ namespace TaskManagement.Infrastructures.Services.Categories.Command
                 _logger.LogWarning("Request validation failed for {Endpoint}. Errors: {@ValidationErrors}",
                     "PUT /category",
                     validationErrors);
-                return ResponseType<CategoryResponseDto>.Fail(validationErrors, "Invalid request data");
+                return ResponseType<CategoryResponseDto>.Fail(validationErrors, "Invalid input. Please check the provided data");
             }
 
             // 2. Get and validate user from JWT

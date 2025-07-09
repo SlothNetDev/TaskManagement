@@ -15,7 +15,7 @@ namespace TaskManagementApi.Domains.Wrapper
         public List<string> Errors { get; private set; } = new();
     
         // Factory methods (for clean creation)
-        public static ResponseType<T> SuccessResult(T data, string message = "") => new()
+        public static ResponseType<T> SuccessResult(T data, string message) => new()
         {
             Success = true,
             Data = data,
@@ -23,15 +23,14 @@ namespace TaskManagementApi.Domains.Wrapper
         };
         
         //containes 1 error
-        public static ResponseType<T> Fail(string error, string message = "") => new()
+        public static ResponseType<T> Fail(string message, string additionalMessage = null) => new()
         {
             Success = false,
-            Message = message,
-            Errors = { error }
+            Message = message
         };
         
         //contains many error
-        public static ResponseType<T> Fail(List<string> errors, string message = "") => new()
+        public static ResponseType<T> Fail(List<string> errors,string message) => new()
         {
             Success = false,
             Message = message,
