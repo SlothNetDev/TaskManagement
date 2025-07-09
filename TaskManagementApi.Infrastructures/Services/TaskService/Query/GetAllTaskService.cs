@@ -13,72 +13,77 @@ namespace TaskManagement.Infrastructures.Services.TaskService.Query
         ApplicationDbContext _dbContext,
         ILogger<GetAllTaskService> _logger) : IGetAllTask
     {
-        public async Task<ResponseType<List<TaskResponseDto>>> GetAllTaskAsync()
+       public async Task<ResponseType<List<TaskResponseDto>>> GetAllTaskAsync()
         {
-            var response = new ResponseType<List<TaskResponseDto>>();
-
-             // 1. Validate user Id
+            // 1. Get and validate user from JWT
             var userId = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parseUserId))
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
             {
-                _logger.LogWarning("Invalid or unauthorized user.");
-                response.Success = false;
-                response.Message = "Unauthorized.";
-                return response;
+                _logger.LogWarning("GT_001: Invalid authentication token for user ID: {UserId}", userId);
+                return ResponseType<List<TaskResponseDto>>.Fail(
+                    "Authentication failed",
+                    "Invalid user credentials");
             }
-             // macth the applicationUsert to TaskUser(Domain)
+        
+            // 2. Match application user
             var matchingApplicationUser = await _dbContext.UserApplicationDb
-                .FirstOrDefaultAsync(ac => ac.Id == parseUserId);
-
+                .FirstOrDefaultAsync(ac => ac.Id == parsedUserId);
+        
             if (matchingApplicationUser == null)
             {
-                _logger.LogWarning("No matching ApplicationUser found for userId {id}.", userId);
-                response.Success = false;
-                response.Message = "Invalid User.";
-                return response;
+                _logger.LogWarning("GT_002: User profile not found for ID: {UserId}", parsedUserId);
+                return ResponseType<List<TaskResponseDto>>.Fail(
+                    "User profile not found",
+                    "Please complete your account setup");
             }
-            // combine 
+        
+            // 3. Validate domain user ID
             var taskUserIdToUse = matchingApplicationUser.DomainUserId;
             if (taskUserIdToUse == Guid.Empty)
             {
-                _logger.LogWarning("User {id} has an empty DomainUserId.", userId);
-                response.Success = false;
-                response.Message = "Invalid User.";
-                return response;
+                _logger.LogWarning("GT_003: Missing domain ID for user: {UserId}", parsedUserId);
+                return ResponseType<List<TaskResponseDto>>.Fail(
+                    "Account configuration incomplete",
+                    "Missing domain user ID");
             }
-            
+        
             try
             {
-                //2. Query Tasks for this user
-                var userTasks = await _dbContext.TaskDb
-                    .Where(ac => ac.UserId == taskUserIdToUse)
+                // 4. Query tasks
+                var tasks = await _dbContext.TaskDb
+                    .Where(t => t.UserId == taskUserIdToUse)
                     .OrderBy(t => t.CreatedAt)
-                    .Select(t => new TaskResponseDto(t.Id, t.Title,
-                    t.Priority.ToString(),
-                    t.Status.ToString() ?? string.Empty,
-                    t.CreatedAt, t.DueDate, t.UpdatedAt))
+                    .Select(t => new TaskResponseDto(
+                        t.Id,
+                        t.Title,
+                        t.Priority.ToString(),
+                        t.Status.ToString(),
+                        t.DueDate,
+                        t.CreatedAt,
+                        t.UpdatedAt))
                     .ToListAsync();
-
-                if (!userTasks.Any())
+        
+                if (!tasks.Any())
                 {
-                    _logger.LogInformation("No tasks found for user {UserId}", taskUserIdToUse);
-                    response.Success = false;
-                    response.Message = "You have no tasks. Create one first.";
-                    return response;
+                    _logger.LogInformation("GT_INFO: No tasks found for user {UserId}", parsedUserId);
+                    return ResponseType<List<TaskResponseDto>>.SuccessResult(
+                        new List<TaskResponseDto>(),
+                        "No tasks found. Create your first task!");
                 }
-
-                //3. return response result
-                response.Success = true;
-                response.Data = userTasks;
-                response.Message = "Successfully Display all tasks";
-                return response;  
+        
+                _logger.LogInformation("GT_SUCCESS: Retrieved {TaskCount} tasks for user {UserId}", 
+                    tasks.Count, parsedUserId);
+                
+                return ResponseType<List<TaskResponseDto>>.SuccessResult(
+                    tasks,
+                    $"Found {tasks.Count} tasks");
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to retrieve tasks for user.");
-                response.Success = false;
-                response.Message = "An error occurred while retrieving tasks.";
-                return response;
+                _logger.LogError(ex, "GT_ERROR: Failed to retrieve tasks for user {UserId}", parsedUserId);
+                return ResponseType<List<TaskResponseDto>>.Fail(
+                    ex.Message,
+                    "Failed to retrieve tasks. Please try again");
             }
         }
     }

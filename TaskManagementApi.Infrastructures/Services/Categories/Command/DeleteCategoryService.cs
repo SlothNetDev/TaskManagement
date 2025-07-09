@@ -14,66 +14,62 @@ namespace TaskManagement.Infrastructures.Services.Categories.Command
         ILogger<DeleteCategoryService> _logger,
         IHttpContextAccessor _httpContextAccessor) : IDeleteCategoryService
     {
-        public async Task<ResponseType<CategoryResponseDto>> DeleteCategoryAsync(Guid Id)
+       public async Task<ResponseType<CategoryResponseDto>> DeleteCategoryAsync(Guid categoryId)
         {
-            var response = new ResponseType<CategoryResponseDto>();      
-
-            //Get user Jwt
+            // 1. Get and validate user from JWT
             var userId = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-            if(string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parseUserId))
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parseUserId))
             {
-                _logger.LogWarning("Failed to extract valid user ID {id} from JWT.",userId);
-                response.Success = false;
-                response.Message = "Unauthorized or invalid user.";
-                return response;
+                _logger.LogWarning("Failed to extract valid user ID {id} from JWT.", userId);
+                return ResponseType<CategoryResponseDto>.Fail("Unauthorized or invalid user.");
             }
-
-             // macth the applicationUsert to TaskUser(Domain)
+        
+            // 2. Match application user
             var matchingApplicationUser = await _dbContext.UserApplicationDb
                 .FirstOrDefaultAsync(ac => ac.Id == parseUserId);
-
-             //4. Create Category
+        
             if (matchingApplicationUser == null)
             {
-                _logger.LogWarning("No matching ApplicationUser found for userId {id}.", userId);
-                response.Success = false;
-                response.Message = "Invalid User.";
-                return response;
+                _logger.LogWarning("No matching ApplicationUser found for userId {id}.", parseUserId);
+                return ResponseType<CategoryResponseDto>.Fail("Invalid user account.");
             }
-            //5. combine and main Id
+        
+            // 3. Validate domain user ID
             var taskUserIdToUse = matchingApplicationUser.DomainUserId;
             if (taskUserIdToUse == Guid.Empty)
             {
-                _logger.LogWarning("User {id} has an empty DomainUserId.", userId);
-                response.Success = false;
-                response.Message = "Invalid User.";
-                return response;
+                _logger.LogWarning("User {id} has an empty DomainUserId.", parseUserId);
+                return ResponseType<CategoryResponseDto>.Fail("Invalid user configuration.");
             }
-            var deleteCategory = await _dbContext.CategoryDb.FirstOrDefaultAsync(d => d.UserId == taskUserIdToUse && d.UserId == Id);
-
-            if(deleteCategory is null)
+        
+            // 4. Find and validate category
+            var categoryToDelete = await _dbContext.CategoryDb
+                .FirstOrDefaultAsync(c => c.UserId == taskUserIdToUse && c.Id == categoryId);
+        
+            if (categoryToDelete == null)
             {
-                _logger.LogWarning("No task found with ID {Id} for user {UserId}.", Id, parseUserId);
-                response.Success = false;
-                response.Message = "Task not found.";
-                return response;
+                _logger.LogWarning("No category found with ID {categoryId} for user {userId}.", 
+                    categoryId, parseUserId);
+                return ResponseType<CategoryResponseDto>.Fail("Category not found.");
             }
+        
+            // 5. Delete category
             try
             {
-                _dbContext.Remove(deleteCategory);
+                _dbContext.Remove(categoryToDelete);
                 await _dbContext.SaveChangesAsync();
-                _logger.LogInformation($"Successfully  Deleted {Id}");
-                response.Success = true;
-                response.Data = new CategoryResponseDto(deleteCategory);
-                return response;
+                
+                _logger.LogInformation("Successfully deleted category {categoryId}", categoryId);
+                return ResponseType<CategoryResponseDto>.SuccessResult(
+                    new CategoryResponseDto(categoryToDelete),
+                    "Category deleted successfully");
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                 _logger.LogError("Error Deleting Category with Id {Id}, Reason: {message}",Id,ex.Message);
-                response.Success = false;
-                response.Message = ex.Message;
-                return response;
+                _logger.LogError(ex, "Error deleting category {categoryId}", categoryId);
+                return ResponseType<CategoryResponseDto>.Fail(
+                    ex.Message,
+                    "Failed to delete category");
             }
         }
     }

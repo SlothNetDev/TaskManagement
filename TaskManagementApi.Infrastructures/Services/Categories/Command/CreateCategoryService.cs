@@ -20,81 +20,70 @@ namespace TaskManagement.Infrastructures.Services.Categories.Command
     {
         public async Task<ResponseType<CategoryResponseDto>> CreateCategoryAsync(CategoryRequestDto requestDto)
         {
-            var response = new ResponseType<CategoryResponseDto>();
-
-            //1. Validate user
+            // 1. Validate request
             var validationErrors = ModelValidation.ModelValidationResponse(requestDto);
-
-            //check if all field  request was correct
             if (validationErrors.Any())
             {
                 _logger.LogWarning("Request validation failed for {Endpoint}. Errors: {@ValidationErrors}", 
-                "POST /login", 
-                validationErrors);
-                response.Success = false;
-                response.Message = "Invalid input. Please check the provided data";
-                response.Errors.AddRange(validationErrors);
-                return response;
-            };
-
-            //2. Get user for JWT
-            var userId = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if(string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parseUserId))
-            {
-                _logger.LogWarning("Failed to extract valid user ID {id} from JWT.",userId);
-                response.Success = false;
-                response.Message = "Unauthorized or invalid user.";
-                return response;
+                    "POST /category", 
+                    validationErrors);
+                return ResponseType<CategoryResponseDto>.Fail(validationErrors, "Invalid input. Please check the provided data");
             }
-
-            //3 macth the applicationUsert to TaskUser(Domain)
+        
+            // 2. Get and validate user from JWT
+            var userId = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parseUserId))
+            {
+                _logger.LogWarning("Failed to extract valid user ID {id} from JWT.", userId);
+                return ResponseType<CategoryResponseDto>.Fail("Unauthorized or invalid user.");
+            }
+        
+            // 3. Match application user
+            _logger.LogInformation("Attempting to create category for UserId: {UserId}", parseUserId);
             var matchingApplicationUser = await _dbContext.UserApplicationDb
                 .FirstOrDefaultAsync(ac => ac.Id == parseUserId);
-
-            // --- ADD THIS LOGGING ---
-            _logger.LogInformation("Attempting to create category for UserId: {UserId}", parseUserId);
-             //4. Create Category
+        
             if (matchingApplicationUser == null)
             {
-                _logger.LogWarning("No matching ApplicationUser found for userId {id}.", userId);
-                response.Success = false;
-                response.Message = "Invalid User.";
-                return response;
+                _logger.LogWarning("No matching ApplicationUser found for userId {id}.", parseUserId);
+                return ResponseType<CategoryResponseDto>.Fail("Invalid user account");
             }
-            //5. combine 
+        
+            // 4. Validate domain user ID
             var taskUserIdToUse = matchingApplicationUser.DomainUserId;
             if (taskUserIdToUse == Guid.Empty)
             {
-                _logger.LogWarning("User {id} has an empty DomainUserId.", userId);
-                response.Success = false;
-                response.Message = "Invalid User.";
-                return response;
+                _logger.LogWarning("User {id} has an empty DomainUserId.", parseUserId);
+                return ResponseType<CategoryResponseDto>.Fail("Invalid user configuration");
             }
-
-            var category = new Category
-            {
-                UserId = taskUserIdToUse,
-                Id = Guid.NewGuid(),
-                CategoryName = requestDto.CategoryName,
-                Description = requestDto.Description
-            };
-            await _dbContext.AddAsync(category);
-            await _dbContext.SaveChangesAsync();
-
+        
+            // 5. Create and save category
             try
             {
-                _logger.LogInformation("Category Created Successfully from user {user}", category.Id);
-                response.Success = true;
-                response.Message = "Category Created Successfully";
-                response.Data = new CategoryResponseDto(category);                                                                              
-                return response;
+                var category = new Category
+                {
+                    UserId = taskUserIdToUse,
+                    Id = Guid.NewGuid(),
+                    CategoryName = requestDto.CategoryName,
+                    Description = requestDto.Description
+                };
+        
+                await _dbContext.AddAsync(category);
+                await _dbContext.SaveChangesAsync();
+        
+                _logger.LogInformation("Category {categoryId} created successfully for user {userId}", 
+                    category.Id, taskUserIdToUse);
+        
+                return ResponseType<CategoryResponseDto>.SuccessResult(
+                    new CategoryResponseDto(category),
+                    "Category created successfully");
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                _logger.LogInformation("Category Created Failed from user {user}, Reason: {reason}", category.Id,ex.Message);
-                response.Success = false;
-                response.Message = "Failed to Create Category";
-                return response;
+                _logger.LogError(ex, "Failed to create category for user {userId}", taskUserIdToUse);
+                return ResponseType<CategoryResponseDto>.Fail(
+                    ex.Message, 
+                    "Failed to create category");
             }
         }
     }

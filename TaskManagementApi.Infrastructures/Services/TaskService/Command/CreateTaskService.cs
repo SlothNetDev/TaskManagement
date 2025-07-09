@@ -17,7 +17,6 @@ namespace TaskManagement.Infrastructures.Services.TaskService.Command
     {
         public async Task<ResponseType<TaskResponseDto>> CreateTaskAsync(TaskRequestDto request)
         {
-            var response = new ResponseType<TaskResponseDto>();
 
             //1. validate user request
             var validationErrors = ModelValidation.ModelValidationResponse(request);
@@ -26,9 +25,7 @@ namespace TaskManagement.Infrastructures.Services.TaskService.Command
                 _logger.LogWarning("Request validation failed for {Endpoint}. Errors: {@ValidationErrors}", 
                 "POST /login", 
                 validationErrors);
-                response.Success = false;
-                response.Message = "Field Request for Models has an Error";
-                return response;
+                return ResponseType<TaskResponseDto>.Fail("Field Request for Models has an Error");  
             }
 
             //2. Get user ID from Jwt
@@ -38,9 +35,7 @@ namespace TaskManagement.Infrastructures.Services.TaskService.Command
             if (string.IsNullOrWhiteSpace(userIdJwt) || !Guid.TryParse(userIdJwt, out var parseUserId))
             {
                _logger.LogWarning("Failed to extract valid user ID {id} from JWT.",userIdJwt);
-               response.Success = false;
-               response.Message = "Unauthorized or invalid user.";
-               return response;
+               return ResponseType<TaskResponseDto>.Fail("Unauthorized or invalid user.");
             }
    
              //3 macth the applicationUsert to TaskUser(Domain)
@@ -51,27 +46,21 @@ namespace TaskManagement.Infrastructures.Services.TaskService.Command
             if (matchingApplicationUser == null)
             {
                 _logger.LogWarning("No matching ApplicationUser found for userId {id}.", matchingApplicationUser.DomainUserId);
-                response.Success = false;
-                response.Message = "Invalid User.";
-                return response;
+                return ResponseType<TaskResponseDto>.Fail("Unauthorized or invalid user");
             }
             //5. combine 
             var taskUserIdToUse = matchingApplicationUser.DomainUserId;
             if (taskUserIdToUse == Guid.Empty)
             {
                 _logger.LogWarning("User {id} has an empty DomainUserId.", taskUserIdToUse);
-                response.Success = false;
-                response.Message = "Invalid User.";
-                return response;
+                return ResponseType<TaskResponseDto>.Fail("Invalid User Account");
             }
             //3. Validate category if there was even category in user before task will created
             var hasCategory = _dbContext.CategoryDb.Any(x => x.UserId == taskUserIdToUse);
             if (hasCategory is false)
             {
                 _logger.LogWarning("No category found for user.");
-                response.Success = false;
-                response.Message = "No category found for the user. Please create a category first.";
-                return response;
+                return ResponseType<TaskResponseDto>.Fail("No category found for the user. Please create a category first.");
             }
             //get category if it was exist in user
             var category = await _dbContext.CategoryDb
@@ -83,9 +72,7 @@ namespace TaskManagement.Infrastructures.Services.TaskService.Command
                 _logger.LogError("Expected {Category} was null when processing {Create}",
                  category,
                  "Create Task");
-                response.Success = false;
-                response.Message = "Category don't exist to user Account";
-                return response;
+                return ResponseType<TaskResponseDto>.Fail("Category don't exist to user Account");
             }
 
             //4. Create Task Item
@@ -108,17 +95,12 @@ namespace TaskManagement.Infrastructures.Services.TaskService.Command
             try
             {
                 _logger.LogInformation("Task Created Successfully from user {user}", createTask.Id);
-                response.Success = true;
-                response.Message = "Task Created Successfully";
-                response.Data = new TaskResponseDto(createTask);
-                return response;
+                return ResponseType<TaskResponseDto>.SuccessResult(new TaskResponseDto(createTask),"Task Created Successfully");
             }
             catch(Exception ex)
             {
                 _logger.LogInformation("Task Created Failed from user {user}, Reason: {reason}", createTask.Id,ex.Message);
-                response.Success = false;
-                response.Message = "Failed to Create Task";
-                return response;
+                return ResponseType<TaskResponseDto>.Fail(new List<string> { ex.Message},"Failed to create task");
             }
         }
     }

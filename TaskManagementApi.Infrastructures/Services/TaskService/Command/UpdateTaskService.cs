@@ -16,103 +16,107 @@ namespace TaskManagement.Infrastructures.Services.TaskService.Command
         ApplicationDbContext _dbContext,
         IHttpContextAccessor _httpContextAccessor) : IUpdateTaskService
     {
-        public async Task<ResponseType<TaskResponseDto>> UpdateTaskAsync(TaskUpdateDto request)
+       public async Task<ResponseType<TaskResponseDto>> UpdateTaskAsync(TaskUpdateDto request)
         {
-            //add response
-            var response = new ResponseType<TaskResponseDto>();
-
-            //1. validate user request 
+            // 1. Validate request
             var validationErrors = ModelValidation.ModelValidationResponse(request);
             if (validationErrors.Any())
             {
-                _logger.LogWarning("Request validation failed for {Endpoint}. Errors: {@ValidationErrors}",
-               "POST /login",
-               validationErrors);
-                response.Success = false;
-                response.Message = "Field Request for Models has an Error";
-                return response;
+                _logger.LogWarning("UT_001: Request validation failed. Errors: {@ValidationErrors}", 
+                    validationErrors);
+                return ResponseType<TaskResponseDto>.Fail(
+                    validationErrors,
+                    "Invalid task data. Please correct the highlighted fields");
             }
-
-            //2. Get User Id and check who are you
+        
+            // 2. Get and validate user from JWT
             var userId = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-            //check if User id was empty or fake 
-            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out Guid parseUserId))
+            if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
             {
-                _logger.LogWarning("No category found for user id {userId}.",userId);
-                response.Success = false;
-                response.Message = "Unauthorized or invalid user.";
-                return response;
+                _logger.LogWarning("UT_002: Invalid user token {UserId}", userId);
+                return ResponseType<TaskResponseDto>.Fail(
+                    "Authentication failed",
+                    "Invalid user credentials");
             }
-   
-             // macth the applicationUsert to TaskUser(Domain)
+        
+            // 3. Match application user
             var matchingApplicationUser = await _dbContext.UserApplicationDb
-                .FirstOrDefaultAsync(ac => ac.Id == parseUserId);
-
+                .FirstOrDefaultAsync(ac => ac.Id == parsedUserId);
+        
             if (matchingApplicationUser == null)
             {
-                _logger.LogWarning("No matching ApplicationUser found for userId {id}.", userId);
-                response.Success = false;
-                response.Message = "Invalid User.";
-                return response;
+                _logger.LogWarning("UT_003: User profile not found {UserId}", parsedUserId);
+                return ResponseType<TaskResponseDto>.Fail(
+                    "User profile not found",
+                    "Please complete your account setup");
             }
-            // combine 
+        
+            // 4. Validate domain user ID
             var taskUserIdToUse = matchingApplicationUser.DomainUserId;
             if (taskUserIdToUse == Guid.Empty)
             {
-                _logger.LogWarning("User {id} has an empty DomainUserId.", userId);
-                response.Success = false;
-                response.Message = "Invalid User.";
-                return response;
+                _logger.LogWarning("UT_004: Missing domain ID for user {UserId}", parsedUserId);
+                return ResponseType<TaskResponseDto>.Fail(
+                    "Account configuration incomplete",
+                    "Missing domain user ID");
             }
-            //3. Validate if task has category
-            var hasCategory = await _dbContext.CategoryDb.AnyAsync(x => x.UserId == taskUserIdToUse);
-            //check if your account has any category
-            if (hasCategory is false)
+        
+            // 5. Verify user has at least one category
+            var hasCategory = await _dbContext.CategoryDb
+                .AnyAsync(x => x.UserId == taskUserIdToUse);
+            
+            if (!hasCategory)
             {
-                _logger.LogWarning("No category found for user.");
-                response.Success = false;
-                response.Message = "No category found for the user. Please create a category first.";
-                return response;
+                _logger.LogWarning("UT_005: No categories found for user {UserId}", parsedUserId);
+                return ResponseType<TaskResponseDto>.Fail(
+                    "No categories available",
+                    "Please create a category first");
             }
-
-            //4. get User Id
-            var updateTask = await _dbContext.TaskDb
-                .FirstOrDefaultAsync(x => x.UserId == taskUserIdToUse);
-            //check if id was exist
-            if(updateTask is null)
+        
+            // 6. Find and validate task
+            var taskToUpdate = await _dbContext.TaskDb
+                .FirstOrDefaultAsync(x => x.UserId == taskUserIdToUse && x.Id == request.Id);
+        
+            if (taskToUpdate == null)
             {
-                _logger.LogWarning($"{updateTask} Id Cannot Found");
-                response.Success = false;
-                response.Message = "Blog not found";
-                return response;
+                _logger.LogWarning("UT_006: Task {TaskId} not found for user {UserId}", 
+                    request.Id, parsedUserId);
+                return ResponseType<TaskResponseDto>.Fail(
+                    "Task not found",
+                    "The specified task doesn't exist or you don't have permission");
             }
-
+        
             try
             {
-                //update field
-                updateTask.Title = request.Title ?? string.Empty;
-                updateTask.Priority = request.Priority ?? Priority.Low; // default as low
-                updateTask.Status = request.Status ?? Status.InProgress; // default as inProgress
-                updateTask.UpdatedAt = DateTime.UtcNow;
-
+                // 7. Apply updates
+                taskToUpdate.Title = request.Title ?? taskToUpdate.Title;
+                taskToUpdate.Priority = request.Priority ?? taskToUpdate.Priority;
+                taskToUpdate.Status = request.Status ?? taskToUpdate.Status;
+                taskToUpdate.UpdatedAt = DateTime.UtcNow;
+        
                 await _dbContext.SaveChangesAsync();
-
-                response.Success = true;
-                response.Message = "Task Update Successfully";
-                response.Data = new TaskResponseDto(updateTask.Id, updateTask.Title,
-                    updateTask.Priority.ToString(), updateTask.Status.ToString() ?? string.Empty, updateTask.DueDate, 
-                    updateTask.CreatedAt,updateTask.UpdatedAt);
-                return response;
-
-            }catch(Exception ex)
-            {
-                _logger.LogInformation("Task Update Failed from user {user}, Reason: {reason}", updateTask.Id,ex.Message);
-                response.Success = false;
-                response.Message = "Failed to Update Task";
-                return response;
+        
+                _logger.LogInformation("UT_SUCCESS: Updated task {TaskId} for user {UserId}", 
+                    request.Id, parsedUserId);
+        
+                return ResponseType<TaskResponseDto>.SuccessResult(
+                    new TaskResponseDto(
+                        taskToUpdate.Id,
+                        taskToUpdate.Title,
+                        taskToUpdate.Priority.ToString(),
+                        taskToUpdate.Status.ToString(),
+                        taskToUpdate.DueDate,
+                        taskToUpdate.CreatedAt,
+                        taskToUpdate.UpdatedAt),
+                    "Task updated successfully");
             }
-
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "UT_ERROR: Failed to update task {TaskId}", request.Id);
+                return ResponseType<TaskResponseDto>.Fail(
+                    ex.Message,
+                    "Failed to update task. Please try again");
+            }
         }
     }
 }

@@ -18,75 +18,68 @@ namespace TaskManagement.Infrastructures.Services.Categories.Query
     {
         public async Task<ResponseType<List<CategoryResponseDtoWithTask>>> GetAllCategoriesAsync()
         {
-            //create response
-            var response = new ResponseType<List<CategoryResponseDtoWithTask>>();
-    
-            //get user id
+            // 1. Get and validate user from JWT
             var userId = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
             {
                 _logger.LogWarning("GA_CAT_001: Failed to extract valid user ID from JWT. Provided ID: {UserId}", userId);
-                response.Success = false;
-                response.Message = "Authentication failed. Invalid user identifier.";
-                return response;
+                return ResponseType<List<CategoryResponseDtoWithTask>>.Fail(
+                    "Authentication failed. Invalid user identifier.");
             }
-    
-            // match the applicationUser to TaskUser(Domain)
+        
+            // 2. Match application user
             var matchingApplicationUser = await _dbContext.UserApplicationDb
                 .FirstOrDefaultAsync(ac => ac.Id == parsedUserId);
-    
+        
             if (matchingApplicationUser == null)
             {
                 _logger.LogWarning("GA_CAT_002: No matching ApplicationUser found for userId {ParsedUserId}.", parsedUserId);
-                response.Success = false;
-                response.Message = "User profile not found.";
-                return response;
+                return ResponseType<List<CategoryResponseDtoWithTask>>.Fail(
+                    "User profile not found.");
             }
-    
-            // combine
+        
+            // 3. Validate domain user ID
             var taskUserIdToUse = matchingApplicationUser.DomainUserId;
             if (taskUserIdToUse == Guid.Empty)
             {
                 _logger.LogWarning("GA_CAT_003: User {ParsedUserId} has an empty DomainUserId.", parsedUserId);
-                response.Success = false;
-                response.Message = "User domain ID is not configured.";
-                return response;
+                return ResponseType<List<CategoryResponseDtoWithTask>>.Fail(
+                    "User domain ID is not configured.");
             }
-    
+        
             try
             {
-                //query the category with task
-                var categoryQuery = _dbContext.CategoryDb
-                    .Where(t => t.UserId == taskUserIdToUse)
-                    .Include(t => t.Tasks)
-                    .Select(c => new CategoryResponseDtoWithTask(c.Id,
-                                    c.CategoryName,
-                                    c.Description ?? string.Empty,
-                                    c.Tasks.Select(task => new TaskResponseDto(task))
-                                    .ToList()));
-    
-                var query = await categoryQuery.ToListAsync();
-    
-                if (!query.Any())
+                // 4. Query categories with tasks
+                var categories = await _dbContext.CategoryDb
+                    .Where(c => c.UserId == taskUserIdToUse)
+                    .Include(c => c.Tasks)
+                    .Select(c => new CategoryResponseDtoWithTask(
+                        c.Id,
+                        c.CategoryName,
+                        c.Description ?? string.Empty,
+                        c.Tasks.Select(t => new TaskResponseDto(t)).ToList()))
+                    .ToListAsync();
+        
+                if (!categories.Any())
                 {
                     _logger.LogInformation("GA_CAT_004: No Categories found for user {ParsedUserId}.", parsedUserId);
-                    response.Success = true; // Still a successful operation, just no data
-                    response.Message = "No categories found for your account. Consider creating one.";
-                    response.Data = new List<CategoryResponseDtoWithTask>(); // Return an empty list
-                    return response;
+                    return ResponseType<List<CategoryResponseDtoWithTask>>.SuccessResult(
+                        new List<CategoryResponseDtoWithTask>(),
+                        "No categories found. Consider creating one.");
                 }
-    
-                response.Success = true;
-                response.Message = "Successfully retrieved all categories.";
-                response.Data = query;
-                return response;
+        
+                _logger.LogInformation("Successfully retrieved {Count} categories for user {UserId}", 
+                    categories.Count, parsedUserId);
+                return ResponseType<List<CategoryResponseDtoWithTask>>.SuccessResult(
+                    categories,
+                    "Successfully retrieved all categories.");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "GA_CAT_005: An unexpected error occurred while retrieving categories for user {ParsedUserId}.", parsedUserId);
-                response.Success = false;
-                response.Message = "An internal server error occurred while fetching categories. Please try again later.";
-                return response;
+                _logger.LogError(ex, "GA_CAT_005: Failed to retrieve categories for user {ParsedUserId}", parsedUserId);
+                return ResponseType<List<CategoryResponseDtoWithTask>>.Fail(
+                    ex.Message,
+                    "Failed to retrieve categories. Please try again later.");
             }
         }
     }
