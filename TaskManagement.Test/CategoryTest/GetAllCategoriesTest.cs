@@ -14,9 +14,6 @@ using TaskManagement.Infrastructures.Data;
 using TaskManagement.Infrastructures.Identity.Models;
 using TaskManagement.Infrastructures.Services.Categories.Query;
 using TaskManagement.Test.HelperTest;
-using TaskManagementApi.Application.Common.Interfaces.ICategory.CategoryQuery;
-using TaskManagementApi.Application.Features.CategoryFeature.CategoriesDto;
-using TaskManagementApi.Application.Features.CategoryFeature.Queries;
 using TaskManagementApi.Domains.Entities;
 using Xunit.Abstractions;
 using static System.Runtime.InteropServices.JavaScript.JSType;
@@ -29,7 +26,6 @@ namespace TaskManagement.Test.CategoryTest
         private Mock<ApplicationDbContext> _mockDbContext;
 
         private Guid _jwtUserId = Guid.NewGuid();
-        private List<Category> _existingCategory;
         private readonly ApplicationUsers _applicationUser;
         public GetAllCategoriesTest(ITestOutputHelper output)
         {
@@ -62,33 +58,11 @@ namespace TaskManagement.Test.CategoryTest
             return new GetAllCategoriesService(_mockDbContext.Object,
                 _mockLogger.Object, _mockHttpContextAccessor.Object);
         }
-        private List<Category> CreateTestCategories(int count = 1)
-        {
-            var category =  Enumerable.Range(1, count).Select(i => new Category
-            {
-                Id = Guid.NewGuid(),
-                UserId = _applicationUser.DomainUserId,
-                CategoryName = $"Category {i}",
-                Description = $"Description {i}",
-                Tasks = new List<TaskItem>()
-            }).ToList();
-
-            _output.WriteLine("List of Categories: \n");
-            foreach(var list in category)
-            {
-                _output.WriteLine($"id: {list.Id}," +
-                    $"UserId: {list.UserId}," +
-                    $"CategoryName: {list.CategoryName}," +
-                    $"Description: {list.Description}," +
-                    $"Task: {list.Tasks.ToList()}");
-            }
-            return category;
-        }
         [Fact]
         public async Task GetAll_WithValidUser_Should_ReturnAllUserEntities()
         {
             // Arrange
-            var testCategories = CreateTestCategories(1);
+            var testCategories = HelperTestMethod.CreateListTestCategories( _applicationUser,_output,1);
             var service = GetGetAllCategoriesUnderTest(testCategories);
 
 
@@ -111,7 +85,7 @@ namespace TaskManagement.Test.CategoryTest
         {
             var emptyList = new List<Category>();
           
-            var testCategories = CreateTestCategories(15);
+            var testCategories = HelperTestMethod.CreateListTestCategories( _applicationUser,_output,15);
             var service = GetGetAllCategoriesUnderTest(testCategories);
 
             var result = await service.GetAllCategoriesAsync();
