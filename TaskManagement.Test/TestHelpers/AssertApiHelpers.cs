@@ -8,7 +8,7 @@ namespace TaskManagement.Test.HelperTest
     /// <summary>
     /// Enhanced API response assertion helper with comprehensive testing capabilities
     /// </summary>
-    public class AsserApiHelpers(ITestOutputHelper output)
+    public class AssertApiHelpers(ITestOutputHelper output)
     {
         private readonly ITestOutputHelper _output = output;
 
