@@ -23,14 +23,25 @@ namespace TaskManagementApi.PresentationUI.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterRequestDto request)
         {
+            _logger.LogInformation("=== REGISTER ENDPOINT HIT ===");
+            _logger.LogInformation("Request: {@Request}", request);
+            
+            if (request == null)
+            {
+                _logger.LogWarning("Request is null");
+                return BadRequest(new { message = "Request is null" });
+            }
+            
+            _logger.LogInformation("Calling mediator...");
             var result = await _mediator.Send(new RegisterCommand(request));
-        
+            _logger.LogInformation("Mediator result: {@Result}", result);
+            
             if (!result.Success)
             {
-                _logger.LogWarning(" Register failed for {Email}", request.Email);
-                return BadRequest(new { errors = result.Errors });
+                _logger.LogWarning("Register failed for {Email}", request.Email);
+                return BadRequest(result);
             }
-        
+            
             _logger.LogInformation("User registered Successfully");
             return Ok(result);
         }
@@ -50,7 +61,7 @@ namespace TaskManagementApi.PresentationUI.Controllers
             
         }
 
-        [Authorize]
+        
         [HttpPost("refresh")]
         public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenCommand command)
         {
