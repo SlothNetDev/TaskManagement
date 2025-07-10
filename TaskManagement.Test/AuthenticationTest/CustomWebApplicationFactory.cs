@@ -26,19 +26,27 @@ namespace TaskManagement.Test.AuthenticationTest
                 Console.WriteLine("Configuring services for testing...");
                 
                 // Remove default DbContext
-                var descriptor = services.SingleOrDefault(
-                    d => d.ServiceType == typeof(DbContextOptions<ApplicationDbContext>));
-                if (descriptor != null)
-                {
-                    services.Remove(descriptor);
-                    Console.WriteLine("Removed existing DbContext configuration");
-                }
+                 var descriptor = services.SingleOrDefault(
+            d => d.ServiceType == typeof(DbContextOptions<ApplicationDbContext>));
+                 if (descriptor != null)
+                 {
+                     services.Remove(descriptor);
+                 }
 
                 // Add in-memory database for testing
                 services.AddDbContext<ApplicationDbContext>(options =>
                 {
                     options.UseInMemoryDatabase("InMemoryDbForTesting");
                 });
+                 // Configure IdentitySettings for testing
+                services.Configure<IdentitySettings>(options =>
+                {
+                    options.AdminEmails = new List<string>
+                    {
+                        "admin@example.com", "superadmin@example.com"
+                    };
+                });
+
                 Console.WriteLine("Added in-memory database configuration");
 
                 // Configure JWT settings for testings
@@ -76,7 +84,7 @@ namespace TaskManagement.Test.AuthenticationTest
             Console.WriteLine("Creating host...");
             var host = base.CreateHost(builder);
             Console.WriteLine($"Host created. Environment: {host.Services.GetRequiredService<IHostEnvironment>().EnvironmentName}");
-            
+
             // Seed the database after the host is created
             using var scope = host.Services.CreateScope();
             var scopedServices = scope.ServiceProvider;
@@ -90,41 +98,20 @@ namespace TaskManagement.Test.AuthenticationTest
 
             SeedTestData(userManager, roleManager).GetAwaiter().GetResult();
             Console.WriteLine("Test data seeded successfully");
-            
+
             return host;
         }
-
         private async Task SeedTestData(UserManager<ApplicationUsers> userManager, RoleManager<ApplicationRole> roleManager)
         {
+
             // Ensure roles
-            foreach (var role in new[] { "User", "Admin" })
+            foreach (var role in new[] { "Admin","User" })
             {
                 if (!await roleManager.RoleExistsAsync(role))
                 {
                     await roleManager.CreateAsync(new ApplicationRole { Name = role });
                     Console.WriteLine($"Created role: {role}");
                 }
-            }
-
-            // Add test user
-            var email = "testuser@gmail.com";
-            if (await userManager.FindByEmailAsync(email) is null)
-            {
-                var user = new ApplicationUsers
-                {
-                    UserName = email,
-                    Email = email,
-                    EmailConfirmed = true,
-                    DomainUserId = Guid.NewGuid()
-                };
-
-                await userManager.CreateAsync(user, "Test@1234");
-                await userManager.AddToRoleAsync(user, "User");
-                Console.WriteLine($"Created test user: {email}");
-            }
-            else
-            {
-                Console.WriteLine($"Test user already exists: {email}");
             }
         }
     }
