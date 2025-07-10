@@ -46,7 +46,7 @@ namespace TaskManagement.Infrastructures.Identity.Services
     
             var token = new JwtSecurityTokenHandler().WriteToken(jwt);
             var refreshToken = GenerateRefreshToken(user.UserId, ipAddress);
-    
+            
             // Store refresh token
             await _dbContext.RefreshTokens.AddAsync(new RefreshToken
             {
@@ -57,15 +57,17 @@ namespace TaskManagement.Infrastructures.Identity.Services
                 Expires = refreshToken.Expires,
                 UserId = Guid.Parse(user.UserId)
             });
-    
+
             await _dbContext.SaveChangesAsync();
-    
-            return new AuthResultDto(
-                token,
-                jwt.ValidTo,
-                refreshToken.Token,
-                user.UserName,
-                string.Join(",", user.Roles));
+
+            return new AuthResultDto
+            {
+                BearerToken = token,
+                ExpiresAt = jwt.ValidTo,
+                RefreshToken = refreshToken.Token,
+                UserName = user.UserName,
+                Role = string.Join(",", user.Roles)
+            };
         }
     
         public RefreshTokenResponseDto GenerateRefreshToken(string userId, string ipAddress)
@@ -92,7 +94,19 @@ namespace TaskManagement.Infrastructures.Identity.Services
                 refreshToken.IsActive
             );
         }
-    
+        public RefreshToken GenerateRefreshTokenEntity(string userId, string ipAddress)
+        {
+            return new RefreshToken
+            {
+                Id = Guid.NewGuid().ToString(),
+                Token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)),
+                Created = DateTime.UtcNow,
+                Expires = DateTime.UtcNow.AddDays(7),
+                CreatedByIp = ipAddress,
+                UserId = Guid.Parse(userId)
+            };
+        }
+
         private string GetIpAddress()
         {
             return _httpContextAccessor.HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? "127.0.0.1";
