@@ -73,9 +73,9 @@ namespace TaskManagementApi.Application.Features.Authentication.Commands
             // 5. Determine role based on config, not hardcoded
             var isAdminEmail = _identitySettings.Value.AdminEmails
                 .Any(x => x.Equals(registerDto.Email, StringComparison.CurrentCultureIgnoreCase));
-        
+
             // If role is equal to isAdminEmail then it's admin, if not, then it's User Role
-            var role = isAdminEmail ? "Admin" : "User";
+            var role = isAdminEmail ? Role.Admin : Role.User;  // Use "User" (PascalCase)
         
             // 6. adding role to user based on email
             // Consider handling the result of AddToRoleAsync as well
@@ -168,16 +168,26 @@ namespace TaskManagementApi.Application.Features.Authentication.Commands
             ));
         
             // 5. Create a expiration date (JWT validity is usually handled by the token service)
-            // This 'expireAt' here usually represents the JWT expiration claim (exp)
-            DateTime expireAt = DateTime.UtcNow.AddYears(1); // Assuming your token is valid for 1 year
+            DateTime expireAt = DateTime.UtcNow.AddHours(1); // Assuming your token is valid for 1 year
         
             _logger.LogInformation("LOG_004: User {UserId} (Email: {Email}) logged in successfully with role: {UserRole}", user.Id, user.Email, userRole);
             return ResponseType<AuthResultDto>.SuccessResult(
-                new AuthResultDto(token.Token, expireAt, token.RefreshToken, user.UserName ?? string.Empty, userRole),
+                new AuthResultDto
+                {
+                    BearerToken = token.BearerToken,
+                    ExpiresAt = expireAt,
+                    RefreshToken = token.RefreshToken,
+                    UserName = user.UserName ?? string.Empty,
+                    Role = userRole
+                },
                 "Login successful! Welcome back."
             );
         }
-            
+        public static class Role
+        {
+            public const string Admin = "Admin";
+            public const string User = "User";    
+        }   
         
     }
 }
