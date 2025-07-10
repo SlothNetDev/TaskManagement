@@ -10,6 +10,7 @@ using Microsoft.OpenApi.Models;
 using Serilog;
 using Serilog.Events;
 using System.Text;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using TaskManagement.Infrastructures.Data;
 using TaskManagement.Infrastructures.Identity.Models;
@@ -128,6 +129,7 @@ namespace TaskManagementApi.PresentationUI.Extensions
                 options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
 
                 //convert date time
+                options.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
                 options.SerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
                 options.SerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
 
@@ -184,11 +186,11 @@ namespace TaskManagementApi.PresentationUI.Extensions
 
         private static void AddAuthentication(IServiceCollection services,IConfiguration configuration)
         {
-            // ✅ First: Configure JwtSettings properly
+            // First: Configure JwtSettings properly
             services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));
             services.AddSingleton(sp => sp.GetRequiredService<IOptions<JwtSettings>>().Value); // Optional but safe
 
-            // ✅ Then: configure JWT scheme
+            //Then: configure JWT scheme
             services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -196,7 +198,7 @@ namespace TaskManagementApi.PresentationUI.Extensions
             })
             .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
             {
-                // ✅ Read settings from already-registered IOptions
+                // Read settings from already-registered IOptions
                 var serviceProvider = services.BuildServiceProvider(); // temporary provider
                 var jwtSettings = serviceProvider.GetRequiredService<IOptions<JwtSettings>>().Value;
 
@@ -204,7 +206,7 @@ namespace TaskManagementApi.PresentationUI.Extensions
                 {
                     ValidateIssuer = true,
                     ValidateAudience = true,
-                    ValidateLifetime = true,
+                    ValidateLifetime = false,
                     ValidateIssuerSigningKey = true,
                     ValidIssuer = jwtSettings.Issuer,
                     ValidAudience = jwtSettings.Audience,
