@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace TaskManagementApi.Domains.Wrapper
@@ -9,10 +10,17 @@ namespace TaskManagementApi.Domains.Wrapper
     public class ResponseType<T>
     {
         // Properties (for direct property access when needed)
-        public bool Success { get; private set; }
-        public string? Message { get; private set; }
-        public T? Data { get; private set; }
-        public List<string> Errors { get; private set; } = new();
+        [JsonPropertyName("success")]
+        public bool Success { get; set; }
+
+        [JsonPropertyName("message")]
+        public string? Message { get; set; }
+
+        [JsonPropertyName("data")]
+        public T? Data { get; set; }
+
+        [JsonPropertyName("errors")]
+        public List<string> Errors { get; set; } = new();
     
         // Factory methods (for clean creation)
         public static ResponseType<T> SuccessResult(T data, string message) => new()
