@@ -38,12 +38,14 @@ namespace TaskManagement.Infrastructures.Identity.Services
                 return ResponseType<RefreshTokenResponseDto>.Fail("Invalid or expired refresh token.");
             }
         
+            // Revoke old token
             storedToken.Revoked = DateTime.UtcNow;
             storedToken.RevokedByIp = ipAddress.GetIpAddress();
             _dbContext.RefreshTokens.Update(storedToken);
         
             var roles = (await _userManager.GetRolesAsync(storedToken.User)).ToList();
         
+            // Generate and store new token
             var newToken = await _tokenService.GenerateTokenAsync(new TokenUserDto(
                 storedToken.UserId.ToString(),
                 storedToken.User.UserName!,
@@ -53,20 +55,32 @@ namespace TaskManagement.Infrastructures.Identity.Services
         
             await _dbContext.SaveChangesAsync();
         
+            // Query the new stored token from DB to return full info
+            var newlyStoredToken = await _dbContext.RefreshTokens
+                .OrderByDescending(rt => rt.Created)
+                .FirstOrDefaultAsync(rt => rt.UserId == storedToken.UserId && rt.Token == newToken.RefreshToken);
+        
+            if (newlyStoredToken is null)
+            {
+                _logger.LogError("New refresh token was generated but not found in DB.");
+                return ResponseType<RefreshTokenResponseDto>.Fail("Failed to retrieve the new refresh token.");
+            }
+        
             var dto = new RefreshTokenResponseDto(
-                storedToken.Id,
-                newToken.RefreshToken,
-                storedToken.Expires,
-                storedToken.IsExpired,
-                storedToken.Created,
-                storedToken.CreatedByIp,
-                storedToken.Revoked,
-                storedToken.RevokedByIp,
-                storedToken.IsActive
+                newlyStoredToken.Id,
+                newlyStoredToken.Token,
+                newlyStoredToken.Expires,
+                newlyStoredToken.IsExpired,
+                newlyStoredToken.Created,
+                newlyStoredToken.CreatedByIp,
+                newlyStoredToken.Revoked,
+                newlyStoredToken.RevokedByIp,
+                newlyStoredToken.IsActive
             );
         
-            return ResponseType<RefreshTokenResponseDto>.SuccessResult(dto, "Successfully Refresh The Token");
+            return ResponseType<RefreshTokenResponseDto>.SuccessResult(dto, "Successfully refreshed the token.");
         }
+
         public async Task<ResponseType<List<RefreshTokenResponseDto>>> GetRefreshTokenAsync(Guid userId)
         {
             if (await _dbContext.RefreshTokens.CountAsync() <= 0)
