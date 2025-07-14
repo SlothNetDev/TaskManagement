@@ -2,8 +2,8 @@
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.OpenApi;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Npgsql.EntityFrameworkCore.PostgreSQL;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -12,6 +12,7 @@ using Serilog.Events;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Microsoft.EntityFrameworkCore;
 using TaskManagement.Infrastructures.Data;
 using TaskManagement.Infrastructures.Identity.Models;
 using TaskManagement.Infrastructures.Identity.Services;
@@ -55,7 +56,7 @@ namespace TaskManagementApi.PresentationUI.Extensions
                 else
                 {
                     Console.WriteLine("Using SQL Server for Production");
-                    options.UseSqlServer(config.GetConnectionString("TaskDbConnection"));
+                    options.UseNpgsql(config.GetConnectionString("TaskDbConnection"));
                 }
             });
 
