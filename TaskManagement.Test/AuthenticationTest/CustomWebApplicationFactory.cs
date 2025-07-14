@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,33 +10,54 @@ using TaskManagement.Infrastructures.Data;
 using TaskManagement.Infrastructures.Identity.Models;
 using TaskManagementApi.Application.Common.Settings;
 using Microsoft.Extensions.Options;
+
 namespace TaskManagement.Test.AuthenticationTest
 {
     public class CustomWebApplicationFactory<TProgram> : WebApplicationFactory<TProgram> where TProgram : class
     {
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
-            Console.WriteLine("Configuring WebHost for Testing...");
-            builder.UseEnvironment("Testing"); // This allows your conditional UseInMemoryDb logic to run
-            Console.WriteLine($"Environment set to: {builder.GetSetting(WebHostDefaults.EnvironmentKey)}");
-            
+            builder.UseEnvironment("Testing");
+
             builder.ConfigureServices(services =>
             {
-                Console.WriteLine("Configuring services for testing...");
-                
-                // Remove default DbContext
-                 var descriptor = services.SingleOrDefault(
-            d => d.ServiceType == typeof(DbContextOptions<ApplicationDbContext>));
-                 if (descriptor != null)
-                 {
-                     services.Remove(descriptor);
-                 }
+                // Find and remove ALL DbContext-related services to ensure a clean slate
+                // This is more robust than just removing the DbContextOptions descriptor
+                var dbContextRelatedServices = services
+                    .Where(s => s.ServiceType.IsGenericType &&
+                                 s.ServiceType.GetGenericTypeDefinition() == typeof(DbContextOptions<>) ||
+                                 s.ServiceType == typeof(ApplicationDbContext) ||
+                                 (s.ServiceType.Name.Contains("DbContext") && s.ServiceType.FullName.Contains("Microsoft.EntityFrameworkCore")))
+                    .ToList(); // Materialize to avoid modifying collection while iterating
 
-                // Add in-memory database for testing
+                foreach (var service in dbContextRelatedServices)
+                {
+                    services.Remove(service);
+                }
+
+                // A more targeted removal for DbContextOptions<ApplicationDbContext>
+                var descriptorToRemove = services.SingleOrDefault(
+                    d => d.ServiceType == typeof(DbContextOptions<ApplicationDbContext>));
+                if (descriptorToRemove != null)
+                {
+                    services.Remove(descriptorToRemove);
+                }
+
+                // ALSO remove the ApplicationDbContext service itself, if directly registered
+                var applicationDbContextService = services.SingleOrDefault(
+                    d => d.ServiceType == typeof(ApplicationDbContext) && d.Lifetime == ServiceLifetime.Scoped);
+                if (applicationDbContextService != null)
+                {
+                    services.Remove(applicationDbContextService);
+                }
+                
+                // Add in-memory database
+                // Use `ServiceLifetime.Scoped` if your DbContext is scoped (which is the default and recommended).
                 services.AddDbContext<ApplicationDbContext>(options =>
                 {
                     options.UseInMemoryDatabase("InMemoryDbForTesting");
-                });
+                }, ServiceLifetime.Scoped); // Explicitly set lifetime if not already default
+
                  // Configure IdentitySettings for testing
                 services.Configure<IdentitySettings>(options =>
                 {
@@ -46,8 +66,6 @@ namespace TaskManagement.Test.AuthenticationTest
                         "admin@example.com", "superadmin@example.com"
                     };
                 });
-
-                Console.WriteLine("Added in-memory database configuration");
 
                 // Configure JWT settings for testings
                 services.Configure<JwtSettings>(options =>
@@ -58,32 +76,20 @@ namespace TaskManagement.Test.AuthenticationTest
                     options.ExpiryMinutes = 60;
                 });
                 services.AddSingleton(sp => sp.GetRequiredService<IOptions<JwtSettings>>().Value);
-                Console.WriteLine("Configured JWT settings for testing");
-
-                // Log all registered services to debug controller discovery
-                Console.WriteLine("Registered services:");
-                foreach (var service in services.Where(s => s.ServiceType.Name.Contains("Controller") || s.ServiceType.Name.Contains("Action")))
-                {
-                    Console.WriteLine($"  {service.ServiceType.Name} -> {service.ImplementationType?.Name ?? "Factory"}");
-                }
             });
 
             builder.ConfigureAppConfiguration((context, config) =>
             {
-                Console.WriteLine($"Configuring app configuration. Environment: {context.HostingEnvironment.EnvironmentName}");
-                // Ensure the environment is set correctly
                 config.AddInMemoryCollection(new Dictionary<string, string>
                 {
                     ["ASPNETCORE_ENVIRONMENT"] = "Testing"
                 });
             });
         }
-
+        
         protected override IHost CreateHost(IHostBuilder builder)
         {
-            Console.WriteLine("Creating host...");
             var host = base.CreateHost(builder);
-            Console.WriteLine($"Host created. Environment: {host.Services.GetRequiredService<IHostEnvironment>().EnvironmentName}");
 
             // Seed the database after the host is created
             using var scope = host.Services.CreateScope();
@@ -93,24 +99,22 @@ namespace TaskManagement.Test.AuthenticationTest
             var roleManager = scopedServices.GetRequiredService<RoleManager<ApplicationRole>>();
             var userManager = scopedServices.GetRequiredService<UserManager<ApplicationUsers>>();
 
+            // EnsureCreated is crucial for InMemoryDb as it doesn't have migrations
             db.Database.EnsureCreated();
-            Console.WriteLine("Database created and seeded");
-
+            
             SeedTestData(userManager, roleManager).GetAwaiter().GetResult();
-            Console.WriteLine("Test data seeded successfully");
 
             return host;
         }
+        
         private async Task SeedTestData(UserManager<ApplicationUsers> userManager, RoleManager<ApplicationRole> roleManager)
         {
-
             // Ensure roles
             foreach (var role in new[] { "Admin","User" })
             {
                 if (!await roleManager.RoleExistsAsync(role))
                 {
                     await roleManager.CreateAsync(new ApplicationRole { Name = role });
-                    Console.WriteLine($"Created role: {role}");
                 }
             }
         }
