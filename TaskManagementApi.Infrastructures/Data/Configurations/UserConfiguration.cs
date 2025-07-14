@@ -10,7 +10,7 @@ namespace TaskManagement.Infrastructures.Data.Configuration
             builder.ToTable("User_Type");
 
             builder.Property(x => x.CreatedAt)
-                .HasDefaultValueSql("GETUTCDATE()")
+                .HasDefaultValueSql("NOW()")
                 .IsRequired(false);
 
             builder.HasKey(x => x.Id);

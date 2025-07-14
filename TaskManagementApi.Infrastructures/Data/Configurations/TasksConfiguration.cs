@@ -14,13 +14,11 @@ namespace TaskManagement.Infrastructures.Data.Configuration
                 .IsRequired();
 
             builder.Property(x => x.Priority)
-                .HasColumnType("NVARCHAR(15)")
                 .HasMaxLength(15)
                 .HasConversion<string>()
                 .IsRequired();
 
             builder.Property(x => x.Status)
-                .HasColumnType("NVARCHAR(15)")
                 .HasMaxLength(15)
                 .HasConversion<string>()
                 .IsRequired(false);

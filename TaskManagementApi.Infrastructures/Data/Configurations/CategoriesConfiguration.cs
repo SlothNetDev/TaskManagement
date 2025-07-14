@@ -13,10 +13,10 @@ namespace TaskManagement.Infrastructures.Data.Configuration
 
             builder.Property(x => x.CategoryName)
                 .IsRequired()
-                .HasColumnType("NVARCHAR(120)");
+                .HasMaxLength(120);
 
             builder.Property(X => X.Description)
-                .HasColumnType("NVARCHAR(1000)")
+                .HasMaxLength(120)
                 .IsRequired(false);
 
             //one to many relationships
