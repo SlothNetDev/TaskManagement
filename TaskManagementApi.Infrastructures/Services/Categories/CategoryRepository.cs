@@ -24,12 +24,12 @@ namespace TaskManagement.Infrastructures.Services.Categories
             throw new NotImplementedException();
         }
 
-        public Task<List<Category>> GetByAllCategoryAsync(int id)
+        public Task<List<Category>> GetByAllCategoryAsync(Category category)
         {
             throw new NotImplementedException();
         }
 
-        public Task<Category> GetByIdAsync(int id)
+        public Task<Category> GetByIdAsync(Guid id)
         {
             throw new NotImplementedException();
         }
