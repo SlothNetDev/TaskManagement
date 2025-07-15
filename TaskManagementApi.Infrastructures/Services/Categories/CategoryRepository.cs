@@ -3,7 +3,7 @@ using TaskManagementApi.Core.IRepository.Categories;
 using TaskManagementApi.Domains.Entities;
 using TaskManagementApi.Domains.Wrapper;
 
-namespace TaskManagement.Infrastructures.Services.Categories.Command
+namespace TaskManagement.Infrastructures.Services.Categories
 {
     public class CategoryRepository(ApplicationDbContext dbContext ) :ICategoryRepository
     {
