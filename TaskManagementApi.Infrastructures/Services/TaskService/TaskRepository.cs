@@ -18,12 +18,12 @@ public class TaskRepository(ApplicationDbContext dbContext) :ITaskRepository
         throw new NotImplementedException();
     }
 
-    public Task<TaskItem> DeleteAsync(TaskItem taskItem)
+    public Task<TaskItem> DeleteAsync(TaskItem taskItemId)
     {
         throw new NotImplementedException();
     }
 
-    public Task<TaskItem> GetByIdAsync(int id)
+    public Task<TaskItem> GetByIdAsync(TaskItem taskItemId)
     {
         throw new NotImplementedException();
     }
