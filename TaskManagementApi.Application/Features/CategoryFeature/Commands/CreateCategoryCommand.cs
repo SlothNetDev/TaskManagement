@@ -1,15 +1,9 @@
-﻿using System.Security.Claims;
-using MediatR;
-using Microsoft.AspNetCore.Http;
+﻿using MediatR;
 using Microsoft.Extensions.Logging;
 using TaskManagementApi.Application.ApplicationHelpers;
-using TaskManagementApi.Application.Common.Interfaces.IAuthentication;
-using TaskManagementApi.Application.Common.Interfaces.ICategory.CategoryCommand;
 using TaskManagementApi.Application.Common.Interfaces.Repository;
 using TaskManagementApi.Application.Features.CategoryFeature.CategoriesDto;
-using TaskManagementApi.Core.Interfaces;
 using TaskManagementApi.Core.IRepository.Categories;
-using TaskManagementApi.Core.IRepository.User;
 using TaskManagementApi.Domains.Entities;
 using TaskManagementApi.Domains.Wrapper;
 
@@ -19,8 +13,7 @@ namespace TaskManagementApi.Application.Features.CategoryFeature.Commands
 
     public class CreateCategoryCommandHandler(ICategoryRepository dbContext,
         IAuthRepository identityService,
-        ILogger<CreateCategoryCommandHandler> logger,
-        IHttpContextAccessor httpContextAccessor) : IRequestHandler<CreateCategoryCommand, ResponseType<CategoryResponseDto>>
+        ILogger<CreateCategoryCommandHandler> logger) : IRequestHandler<CreateCategoryCommand, ResponseType<CategoryResponseDto>>
     {
         public async Task<ResponseType<CategoryResponseDto>> Handle(CreateCategoryCommand request, CancellationToken cancellationToken)
         {
@@ -35,22 +28,29 @@ namespace TaskManagementApi.Application.Features.CategoryFeature.Commands
             }
             
             //2. Get UserDomain Id
-            var userDomainId =  await identityService.GetCurrentUserDomainIdAsync();
-            
+            var userDomainResponse =  await identityService.GetCurrentUserDomainIdAsync();
+            if (!userDomainResponse.Success)
+            {
+                logger.LogWarning("Failed to retrieve DomainUserId or category validation failed: {Message}", userDomainResponse.Message);
+                return ResponseType<CategoryResponseDto>.Fail(userDomainResponse.Errors, userDomainResponse.Message);
+            }
+            var userDomainId = userDomainResponse.Data;
             try
             {
+                //3. Create category
                 var category = new Category
                 {
-                    UserId = userDomainId.Data.Value,
+                    UserId = userDomainId,
                     Id = Guid.NewGuid(),
                     CategoryName = request.Dto.CategoryName,
                     Description = request.Dto.Description
                 };
-        
+                
+                //4. Create ans Save Category
                 await dbContext.CreateAsync(category);
         
                 logger.LogInformation("Category {categoryId} created successfully for user {userId}", 
-                    category.Id, userDomainId.Data.Value);
+                    category.Id, userDomainId);
         
                 return ResponseType<CategoryResponseDto>.SuccessResult(
                     new CategoryResponseDto(category),
@@ -58,7 +58,7 @@ namespace TaskManagementApi.Application.Features.CategoryFeature.Commands
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Failed to create category for user {userId}", userDomainId.Data.Value);
+                logger.LogError(ex, "Failed to create category for user {userId}", userDomainId);
                 return ResponseType<CategoryResponseDto>.Fail(
                     ex.Message, 
                     "Failed to create category");
