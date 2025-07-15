@@ -16,6 +16,7 @@ using Microsoft.EntityFrameworkCore;
 using TaskManagement.Infrastructures.Data;
 using TaskManagement.Infrastructures.Identity.Models;
 using TaskManagement.Infrastructures.Identity.Services;
+using TaskManagement.Infrastructures.Services;
 using TaskManagement.Infrastructures.Services.Categories.Command;
 using TaskManagement.Infrastructures.Services.Categories.Query;
 using TaskManagement.Infrastructures.Services.TaskService.Command;
@@ -27,9 +28,12 @@ using TaskManagementApi.Application.Common.Interfaces.ITask.TaskCommand;
 using TaskManagementApi.Application.Common.Interfaces.ITaskItem.TaskCommand;
 using TaskManagementApi.Application.Common.Interfaces.ITaskItem.TaskQuery;
 using TaskManagementApi.Application.Common.Interfaces.IUser;
+using TaskManagementApi.Application.Common.Interfaces.Repository;
 using TaskManagementApi.Application.Common.Settings;
 using TaskManagementApi.Application.Features.Authentication.Commands;
 using TaskManagementApi.Application.Features.Authentication.DTOs;
+using TaskManagementApi.Application.Features.CategoryFeature.Commands;
+using TaskManagementApi.Core.IRepository.Categories;
 
 namespace TaskManagementApi.PresentationUI.Extensions
 {
@@ -93,7 +97,8 @@ namespace TaskManagementApi.PresentationUI.Extensions
                 x.RegisterServicesFromAssembly(typeof(RegisterCommand).Assembly);
                 x.RegisterServicesFromAssembly(typeof(LoginCommand).Assembly);
             });
-
+            
+            services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(CreateCategoryCommand).Assembly));
             //swagger end points
            /* services.AddEndpointsApiExplorer();*/
             /*services.AddSwaggerGen();*/
@@ -114,9 +119,10 @@ namespace TaskManagementApi.PresentationUI.Extensions
             services.AddScoped<IUpdateTaskService, UpdateTaskService>();
             services.AddScoped<IGetAllTask, GetAllTaskService>();
             services.AddScoped<ISearchTask, SearchTaskServices>();
+            services.AddScoped<IAuthRepository, AuthRepository>();
             services.AddScoped<IDeleteTaskService, DeleteTaskService>();
             services.AddScoped<IPaganationTaskService, PaganationService>();
-            services.AddScoped<ICreateCategoryService, CreateCategoryService>();
+            services.AddScoped<ICategoryRepository, CategoryRepository>();
             services.AddScoped<IGetAllCategories, GetAllCategoriesService>();
             services.AddScoped<IUpdateCategoryService, UpdateCategoryService>();
             services.AddScoped<IDeleteCategoryService, DeleteCategoryService>();
