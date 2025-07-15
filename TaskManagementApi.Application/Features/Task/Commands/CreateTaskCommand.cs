@@ -13,7 +13,7 @@ namespace TaskManagementApi.Application.Features.Task.Commands
     public record CreateTaskCommand(TaskRequestDto createDto) : IRequest<ResponseType<TaskResponseDto>>;
     public class CreateTaskCommandHandler(ITaskRepository task,
         ILogger<CreateTaskCommandHandler> logger,
-        IAuthRepository identityService) : IRequestHandler<CreateTaskCommand, ResponseType<TaskResponseDto>>
+        IGetDomainIdCategoryRepository identityService) : IRequestHandler<CreateTaskCommand, ResponseType<TaskResponseDto>>
     {
         public async Task<ResponseType<TaskResponseDto>> Handle(CreateTaskCommand request,
             CancellationToken cancellationToken)
@@ -28,11 +28,11 @@ namespace TaskManagementApi.Application.Features.Task.Commands
                 return ResponseType<TaskResponseDto>.Fail("Field Request for Models has an Error");  
             }
             // 2. Get User Domain ID and validate Task non-existence
-            var userDomainReponse = await identityService.GetApplicationUserIdAndCheckCategoryExistAysnc(request.createDto.CategoryId);
+            var userDomainReponse = await identityService.GetCurrentUserDomainIdCreateCategoryAsync();
             if (!userDomainReponse.Success)
             {
                 logger.LogWarning("Failed to retrieve DomainUserId or category validation failed: {Message}", userDomainReponse.Message);
-                return ResponseType<TaskResponseDto>.Fail(userDomainReponse.Errors, userDomainReponse.Message);
+                return ResponseType<TaskResponseDto>.Fail(userDomainReponse.Message);
             }
             var domainUserId = userDomainReponse.Data;
             
