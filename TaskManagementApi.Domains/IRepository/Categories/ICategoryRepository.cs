@@ -8,8 +8,8 @@ namespace TaskManagementApi.Core.IRepository.Categories;
 public interface ICategoryRepository
 {
     Task<Category> CreateAsync(Category category);
-    Task<Category> DeleteAsync(Category category);
+    Task<Category> DeleteAsync(Category categoryId);
     Task<Category> UpdateAsync(Category category);
-    Task<List<Category>> GetByAllCategoryAsync(int id);
-    Task<Category> GetByIdAsync(int id);
+    Task<List<Category>> GetByAllCategoryAsync(Category id);
+    Task<Category> GetByIdAsync(Guid id);
 }
