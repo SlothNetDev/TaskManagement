@@ -17,8 +17,10 @@ using TaskManagement.Infrastructures.Data;
 using TaskManagement.Infrastructures.Identity.Models;
 using TaskManagement.Infrastructures.Identity.Services;
 using TaskManagement.Infrastructures.Services;
+using TaskManagement.Infrastructures.Services.Categories;
 using TaskManagement.Infrastructures.Services.Categories.Command;
 using TaskManagement.Infrastructures.Services.Categories.Query;
+using TaskManagement.Infrastructures.Services.TaskService;
 using TaskManagement.Infrastructures.Services.TaskService.Command;
 using TaskManagement.Infrastructures.Services.TaskService.Query;
 using TaskManagementApi.Application.Common.Interfaces.IAuthentication;
@@ -33,7 +35,9 @@ using TaskManagementApi.Application.Common.Settings;
 using TaskManagementApi.Application.Features.Authentication.Commands;
 using TaskManagementApi.Application.Features.Authentication.DTOs;
 using TaskManagementApi.Application.Features.CategoryFeature.Commands;
+using TaskManagementApi.Application.Features.Task.Commands;
 using TaskManagementApi.Core.IRepository.Categories;
+using TaskManagementApi.Core.IRepository.Task;
 
 namespace TaskManagementApi.PresentationUI.Extensions
 {
@@ -99,6 +103,7 @@ namespace TaskManagementApi.PresentationUI.Extensions
             });
             
             services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(CreateCategoryCommand).Assembly));
+            services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(CreateTaskCommand).Assembly));
             //swagger end points
            /* services.AddEndpointsApiExplorer();*/
             /*services.AddSwaggerGen();*/
@@ -115,7 +120,6 @@ namespace TaskManagementApi.PresentationUI.Extensions
             services.AddScoped<IRefreshTokenService, RefreshTokenService>();
             services.AddScoped<ITokenService, TokenService>();
             services.AddScoped<IUserService, UserService>();
-            services.AddScoped<ICreateTask, CreateTaskService>();
             services.AddScoped<IUpdateTaskService, UpdateTaskService>();
             services.AddScoped<IGetAllTask, GetAllTaskService>();
             services.AddScoped<ISearchTask, SearchTaskServices>();
@@ -123,6 +127,7 @@ namespace TaskManagementApi.PresentationUI.Extensions
             services.AddScoped<IDeleteTaskService, DeleteTaskService>();
             services.AddScoped<IPaganationTaskService, PaganationService>();
             services.AddScoped<ICategoryRepository, CategoryRepository>();
+            services.AddScoped<ITaskRepository, TaskRepository>();
             services.AddScoped<IGetAllCategories, GetAllCategoriesService>();
             services.AddScoped<IUpdateCategoryService, UpdateCategoryService>();
             services.AddScoped<IDeleteCategoryService, DeleteCategoryService>();
