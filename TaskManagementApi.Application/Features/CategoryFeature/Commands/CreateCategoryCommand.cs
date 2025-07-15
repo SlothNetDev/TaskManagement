@@ -12,7 +12,7 @@ namespace TaskManagementApi.Application.Features.CategoryFeature.Commands
     public record CreateCategoryCommand(CategoryRequestDto Dto) :IRequest<ResponseType<CategoryResponseDto>>;
 
     public class CreateCategoryCommandHandler(ICategoryRepository dbContext,
-        IAuthRepository identityService,
+        IGetDomainIdCategoryRepository identityService,
         ILogger<CreateCategoryCommandHandler> logger) : IRequestHandler<CreateCategoryCommand, ResponseType<CategoryResponseDto>>
     {
         public async Task<ResponseType<CategoryResponseDto>> Handle(CreateCategoryCommand request, CancellationToken cancellationToken)
@@ -28,11 +28,11 @@ namespace TaskManagementApi.Application.Features.CategoryFeature.Commands
             }
             
             //2. Get UserDomain Id
-            var userDomainResponse =  await identityService.GetCurrentUserDomainIdAsync();
+            var userDomainResponse =  await identityService.GetCurrentUserDomainIdCreateCategoryAsync();
             if (!userDomainResponse.Success)
             {
                 logger.LogWarning("Failed to retrieve DomainUserId or category validation failed: {Message}", userDomainResponse.Message);
-                return ResponseType<CategoryResponseDto>.Fail(userDomainResponse.Errors, userDomainResponse.Message);
+                return ResponseType<CategoryResponseDto>.Fail(userDomainResponse.Message);
             }
             var userDomainId = userDomainResponse.Data;
             try
