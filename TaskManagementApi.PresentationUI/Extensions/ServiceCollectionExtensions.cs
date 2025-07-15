@@ -18,7 +18,6 @@ using TaskManagement.Infrastructures.Identity.Models;
 using TaskManagement.Infrastructures.Identity.Services;
 using TaskManagement.Infrastructures.Services;
 using TaskManagement.Infrastructures.Services.Categories;
-using TaskManagement.Infrastructures.Services.Categories.Command;
 using TaskManagement.Infrastructures.Services.Categories.Query;
 using TaskManagement.Infrastructures.Services.TaskService;
 using TaskManagement.Infrastructures.Services.TaskService.Command;
@@ -35,6 +34,7 @@ using TaskManagementApi.Application.Common.Settings;
 using TaskManagementApi.Application.Features.Authentication.Commands;
 using TaskManagementApi.Application.Features.Authentication.DTOs;
 using TaskManagementApi.Application.Features.CategoryFeature.Commands;
+using TaskManagementApi.Application.Features.CategoryFeature.Queries;
 using TaskManagementApi.Application.Features.Task.Commands;
 using TaskManagementApi.Core.IRepository.Categories;
 using TaskManagementApi.Core.IRepository.Task;
@@ -98,11 +98,21 @@ namespace TaskManagementApi.PresentationUI.Extensions
             //mediaR
             services.AddMediatR(x =>
             {
+                #region Authentication Commands
                 x.RegisterServicesFromAssembly(typeof(RegisterCommand).Assembly);
                 x.RegisterServicesFromAssembly(typeof(LoginCommand).Assembly);
+                #endregion
+
+                #region Category Commands
                 x.RegisterServicesFromAssembly(typeof(CreateCategoryCommand).Assembly);
-                x.RegisterServicesFromAssembly(typeof(CreateTaskCommand).Assembly);
+                x.RegisterServicesFromAssembly(typeof(GetAllCategoriesQuery).Assembly);
                 x.RegisterServicesFromAssembly(typeof(UpdateCategoryCommand).Assembly);
+                x.RegisterServicesFromAssembly(typeof(DeleteCategoryCommand).Assembly);
+                #endregion
+                
+                #region Task Commands
+                x.RegisterServicesFromAssembly(typeof(CreateTaskCommand).Assembly);
+                #endregion
                 
             });
             //swagger end points
@@ -131,7 +141,6 @@ namespace TaskManagementApi.PresentationUI.Extensions
             services.AddScoped<ITaskRepository, TaskRepository>();
             services.AddScoped<IGetAllCategories, GetAllCategoriesService>();
             services.AddScoped<IGetDomainTaskRepository,GetDomainIdTaskRepository>();
-            services.AddScoped<IDeleteCategoryService, DeleteCategoryService>();
         }
 
         private static void ConfigureJsonOptions(this IMvcBuilder builder)
