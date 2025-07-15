@@ -100,10 +100,11 @@ namespace TaskManagementApi.PresentationUI.Extensions
             {
                 x.RegisterServicesFromAssembly(typeof(RegisterCommand).Assembly);
                 x.RegisterServicesFromAssembly(typeof(LoginCommand).Assembly);
+                x.RegisterServicesFromAssembly(typeof(CreateCategoryCommand).Assembly);
+                x.RegisterServicesFromAssembly(typeof(CreateTaskCommand).Assembly);
+                x.RegisterServicesFromAssembly(typeof(UpdateCategoryCommand).Assembly);
+                
             });
-            
-            services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(CreateCategoryCommand).Assembly));
-            services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(CreateTaskCommand).Assembly));
             //swagger end points
            /* services.AddEndpointsApiExplorer();*/
             /*services.AddSwaggerGen();*/
@@ -123,13 +124,13 @@ namespace TaskManagementApi.PresentationUI.Extensions
             services.AddScoped<IUpdateTaskService, UpdateTaskService>();
             services.AddScoped<IGetAllTask, GetAllTaskService>();
             services.AddScoped<ISearchTask, SearchTaskServices>();
-            services.AddScoped<IAuthRepository, AuthRepository>();
+            services.AddScoped<IGetDomainIdCategoryRepository, GetDomainIdCategoryRepository>();
             services.AddScoped<IDeleteTaskService, DeleteTaskService>();
             services.AddScoped<IPaganationTaskService, PaganationService>();
             services.AddScoped<ICategoryRepository, CategoryRepository>();
             services.AddScoped<ITaskRepository, TaskRepository>();
             services.AddScoped<IGetAllCategories, GetAllCategoriesService>();
-            services.AddScoped<IUpdateCategoryService, UpdateCategoryService>();
+            services.AddScoped<IGetDomainTaskRepository,GetDomainIdTaskRepository>();
             services.AddScoped<IDeleteCategoryService, DeleteCategoryService>();
         }
 
