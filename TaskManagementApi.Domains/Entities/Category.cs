@@ -1,5 +1,6 @@
 ﻿
 using System.ComponentModel.DataAnnotations;
+using TaskManagementApi.Domains.Wrapper;
 
 namespace TaskManagementApi.Domains.Entities
 {
