@@ -17,7 +17,7 @@ namespace TaskManagementApi.Domains.Wrapper
         public string? Message { get; set; }
 
         [JsonPropertyName("data")]
-        public T? Data { get; set; }
+        public T Data { get; set; }
 
         [JsonPropertyName("errors")]
         public List<string> Errors { get; set; } = new();
