@@ -21,7 +21,7 @@ namespace TaskManagement.Infrastructures.Data.Configuration
 
             //one to many relationships
             //1 user many categories
-            builder.HasOne(x => x.User)
+            builder.HasOne(x => x.TaskUsers)
                 .WithMany(x => x.Categories)
                 .HasForeignKey(x => x.UserId)
                 .OnDelete(deleteBehavior: DeleteBehavior.Restrict);
