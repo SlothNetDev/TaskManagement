@@ -36,6 +36,17 @@ namespace TaskManagementApi.PresentationUI.Controllers
             }
             return Ok(result);
         }
+        [HttpGet("getByIdCategories{id}")]
+        public async Task<IActionResult> GetByIdCategoryAsync(Guid id)
+        {
+            var result = await _mediaR.Send(new GetByIdCategoriesQuery(id));
+            if (!result.Success)
+            {
+                _logger.LogWarning("Successfully Retrieve Categories");
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
         [HttpPatch("update")]
         public async Task<IActionResult> UpdateCategoryAsync([FromBody] CategoryUpdateDto request)
         {
@@ -47,7 +58,7 @@ namespace TaskManagementApi.PresentationUI.Controllers
             }
             return Ok(result);
         }
-        [HttpDelete("delete")]
+        [HttpDelete("delete{Id}")]
         public async Task<IActionResult> DeleteCategoriesAsync([FromBody] Guid Id)
         {
             var result = await _mediaR.Send(new DeleteCategoryCommand(Id));
