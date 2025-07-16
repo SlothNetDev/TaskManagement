@@ -13,6 +13,6 @@ public interface IGetDomainIdCategoryRepository
     Task<ResponseType<Category>> GetCurrentUserDomainIdUpdateCategoryAsync(Guid id);
     Task<ResponseType<Category>> GetCurrentUserDomainIdDeleteCategoryAsync(Guid id);
     Task<ResponseType<Guid>> GetCurrentUserDomainIdGetAllCategoryAsync();
-    Task<ResponseType<Guid>> GetCurrentUserDomainIdGetByIdCategoryAsync(Guid id);
+    Task<ResponseType<Category>> GetCurrentUserDomainIdGetByIdCategoryAsync(Guid id);
     
 }
