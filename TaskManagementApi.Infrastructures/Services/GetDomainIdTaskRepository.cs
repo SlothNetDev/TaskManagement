@@ -13,7 +13,7 @@ public class GetDomainIdTaskRepository(
     IHttpContextAccessor  httpContextAccessor,
     ILogger<GetDomainIdCategoryRepository> logger) :IGetDomainTaskRepository
 {
-    public async Task<ResponseType<Guid>> GetCurrentUserDomainIdCreateCategoryAsync()
+    public async Task<ResponseType<Guid>> GetCurrentUserDomainIdCreateTaskAsync()
     {
         var userId = httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parseUserId))
@@ -55,7 +55,7 @@ public class GetDomainIdTaskRepository(
             "User Domain Id Retrieved Successfully");
     }
 
-    public Task<ResponseType<Guid>> GetCurrentUserDomainIdUpdateCategoryAsync(Guid id)
+    public Task<ResponseType<Guid>> GetCurrentUserDomainIdUpdateTaskAsync(Guid id)
     {
         throw new NotImplementedException();
     }
