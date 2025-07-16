@@ -10,6 +10,6 @@ public interface ICategoryRepository
     Task<Category> CreateAsync(Category category);
     Task<Category> DeleteAsync(Category categoryId);
     Task<Category> UpdateAsync(Category category);
-    Task<List<Category>> GetByAllCategoryAsync(Category id);
+    Task<List<Category>> GetByAllCategoryAsync(Guid id);
     Task<Category> GetByIdAsync(Guid id);
 }
