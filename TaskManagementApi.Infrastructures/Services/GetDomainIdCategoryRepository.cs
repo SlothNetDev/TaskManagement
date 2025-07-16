@@ -4,6 +4,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using TaskManagement.Infrastructures.Data;
 using TaskManagementApi.Application.Common.Interfaces.Repository;
+using TaskManagementApi.Application.DTOs.TaskDto;
+using TaskManagementApi.Application.Features.CategoryFeature.CategoriesDto;
 using TaskManagementApi.Domains.Entities;
 using TaskManagementApi.Domains.Wrapper;
 
@@ -134,6 +136,37 @@ public class GetDomainIdCategoryRepository(
         
         return ResponseType<Category>.SuccessResult(
             categoryToDelete,
+            "User Domain Id Retrieved Successfully");
+    }
+
+    public async Task<ResponseType<Guid>> GetCurrentUserDomainIdGetAllCategoryAsync()
+    {
+        // 1. Get and validate user from JWT
+        var userId = httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
+        {
+            logger.LogWarning("GA_CAT_001: Failed to extract valid user ID from JWT. Provided ID: {UserId}", userId);
+            return ResponseType<Guid>.Fail(
+                "Authentication failed. Invalid user identifier.");
+        }
+        
+        // 2. Match application user
+        var matchingApplicationUser = await applicationDbContext.UserApplicationDb
+            .FirstOrDefaultAsync(ac => ac.Id == parsedUserId);
+        
+        if (matchingApplicationUser == null)
+        {
+            logger.LogWarning("GA_CAT_002: No matching ApplicationUser found for userId {ParsedUserId}.", parsedUserId);
+            return ResponseType<Guid>.Fail(
+                "User profile not found.");
+        }
+
+        if (matchingApplicationUser.DomainUserId == Guid.Empty)
+        {
+            logger.LogWarning("AUTH_003: User {UserId} has an empty DomainUserId", parsedUserId);
+            return ResponseType<Guid>.Fail("Invalid user configuration");
+        }
+        return ResponseType<Guid>.SuccessResult(matchingApplicationUser.DomainUserId,
             "User Domain Id Retrieved Successfully");
     }
 }
