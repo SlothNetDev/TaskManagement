@@ -12,5 +12,6 @@ public interface IGetDomainIdCategoryRepository
     Task<ResponseType<Guid>> GetCurrentUserDomainIdCreateCategoryAsync();
     Task<ResponseType<Category>> GetCurrentUserDomainIdUpdateCategoryAsync(Guid id);
     Task<ResponseType<Category>> GetCurrentUserDomainIdDeleteCategoryAsync(Guid id);
+    Task<ResponseType<Guid>> GetCurrentUserDomainIdGetAllCategoryAsync();
     
 }
