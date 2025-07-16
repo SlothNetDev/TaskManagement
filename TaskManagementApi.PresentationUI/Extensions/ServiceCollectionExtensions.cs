@@ -2,28 +2,22 @@
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.OpenApi;
-using Microsoft.Extensions.Configuration;
-using Npgsql.EntityFrameworkCore.PostgreSQL;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Serilog;
-using Serilog.Events;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
 using TaskManagement.Infrastructures.Data;
+using TaskManagement.Infrastructures.Data.Repositories;
 using TaskManagement.Infrastructures.Identity.Models;
 using TaskManagement.Infrastructures.Identity.Services;
 using TaskManagement.Infrastructures.Services;
-using TaskManagement.Infrastructures.Services.Categories;
-using TaskManagement.Infrastructures.Services.Categories.Query;
-using TaskManagement.Infrastructures.Services.TaskService;
 using TaskManagement.Infrastructures.Services.TaskService.Command;
 using TaskManagement.Infrastructures.Services.TaskService.Query;
 using TaskManagementApi.Application.Common.Interfaces.IAuthentication;
-using TaskManagementApi.Application.Common.Interfaces.ICategory.CategoryCommand;
 using TaskManagementApi.Application.Common.Interfaces.ICategory.CategoryQuery;
 using TaskManagementApi.Application.Common.Interfaces.ITask.TaskCommand;
 using TaskManagementApi.Application.Common.Interfaces.ITaskItem.TaskCommand;
@@ -32,7 +26,6 @@ using TaskManagementApi.Application.Common.Interfaces.IUser;
 using TaskManagementApi.Application.Common.Interfaces.Repository;
 using TaskManagementApi.Application.Common.Settings;
 using TaskManagementApi.Application.Features.Authentication.Commands;
-using TaskManagementApi.Application.Features.Authentication.DTOs;
 using TaskManagementApi.Application.Features.CategoryFeature.Commands;
 using TaskManagementApi.Application.Features.CategoryFeature.Queries;
 using TaskManagementApi.Application.Features.Task.Commands;
@@ -131,16 +124,18 @@ namespace TaskManagementApi.PresentationUI.Extensions
             services.AddScoped<IRefreshTokenService, RefreshTokenService>();
             services.AddScoped<ITokenService, TokenService>();
             services.AddScoped<IUserService, UserService>();
+            
+            services.AddScoped<IGetDomainIdCategoryRepository, GetDomainIdCategoryRepository>();
+            services.AddScoped<IGetDomainTaskRepository,GetDomainIdTaskRepository>();
+            
+            services.AddScoped<ITaskRepository, TaskRepository>();
+            services.AddScoped<ICategoryRepository, CategoryRepository>();
+            
+            services.AddScoped<IPaganationTaskService, PaganationService>();
             services.AddScoped<IUpdateTaskService, UpdateTaskService>();
             services.AddScoped<IGetAllTask, GetAllTaskService>();
             services.AddScoped<ISearchTask, SearchTaskServices>();
-            services.AddScoped<IGetDomainIdCategoryRepository, GetDomainIdCategoryRepository>();
             services.AddScoped<IDeleteTaskService, DeleteTaskService>();
-            services.AddScoped<IPaganationTaskService, PaganationService>();
-            services.AddScoped<ICategoryRepository, CategoryRepository>();
-            services.AddScoped<ITaskRepository, TaskRepository>();
-            services.AddScoped<IGetAllCategories, GetAllCategoriesService>();
-            services.AddScoped<IGetDomainTaskRepository,GetDomainIdTaskRepository>();
         }
 
         private static void ConfigureJsonOptions(this IMvcBuilder builder)
