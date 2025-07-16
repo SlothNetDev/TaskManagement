@@ -13,7 +13,7 @@ public class GetDomainIdTaskRepository(
     IHttpContextAccessor  httpContextAccessor,
     ILogger<GetDomainIdCategoryRepository> logger) :IGetDomainTaskRepository
 {
-    public async Task<ResponseType<Guid>> GetCurrentUserDomainIdCreateCategoryAsync(Guid id)
+    public async Task<ResponseType<Guid>> GetCurrentUserDomainIdCreateCategoryAsync()
     {
         var userId = httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parseUserId))
