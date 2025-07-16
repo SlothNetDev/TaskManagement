@@ -101,6 +101,7 @@ namespace TaskManagementApi.PresentationUI.Extensions
                 x.RegisterServicesFromAssembly(typeof(GetAllCategoriesQuery).Assembly);
                 x.RegisterServicesFromAssembly(typeof(UpdateCategoryCommand).Assembly);
                 x.RegisterServicesFromAssembly(typeof(DeleteCategoryCommand).Assembly);
+                x.RegisterServicesFromAssembly(typeof(GetByIdCategoriesQuery).Assembly);
                 #endregion
                 
                 #region Task Commands
