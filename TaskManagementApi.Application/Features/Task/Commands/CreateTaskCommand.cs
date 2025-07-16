@@ -11,9 +11,9 @@ using TaskManagementApi.Domains.Wrapper;
 namespace TaskManagementApi.Application.Features.Task.Commands
 {
     public record CreateTaskCommand(TaskRequestDto createDto) : IRequest<ResponseType<TaskResponseDto>>;
-    public class CreateTaskCommandHandler(ITaskRepository task,
+    public class CreateTaskCommandHandler(ITaskRepository dbContext,
         ILogger<CreateTaskCommandHandler> logger,
-        IGetDomainIdCategoryRepository identityService) : IRequestHandler<CreateTaskCommand, ResponseType<TaskResponseDto>>
+        IGetDomainTaskRepository identityService) : IRequestHandler<CreateTaskCommand, ResponseType<TaskResponseDto>>
     {
         public async Task<ResponseType<TaskResponseDto>> Handle(CreateTaskCommand request,
             CancellationToken cancellationToken)
@@ -49,7 +49,7 @@ namespace TaskManagementApi.Application.Features.Task.Commands
                 DueDate = request.createDto.DueDate
             };
 
-            await task.CreateAsync(createTask);
+            await dbContext.CreateAsync(createTask);
             
             try
             {
