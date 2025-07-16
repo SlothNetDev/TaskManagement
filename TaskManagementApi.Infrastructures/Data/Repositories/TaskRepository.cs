@@ -2,7 +2,7 @@ using TaskManagement.Infrastructures.Data;
 using TaskManagementApi.Core.IRepository.Task;
 using TaskManagementApi.Domains.Entities;
 
-namespace TaskManagement.Infrastructures.Services.TaskService;
+namespace TaskManagement.Infrastructures.Data.Repositories;
 
 public class TaskRepository(ApplicationDbContext dbContext) :ITaskRepository
 {
