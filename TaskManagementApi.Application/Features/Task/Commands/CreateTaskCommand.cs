@@ -28,7 +28,7 @@ namespace TaskManagementApi.Application.Features.Task.Commands
                 return ResponseType<TaskResponseDto>.Fail("Field Request for Models has an Error");  
             }
             // 2. Get User Domain ID and validate Task non-existence
-            var userDomainReponse = await identityService.GetCurrentUserDomainIdCreateCategoryAsync();
+            var userDomainReponse = await identityService.GetCurrentUserDomainIdCreateTaskAsync();
             if (!userDomainReponse.Success)
             {
                 logger.LogWarning("Failed to retrieve DomainUserId or category validation failed: {Message}", userDomainReponse.Message);
