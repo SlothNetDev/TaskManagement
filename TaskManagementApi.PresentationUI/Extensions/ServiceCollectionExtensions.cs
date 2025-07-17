@@ -25,6 +25,7 @@ using TaskManagementApi.Application.Features.Authentication.Commands;
 using TaskManagementApi.Application.Features.CategoryFeature.Commands;
 using TaskManagementApi.Application.Features.CategoryFeature.Queries;
 using TaskManagementApi.Application.Features.Task.Commands;
+using TaskManagementApi.Application.Features.Task.Query;
 using TaskManagementApi.Core.IRepository.Categories;
 using TaskManagementApi.Core.IRepository.Task;
 
@@ -104,6 +105,8 @@ namespace TaskManagementApi.PresentationUI.Extensions
                 x.RegisterServicesFromAssembly(typeof(CreateTaskCommand).Assembly);
                 x.RegisterServicesFromAssembly(typeof(UpdateCategoryCommand).Assembly);
                 x.RegisterServicesFromAssembly(typeof(DeleteTaskCommand).Assembly);
+                
+                x.RegisterServicesFromAssembly(typeof(GetAllTaskQuery).Assembly);
                 #endregion
                 
             });
@@ -131,7 +134,6 @@ namespace TaskManagementApi.PresentationUI.Extensions
             services.AddScoped<ICategoryRepository, CategoryRepository>();
             
             services.AddScoped<IPaganationTaskService, PaganationService>();
-            services.AddScoped<IGetAllTask, GetAllTaskService>();
             services.AddScoped<ISearchTask, SearchTaskServices>();
         }
 
