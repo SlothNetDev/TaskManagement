@@ -105,6 +105,7 @@ namespace TaskManagementApi.PresentationUI.Extensions
                 
                 #region Task Commands
                 x.RegisterServicesFromAssembly(typeof(CreateTaskCommand).Assembly);
+                x.RegisterServicesFromAssembly(typeof(UpdateCategoryCommand).Assembly);
                 #endregion
                 
             });
@@ -132,7 +133,6 @@ namespace TaskManagementApi.PresentationUI.Extensions
             services.AddScoped<ICategoryRepository, CategoryRepository>();
             
             services.AddScoped<IPaganationTaskService, PaganationService>();
-            services.AddScoped<IUpdateTaskService, UpdateTaskService>();
             services.AddScoped<IGetAllTask, GetAllTaskService>();
             services.AddScoped<ISearchTask, SearchTaskServices>();
             services.AddScoped<IDeleteTaskService, DeleteTaskService>();
