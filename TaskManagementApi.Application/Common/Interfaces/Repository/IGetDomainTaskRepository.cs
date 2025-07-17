@@ -1,3 +1,4 @@
+using TaskManagementApi.Domains.Entities;
 using TaskManagementApi.Domains.Wrapper;
 
 namespace TaskManagementApi.Application.Common.Interfaces.Repository;
@@ -5,5 +6,5 @@ namespace TaskManagementApi.Application.Common.Interfaces.Repository;
 public interface IGetDomainTaskRepository
 {
     Task<ResponseType<Guid>> GetCurrentUserDomainIdCreateTaskAsync();
-    Task<ResponseType<Guid>> GetCurrentUserDomainIdUpdateTaskAsync(Guid id);
+    Task<ResponseType<TaskItem>> GetCurrentUserDomainIdUpdateTaskAsync(Guid id);
 }
