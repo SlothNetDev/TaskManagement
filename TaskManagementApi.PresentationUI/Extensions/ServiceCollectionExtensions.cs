@@ -15,11 +15,8 @@ using TaskManagement.Infrastructures.Data.Repositories;
 using TaskManagement.Infrastructures.Identity.Models;
 using TaskManagement.Infrastructures.Identity.Services;
 using TaskManagement.Infrastructures.Services;
-using TaskManagement.Infrastructures.Services.TaskService.Command;
 using TaskManagement.Infrastructures.Services.TaskService.Query;
 using TaskManagementApi.Application.Common.Interfaces.IAuthentication;
-using TaskManagementApi.Application.Common.Interfaces.ITask.TaskCommand;
-using TaskManagementApi.Application.Common.Interfaces.ITaskItem.TaskCommand;
 using TaskManagementApi.Application.Common.Interfaces.ITaskItem.TaskQuery;
 using TaskManagementApi.Application.Common.Interfaces.IUser;
 using TaskManagementApi.Application.Common.Interfaces.Repository;
@@ -106,6 +103,7 @@ namespace TaskManagementApi.PresentationUI.Extensions
                 #region Task Commands
                 x.RegisterServicesFromAssembly(typeof(CreateTaskCommand).Assembly);
                 x.RegisterServicesFromAssembly(typeof(UpdateCategoryCommand).Assembly);
+                x.RegisterServicesFromAssembly(typeof(DeleteTaskCommand).Assembly);
                 #endregion
                 
             });
@@ -135,7 +133,6 @@ namespace TaskManagementApi.PresentationUI.Extensions
             services.AddScoped<IPaganationTaskService, PaganationService>();
             services.AddScoped<IGetAllTask, GetAllTaskService>();
             services.AddScoped<ISearchTask, SearchTaskServices>();
-            services.AddScoped<IDeleteTaskService, DeleteTaskService>();
         }
 
         private static void ConfigureJsonOptions(this IMvcBuilder builder)
