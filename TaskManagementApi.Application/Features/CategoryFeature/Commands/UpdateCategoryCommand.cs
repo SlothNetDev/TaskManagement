@@ -1,7 +1,6 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Logging;
 using TaskManagementApi.Application.ApplicationHelpers;
-using TaskManagementApi.Application.Common.Interfaces.ICategory.CategoryCommand;
 using TaskManagementApi.Application.Common.Interfaces.Repository;
 using TaskManagementApi.Application.Features.CategoryFeature.CategoriesDto;
 using TaskManagementApi.Core.IRepository.Categories;

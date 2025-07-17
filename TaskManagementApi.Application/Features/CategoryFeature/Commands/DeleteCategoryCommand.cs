@@ -1,11 +1,5 @@
 ﻿using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using TaskManagementApi.Application.Common.Interfaces.ICategory.CategoryCommand;
 using TaskManagementApi.Application.Common.Interfaces.Repository;
 using TaskManagementApi.Application.Features.CategoryFeature.CategoriesDto;
 using TaskManagementApi.Core.IRepository.Categories;
