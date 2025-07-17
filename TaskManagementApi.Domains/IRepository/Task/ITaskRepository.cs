@@ -7,8 +7,8 @@ public interface ITaskRepository
     Task<TaskItem> CreateAsync(TaskItem taskItem);
     Task<TaskItem> UpdateAsync(TaskItem taskItem);
     Task<TaskItem> DeleteAsync(TaskItem taskItemId);
-    Task<TaskItem> GetByIdAsync(TaskItem taskItemId);
-    Task<IEnumerable<TaskItem>> GetAllAsync();
+    Task<TaskItem> GetByIdAsync(Guid taskItemId);
+    Task<IEnumerable<TaskItem>> GetAllTaskAsync(Guid id);
     Task<IEnumerable<TaskItem>> PaganationAsync(TaskItem taskItem, CancellationToken cancellationToken);
     Task<IEnumerable<TaskItem>> ISearchTask(string searchTerm);
     
