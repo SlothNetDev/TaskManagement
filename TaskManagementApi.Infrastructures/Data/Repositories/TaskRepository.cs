@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using TaskManagement.Infrastructures.Data;
 using TaskManagementApi.Core.IRepository.Task;
 using TaskManagementApi.Domains.Entities;
@@ -8,30 +9,43 @@ public class TaskRepository(ApplicationDbContext dbContext) :ITaskRepository
 {
     public async Task<TaskItem> CreateAsync(TaskItem taskItem)
     {
-        await dbContext.AddAsync(taskItem);
+        await dbContext.TaskDb.AddAsync(taskItem);
         await dbContext.SaveChangesAsync();
         return taskItem;
     }
 
-    public Task<TaskItem> UpdateAsync(TaskItem taskItem)
+    public async Task<TaskItem> UpdateAsync(TaskItem taskItem)
     {
-        throw new NotImplementedException();
+        dbContext.TaskDb.Update(taskItem);
+        await dbContext.SaveChangesAsync();
+        return taskItem;
     }
 
-    public Task<TaskItem> DeleteAsync(TaskItem taskItemId)
+    public async Task<TaskItem> DeleteAsync(TaskItem taskItemId)
     {
-        throw new NotImplementedException();
+        dbContext.TaskDb.Remove(taskItemId);
+        await dbContext.SaveChangesAsync();
+        return taskItemId;
     }
 
-    public Task<TaskItem> GetByIdAsync(TaskItem taskItemId)
+    public async Task<TaskItem> GetByIdAsync(Guid id)
     {
-        throw new NotImplementedException();
+        var task =  await dbContext.TaskDb.FirstOrDefaultAsync(x => x.Id == id);
+        return new TaskItem
+        {
+            Id = task.Id,
+            CategoryId = task.CategoryId,
+            DueDate = task.DueDate,
+            CreatedAt = task.CreatedAt,
+            UpdatedAt = task.UpdatedAt ?? null,
+        };
     }
 
-    public Task<IEnumerable<TaskItem>> GetAllAsync()
+    public async Task<IEnumerable<TaskItem>> GetAllTaskAsync(Guid id)
     {
-        throw new NotImplementedException();
+        return await Task.FromResult<IEnumerable<TaskItem>>(new List<TaskItem>());
     }
+    
 
     public Task<IEnumerable<TaskItem>> PaganationAsync(TaskItem taskItem, CancellationToken cancellationToken)
     {
