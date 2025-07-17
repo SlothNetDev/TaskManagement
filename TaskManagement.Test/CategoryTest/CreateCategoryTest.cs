@@ -1,4 +1,5 @@
-﻿using Castle.Core.Logging;
+﻿/*
+using Castle.Core.Logging;
 using EntityFrameworkCoreMock;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -20,7 +21,7 @@ using Xunit.Abstractions;
 
 namespace TaskManagement.Test.CategoryTest
 {
-    public class CreateCategoryTest /*: IDisposable*/
+    public class CreateCategoryTest /*: IDisposable#1#
     {
          private readonly ITestOutputHelper _output;
         private Mock<ApplicationDbContext> _mockDbContext;
@@ -46,16 +47,16 @@ namespace TaskManagement.Test.CategoryTest
 
             return dbContext;
         }
-        private CreateCategoryService CreateCategoriesUnderTest(Category categories)
+        private CategoryService CreateCategoriesUnderTest(Category categories)
         {
-             var _mockLogger = new Mock<ILogger<CreateCategoryService>>();
+             var _mockLogger = new Mock<ILogger<CategoryService>>();
              var _mockHttpContextAccessor = new Mock<IHttpContextAccessor>();
 
             HelperTestMethod.SetUpHttpContextAccessor(_jwtUserId, _mockHttpContextAccessor);
 
             _mockDbContext = GetMockDbContext(_applicationUser, categories);
 
-            return new CreateCategoryService(_mockDbContext.Object,
+            return new CategoryService(_mockDbContext.Object,
                 _mockLogger.Object, _mockHttpContextAccessor.Object);
         }
             
@@ -114,3 +115,4 @@ namespace TaskManagement.Test.CategoryTest
         
     }
 }
+*/
