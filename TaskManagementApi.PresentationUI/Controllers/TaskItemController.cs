@@ -51,6 +51,7 @@ namespace TaskManagementApi.PresentationUI.Controllers
             }
             return Ok(result);
         }
+        
         [HttpGet("GetAllTask")]
         public async Task<IActionResult> GetAllTask()
         {
@@ -62,6 +63,19 @@ namespace TaskManagementApi.PresentationUI.Controllers
             }
             return Ok(result);
         }
+        
+        [HttpGet("GetTaskById{id}")]
+        public async Task<IActionResult> GetTaskById(Guid id)
+        {
+            var result = await _mediaR.Send(new GetByIdTaskQuery(id));
+            if (!result.Success)
+            {
+                _logger.LogWarning("Get Task Failed, Reason: {reason}",result.Message);
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
+        
         [HttpGet("paganation")]
         public async Task<IActionResult> GetPaganatedAsync(PaganationDto request,CancellationToken token)
         {
