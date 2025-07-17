@@ -107,6 +107,9 @@ namespace TaskManagementApi.PresentationUI.Extensions
                 x.RegisterServicesFromAssembly(typeof(DeleteTaskCommand).Assembly);
                 
                 x.RegisterServicesFromAssembly(typeof(GetAllTaskQuery).Assembly);
+                x.RegisterServicesFromAssembly(typeof(GetByIdCategoriesQuery).Assembly);
+                x.RegisterServicesFromAssembly(typeof(GetPaganationTasksQuery).Assembly);
+                x.RegisterServicesFromAssembly(typeof(SearchTaskQuery).Assembly);
                 #endregion
                 
             });
