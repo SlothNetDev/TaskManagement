@@ -1,3 +1,4 @@
+using TaskManagementApi.Core.Wrapper;
 using TaskManagementApi.Domains.Entities;
 
 namespace TaskManagementApi.Core.IRepository.Task;
@@ -9,7 +10,7 @@ public interface ITaskRepository
     Task<TaskItem> DeleteAsync(TaskItem taskItemId);
     Task<TaskItem> GetByIdAsync(Guid taskItemId);
     Task<IEnumerable<TaskItem>> GetAllTaskAsync(Guid id);
-    Task<IEnumerable<TaskItem>> PaganationAsync(TaskItem taskItem, CancellationToken cancellationToken);
+    Task<(List<TaskItem> Items, int TotalCount)> GetPaginatedTasksAsync(Guid userId, int pageNumber, int pageSize);
     Task<IEnumerable<TaskItem>> ISearchTask(string searchTerm);
     
 }
