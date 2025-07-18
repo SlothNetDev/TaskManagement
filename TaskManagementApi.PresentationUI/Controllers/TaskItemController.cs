@@ -77,9 +77,9 @@ namespace TaskManagementApi.PresentationUI.Controllers
         }
         
         [HttpGet("paganation")]
-        public async Task<IActionResult> GetPaganatedAsync(PaganationDto request,CancellationToken token)
+        public async Task<IActionResult> GetPaganatedAsync(PaganationDto request)
         {
-            var result = await _mediaR.Send(new GetPaganationTasksQuery(request, token));
+            var result = await _mediaR.Send(new GetPaganationTasksQuery(request));
 
             if (!result.Success)
             {
