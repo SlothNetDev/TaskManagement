@@ -15,6 +15,7 @@ using TaskManagement.Infrastructures.Data.Repositories;
 using TaskManagement.Infrastructures.Identity.Models;
 using TaskManagement.Infrastructures.Identity.Services;
 using TaskManagement.Infrastructures.Services;
+using TaskManagementApi.Application.ApplicationHelpers;
 using TaskManagementApi.Application.Common.Interfaces.IAuthentication;
 using TaskManagementApi.Application.Common.Interfaces.IUser;
 using TaskManagementApi.Application.Common.Interfaces.Repository;
@@ -52,7 +53,8 @@ namespace TaskManagementApi.PresentationUI.Extensions
                 else
                 {
                     Console.WriteLine("Using SQL Server for Production");
-                    options.UseNpgsql(config.GetConnectionString("TaskDbConnection"));
+                    services.AddDbContext<ApplicationDbContext>(options =>
+                        options.UseSqlServer(configuration.GetConnectionString("TaskDbConnection")));
                 }
             });
 
@@ -149,6 +151,15 @@ namespace TaskManagementApi.PresentationUI.Extensions
 
             });
            
+            //parsing for enums and datetime
+            builder.Services.AddControllers().AddJsonOptions(options =>
+            {
+                // DateTime parsing in ISO 8601 (default)
+                options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+            
+                // Optional: Customize DateTime globally
+                options.JsonSerializerOptions.Converters.Add(new JsonDateTimeConverter("yyyy-MM-ddTHH:mm:ssZ")); 
+            });
         }
 
         private static void AddCustomIdentity(this IServiceCollection services)
