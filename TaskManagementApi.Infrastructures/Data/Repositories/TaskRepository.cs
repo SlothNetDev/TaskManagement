@@ -64,8 +64,25 @@ public class TaskRepository(ApplicationDbContext dbContext) :ITaskRepository
         return (items, totalCount);
     }
 
-    public Task<IEnumerable<TaskItem>> ISearchTask(string searchTerm)
+    public async Task<IEnumerable<TaskItem>> ISearchTaskAsync(Guid taskUserIdToUse,string searchTerm)
     {
-        throw new NotImplementedException();
+        // 2. Prepare query
+        var query = dbContext.TaskDb
+            .Include(t => t.Category)
+            .Where(x => x.UserId == taskUserIdToUse);
+    
+        var lowerSearch = searchTerm?.ToLower().Trim();
+    
+        if (!string.IsNullOrWhiteSpace(lowerSearch))
+        {
+            query = query.Where(x =>
+                    x.Title.ToLower().Contains(lowerSearch) ||
+                    x.Status.ToString().ToLower().Contains(lowerSearch) ||
+                    x.Priority.ToString().ToLower().Contains(lowerSearch) ||
+                    (x.DueDate.HasValue && x.DueDate.Value.ToString("yyyy-MM-dd").ToLower().Contains(lowerSearch)) || // More specific date format
+                    (x.Category != null && x.Category.CategoryName.ToLower().Contains(lowerSearch)) // Null check for category
+            );
+        }
+        return await Task.FromResult<IEnumerable<TaskItem>>(query.ToList());
     }
 }
