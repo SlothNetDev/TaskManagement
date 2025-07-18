@@ -136,7 +136,6 @@ namespace TaskManagementApi.PresentationUI.Extensions
             services.AddScoped<ITaskRepository, TaskRepository>();
             services.AddScoped<ICategoryRepository, CategoryRepository>();
             
-            services.AddScoped<IPaganationTaskService, PaganationService>();
             services.AddScoped<ISearchTask, SearchTaskServices>();
         }
 
