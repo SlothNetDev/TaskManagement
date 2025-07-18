@@ -12,7 +12,7 @@ public interface IGetDomainTaskRepository
     
     Task<ResponseType<Guid>> GetCurrentUserDomainIdGetAllTaskAsync();
     Task<ResponseType<TaskItem>> GetCurrentUserDomainIdGetByIdTaskAsync(Guid id);
-    Task<ResponseType<TaskItem>> GetCurrentUserDomainIdPaganationTaskAsync(Guid id);
+    Task<ResponseType<Guid>> GetCurrentUserDomainIdPaganationTaskAsync(CancellationToken cancellationToken);
     Task<ResponseType<TaskItem>> GetCurrentUserDomainIdSearchTaskAsync(string id);
     
     
