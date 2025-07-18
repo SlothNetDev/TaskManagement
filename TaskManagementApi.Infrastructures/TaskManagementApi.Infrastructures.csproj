@@ -45,9 +45,5 @@
       </Reference>
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Services\TaskService\" />
-    </ItemGroup>
-
 	
 </Project>
