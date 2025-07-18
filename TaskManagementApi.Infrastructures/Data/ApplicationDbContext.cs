@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using TaskManagement.Infrastructures.Data.Configuration;
+using TaskManagement.Infrastructures.Data.Configurations;
 using TaskManagement.Infrastructures.Data.Configurations;
 using TaskManagement.Infrastructures.Identity.Models;
 using TaskManagementApi.Domains.Entities;

@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 using TaskManagementApi.Domains.Entities;
 
-namespace TaskManagement.Infrastructures.Data.Configuration
+namespace TaskManagement.Infrastructures.Data.Configurations
 {
     internal class CategoriesConfiguration : IEntityTypeConfiguration<Category>
     {

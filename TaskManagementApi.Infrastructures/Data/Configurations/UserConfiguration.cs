@@ -1,7 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using TaskManagement.Infrastructures.Data.Seeders;
 using TaskManagement.Infrastructures.Identity.Models;
-namespace TaskManagement.Infrastructures.Data.Configuration
+namespace TaskManagement.Infrastructures.Data.Configurations
 {
     sealed partial class UserConfiguration : IEntityTypeConfiguration<ApplicationUsers>
     {
@@ -10,7 +11,6 @@ namespace TaskManagement.Infrastructures.Data.Configuration
             builder.ToTable("User_Type");
 
             builder.Property(x => x.CreatedAt)
-                .HasDefaultValueSql("NOW()")
                 .IsRequired(false);
 
             builder.HasKey(x => x.Id);
