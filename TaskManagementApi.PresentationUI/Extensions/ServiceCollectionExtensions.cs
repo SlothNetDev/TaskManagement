@@ -15,9 +15,7 @@ using TaskManagement.Infrastructures.Data.Repositories;
 using TaskManagement.Infrastructures.Identity.Models;
 using TaskManagement.Infrastructures.Identity.Services;
 using TaskManagement.Infrastructures.Services;
-using TaskManagement.Infrastructures.Services.TaskService.Query;
 using TaskManagementApi.Application.Common.Interfaces.IAuthentication;
-using TaskManagementApi.Application.Common.Interfaces.ITaskItem.TaskQuery;
 using TaskManagementApi.Application.Common.Interfaces.IUser;
 using TaskManagementApi.Application.Common.Interfaces.Repository;
 using TaskManagementApi.Application.Common.Settings;
@@ -135,8 +133,6 @@ namespace TaskManagementApi.PresentationUI.Extensions
             
             services.AddScoped<ITaskRepository, TaskRepository>();
             services.AddScoped<ICategoryRepository, CategoryRepository>();
-            
-            services.AddScoped<ISearchTask, SearchTaskServices>();
         }
 
         private static void ConfigureJsonOptions(this IMvcBuilder builder)
