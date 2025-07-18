@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using TaskManagement.Infrastructures.Data;
 using TaskManagementApi.Core.IRepository.Task;
+using TaskManagementApi.Core.Wrapper;
 using TaskManagementApi.Domains.Entities;
 
 namespace TaskManagement.Infrastructures.Data.Repositories;
@@ -45,11 +46,22 @@ public class TaskRepository(ApplicationDbContext dbContext) :ITaskRepository
     {
         return await Task.FromResult<IEnumerable<TaskItem>>(new List<TaskItem>());
     }
-    
 
-    public Task<IEnumerable<TaskItem>> PaganationAsync(TaskItem taskItem, CancellationToken cancellationToken)
+    public async Task<(List<TaskItem> Items, int TotalCount)> GetPaginatedTasksAsync(Guid userId, int pageNumber, int pageSize)
     {
-        throw new NotImplementedException();
+        var query = dbContext.TaskDb.Where(t => t.UserId == userId);
+
+        // Get total count
+        var totalCount = await query.CountAsync();
+
+        // Get paginated data
+        var items = await query
+            .OrderByDescending(t => t.CreatedAt)
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+
+        return (items, totalCount);
     }
 
     public Task<IEnumerable<TaskItem>> ISearchTask(string searchTerm)
