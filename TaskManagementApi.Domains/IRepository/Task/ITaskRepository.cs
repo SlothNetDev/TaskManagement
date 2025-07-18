@@ -11,6 +11,6 @@ public interface ITaskRepository
     Task<TaskItem> GetByIdAsync(Guid taskItemId);
     Task<IEnumerable<TaskItem>> GetAllTaskAsync(Guid id);
     Task<(List<TaskItem> Items, int TotalCount)> GetPaginatedTasksAsync(Guid userId, int pageNumber, int pageSize);
-    Task<IEnumerable<TaskItem>> ISearchTask(string searchTerm);
+    Task<IEnumerable<TaskItem>> ISearchTaskAsync(Guid id,string searchTerm);
     
 }
