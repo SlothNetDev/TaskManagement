@@ -5,6 +5,8 @@ using Microsoft.Extensions.Logging;
 using TaskManagement.Infrastructures.Data;
 using TaskManagementApi.Application.ApplicationHelpers;
 using TaskManagementApi.Application.Common.Interfaces.Repository;
+using TaskManagementApi.Application.DTOs.TaskDto;
+using TaskManagementApi.Core.Wrapper;
 using TaskManagementApi.Domains.Entities;
 using TaskManagementApi.Domains.Wrapper;
 
@@ -288,9 +290,42 @@ public class GetDomainIdTaskRepository(
             "User Domain Id Retrieved Successfully");
     }
 
-    public Task<ResponseType<TaskItem>> GetCurrentUserDomainIdPaganationTaskAsync(Guid id)
+    public async Task<ResponseType<Guid>> GetCurrentUserDomainIdPaganationTaskAsync(CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        // 2. Get and validate user from JWT
+        var userId = httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out var parsedUserId))
+        {
+            logger.LogWarning("PAG_002: Invalid authentication token for user ID: {UserId}", userId);
+            return ResponseType<Guid>.Fail(
+                "Authentication failed",
+                "Invalid user credentials");
+        }
+        
+        // 3. Match application user
+        var matchingApplicationUser = await applicationDbContext.UserApplicationDb
+            .FirstOrDefaultAsync(ac => ac.Id == parsedUserId, cancellationToken);
+        
+        if (matchingApplicationUser == null)
+        {
+            logger.LogWarning("PAG_003: User profile not found for ID: {UserId}", parsedUserId);
+            return ResponseType<Guid>.Fail(
+                "User profile not found",
+                "Please complete your account setup");
+        }
+        
+        // 4. Validate domain user ID
+        var taskUserIdToUse = matchingApplicationUser.DomainUserId;
+        if (taskUserIdToUse == Guid.Empty)
+        {
+            logger.LogWarning("PAG_004: Missing domain ID for user: {UserId}", parsedUserId);
+            return ResponseType<Guid>.Fail(
+                "Account configuration incomplete",
+                "Missing domain user ID");
+        }
+        return ResponseType<Guid>.SuccessResult(
+            taskUserIdToUse,
+            "User Domain Id Retrieved Successfully");
     }
 
     public Task<ResponseType<TaskItem>> GetCurrentUserDomainIdSearchTaskAsync(string id)
