@@ -26,11 +26,11 @@ public class JsonDateTimeConverter : JsonConverter<DateTime>
             return result;
         }
 
-        // Optionally, try parsing as DateTimeOffset for offset-based inputs
-        if (DateTimeOffset.TryParse(dateString, CultureInfo.InvariantCulture, DateTimeStyles.None, out var dateTimeOffset))
+        if (DateTime.TryParseExact(dateString, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var fallback))
         {
-            return dateTimeOffset.UtcDateTime; // Convert to UTC DateTime
+            return fallback;
         }
+
 
         throw new JsonException($"Invalid DateTime format: {dateString}. Expected format: {_format}.");
     }
