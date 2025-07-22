@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MediatR;
-using TaskManagementApi.Application.DTOs.TaskDto;
 using TaskManagementApi.Application.Features.Task.Commands;
 using TaskManagementApi.Application.Features.Task.Query;
 using TaskManagementApi.Application.Features.Task.TaskDto;
@@ -18,11 +17,12 @@ namespace TaskManagementApi.PresentationUI.Controllers
         [HttpPost("create")]
         public async Task<IActionResult> CreateTaskAsync([FromBody] TaskRequestDto requestDto)
         {
-            var result = await _mediaR.Send(new CreateTaskCommand(requestDto));
-
+            _logger.LogInformation("Creating new task start...");
+            var result = await _mediaR.Send(new  CreateTaskCommand(requestDto));
+            
             if (!result.Success)
             {
-                _logger.LogWarning("Creating Task Titled {title} Failed", result.Data.Title ?? null);
+                _logger.LogWarning("Creating Task Titled {title} Failed", result.Data?.Title);
                 return BadRequest(result);
             }
             return Ok(result);
@@ -30,6 +30,7 @@ namespace TaskManagementApi.PresentationUI.Controllers
         [HttpPatch("update")]
         public async Task<IActionResult> UpdateTaskAsync([FromBody] TaskUpdateDto requestDto)
         {
+            
             var result = await _mediaR.Send(new UpdateTaskCommand(requestDto));
 
             if (!result.Success)
