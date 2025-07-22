@@ -1,9 +1,9 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Logging;
 using TaskManagementApi.Application.Common.Interfaces.Repository;
-using TaskManagementApi.Application.DTOs.TaskDto;
 using TaskManagementApi.Application.Features.CategoryFeature.CategoriesDto;
 using TaskManagementApi.Application.Features.CategoryFeature.Commands;
+using TaskManagementApi.Application.Features.Task.TaskDto;
 using TaskManagementApi.Core.IRepository.Categories;
 using TaskManagementApi.Domains.Wrapper;
 namespace TaskManagementApi.Application.Features.CategoryFeature.Queries

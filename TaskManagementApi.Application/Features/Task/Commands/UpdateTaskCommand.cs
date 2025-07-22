@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Logging;
 using TaskManagementApi.Application.ApplicationHelpers;
 using TaskManagementApi.Application.Common.Interfaces.Repository;
-using TaskManagementApi.Application.DTOs.TaskDto;
+using TaskManagementApi.Application.Features.Task.TaskDto;
 using TaskManagementApi.Core.IRepository.Task;
 using TaskManagementApi.Domains.Wrapper;
 

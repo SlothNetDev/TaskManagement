@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 using TaskManagementApi.Domains.Enums;
 
-namespace TaskManagementApi.Application.DTOs.TaskDto
+namespace TaskManagementApi.Application.Features.Task.TaskDto
 {
     public class TaskUpdateDto
     {

@@ -1,4 +1,6 @@
-﻿namespace TaskManagementApi.Domains.Enums
+﻿using System.Runtime.Serialization;
+
+namespace TaskManagementApi.Domains.Enums
 {
     public enum Status
     {

@@ -5,7 +5,6 @@ using Microsoft.Extensions.Logging;
 using TaskManagement.Infrastructures.Data;
 using TaskManagementApi.Application.ApplicationHelpers;
 using TaskManagementApi.Application.Common.Interfaces.Repository;
-using TaskManagementApi.Application.DTOs.TaskDto;
 using TaskManagementApi.Core.Wrapper;
 using TaskManagementApi.Domains.Entities;
 using TaskManagementApi.Domains.Wrapper;
@@ -70,7 +69,7 @@ public class GetDomainIdTaskRepository(
             logger.LogWarning("UT_001: Request validation failed. Errors: {@ValidationErrors}", 
                 validationErrors);
             return ResponseType<TaskItem>.Fail(
-                validationErrors,
+                validationErrors.SelectMany(kv => kv.Value).ToList(),
                 "Invalid task data. Please correct the highlighted fields");
         }
         

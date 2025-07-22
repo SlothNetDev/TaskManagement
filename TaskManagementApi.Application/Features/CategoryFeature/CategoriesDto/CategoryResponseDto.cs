@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TaskManagementApi.Application.DTOs.TaskDto;
+using TaskManagementApi.Application.Features.Task.TaskDto;
 using TaskManagementApi.Domains.Entities;
 
 namespace TaskManagementApi.Application.Features.CategoryFeature.CategoriesDto

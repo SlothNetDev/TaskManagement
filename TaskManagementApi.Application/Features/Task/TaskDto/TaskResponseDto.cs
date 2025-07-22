@@ -1,6 +1,6 @@
 ﻿using TaskManagementApi.Domains.Entities;
 
-namespace TaskManagementApi.Application.DTOs.TaskDto
+namespace TaskManagementApi.Application.Features.Task.TaskDto
 {
     public record TaskResponseDto(
           Guid Id,

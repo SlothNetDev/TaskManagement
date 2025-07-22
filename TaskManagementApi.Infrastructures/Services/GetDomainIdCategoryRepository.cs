@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using TaskManagement.Infrastructures.Data;
 using TaskManagementApi.Application.Common.Interfaces.Repository;
-using TaskManagementApi.Application.DTOs.TaskDto;
 using TaskManagementApi.Application.Features.CategoryFeature.CategoriesDto;
 using TaskManagementApi.Domains.Entities;
 using TaskManagementApi.Domains.Wrapper;
