@@ -24,7 +24,8 @@ namespace TaskManagementApi.Application.Features.CategoryFeature.Commands
                 logger.LogWarning("Request validation failed for {Endpoint}. Errors: {@ValidationErrors}", 
                     "POST /category", 
                     validationErrors);
-                return ResponseType<CategoryResponseDto>.Fail(validationErrors, "Invalid input. Please check the provided data");
+                return ResponseType<CategoryResponseDto>.Fail(validationErrors.SelectMany(kv => kv.Value).ToList(),
+                    "Invalid input. Please check the provided data");
             }
             
             //2. Get UserDomain Id

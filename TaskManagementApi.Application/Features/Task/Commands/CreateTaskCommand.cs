@@ -3,7 +3,7 @@ using MediatR;
 using Microsoft.Extensions.Logging;
 using TaskManagementApi.Application.ApplicationHelpers;
 using TaskManagementApi.Application.Common.Interfaces.Repository;
-using TaskManagementApi.Application.DTOs.TaskDto;
+using TaskManagementApi.Application.Features.Task.TaskDto;
 using TaskManagementApi.Core.IRepository.Task;
 using TaskManagementApi.Domains.Entities;
 using TaskManagementApi.Domains.Enums;
@@ -19,13 +19,13 @@ namespace TaskManagementApi.Application.Features.Task.Commands
             CancellationToken cancellationToken)
         {
              //1. validate user request
-            var validationErrors = ModelValidation.ModelValidationResponse(request);
+            var validationErrors = ModelValidation.ModelValidationResponse(request.createDto);
             if (validationErrors.Any())
             {
-                logger.LogWarning("Request validation failed for {Endpoint}. Errors: {@ValidationErrors}", 
-                "POST /login", 
-                validationErrors);
-                return ResponseType<TaskResponseDto>.Fail("Field Request for Models has an Error");  
+                logger.LogWarning("Request validation failed for {Endpoint}. Errors: {@ValidationErrors}",
+                    "POST /login"); 
+                return ResponseType<TaskResponseDto>.Fail(validationErrors.SelectMany(kv => kv.Value).ToList(),
+                    "Invalid input. Please check the provided data");
             }
             // 2. Get User Domain ID and validate Task non-existence
             var userDomainReponse = await identityService.GetCurrentUserDomainIdCreateTaskAsync();
