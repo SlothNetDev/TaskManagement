@@ -8,7 +8,7 @@ using TaskManagement.Infrastructures.Identity.Services;
 using TaskManagementApi.Application.ApplicationHelpers;
 using TaskManagementApi.Application.Common.Interfaces.IAuthentication;
 using TaskManagementApi.Application.Common.Settings;
-using TaskManagementApi.Application.DTOs;
+using TaskManagementApi.Application.Features.Task.TaskDto;
 using TaskManagementApi.Application.Features.Authentication.DTOs;
 using TaskManagementApi.Domains.Entities;
 using TaskManagementApi.Domains.Wrapper;
@@ -32,7 +32,7 @@ namespace TaskManagementApi.Application.Features.Authentication.Commands
                     "REG_001: Validation Failed for registration of {Email}. Invalid fields: {@validationErrors}",
                     registerDto.Email, validationErrors);
                 return ResponseType<string>.Fail(
-                    validationErrors,
+                    validationErrors.SelectMany(kv => kv.Value).ToList(),
                     "Validation failed. Please check the provided data."
                 );
             }
@@ -128,7 +128,7 @@ namespace TaskManagementApi.Application.Features.Authentication.Commands
                     "LOG_001: Validation Failed for login of {Email}. Invalid fields: {@validationErrors}",
                     loginDto.Email, validateUser);
                 return ResponseType<AuthResultDto>.Fail(
-                    validateUser,
+                    validateUser.SelectMany(kv => kv.Value).ToList(),
                     "Validation failed. Please check your login credentials."
                 );
             }
