@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 using TaskManagementApi.Domains.Entities;
 using TaskManagementApi.Domains.Enums;
 
-namespace TaskManagementApi.Application.DTOs.TaskDto
+namespace TaskManagementApi.Application.Features.Task.TaskDto
 {
     public record TaskRequestDto
     {
@@ -15,6 +15,7 @@ namespace TaskManagementApi.Application.DTOs.TaskDto
         public string Title { get; init; } = string.Empty;
 
         [Required(ErrorMessage = "Choose Priority")]
+        [JsonConverter(typeof(JsonStringEnumConverter))]
         public Priority Priority { get; init; }
 
         [Required(ErrorMessage = "Decide a Due Date")]
