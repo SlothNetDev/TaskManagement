@@ -36,7 +36,7 @@ namespace TaskManagementApi.PresentationUI.Extensions
     public static class ServiceCollectionExtensions
     {
         public static IServiceCollection AddPresentationService(this IServiceCollection services,
-            IConfiguration configuration )
+             IConfiguration configuration )
         {
             services.AddDbContext<ApplicationDbContext>((serviceProvider, options) =>
             {
@@ -53,11 +53,10 @@ namespace TaskManagementApi.PresentationUI.Extensions
                 else
                 {
                     Console.WriteLine("Using SQL Server for Production");
-                    services.AddDbContext<ApplicationDbContext>(options =>
-                        options.UseSqlServer(configuration.GetConnectionString("TaskDbConnection")));
+                    options.UseSqlServer(configuration.GetConnectionString("TaskDbConnection"));
                 }
             });
-
+            
             //Core service - Single AddControllers call with both assembly part and JSON configuration
             services.AddControllers()
                 .AddApplicationPart(typeof(Controllers.DashboardController).Assembly)
@@ -103,6 +102,7 @@ namespace TaskManagementApi.PresentationUI.Extensions
                 
                 #region Task Commands
                 x.RegisterServicesFromAssembly(typeof(CreateTaskCommand).Assembly);
+                x.RegisterServicesFromAssembly(typeof(CreateTaskCommandHandler).Assembly);
                 x.RegisterServicesFromAssembly(typeof(UpdateCategoryCommand).Assembly);
                 x.RegisterServicesFromAssembly(typeof(DeleteTaskCommand).Assembly);
                 
@@ -141,24 +141,20 @@ namespace TaskManagementApi.PresentationUI.Extensions
         {
             builder.Services.Configure<JsonOptions>(options =>
             {
-                //convert enum
-                options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
-
-                //convert date time
                 options.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
                 options.SerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
                 options.SerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
-
-            });
-           
-            //parsing for enums and datetime
-            builder.Services.AddControllers().AddJsonOptions(options =>
-            {
+                options.SerializerOptions.PropertyNameCaseInsensitive = true;
+                
                 // DateTime parsing in ISO 8601 (default)
-                options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+                options.SerializerOptions.PropertyNameCaseInsensitive = true;
+                
+                // Convert Json to Enums
+                options.SerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
+
             
-                // Optional: Customize DateTime globally
-                options.JsonSerializerOptions.Converters.Add(new JsonDateTimeConverter("yyyy-MM-ddTHH:mm:ssZ")); 
+                // Customize DateTime globally
+                options.SerializerOptions.Converters.Add(new JsonDateTimeConverter("yyyy-MM-ddTHH:mm:ssZ"));
             });
         }
 
