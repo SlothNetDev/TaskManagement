@@ -6,7 +6,7 @@ using TaskManagementApi.Application.Features.CategoryFeature.CategoriesDto;
 using TaskManagementApi.Application.Features.CategoryFeature.Commands;
 using TaskManagementApi.Application.Features.CategoryFeature.Queries;
 
-namespace TaskManagementApi.PresentationUI.Controllers
+namespace TaskManagementApi.WebAPI.Controllers
 {
     [Route("category")]
     [ApiController]

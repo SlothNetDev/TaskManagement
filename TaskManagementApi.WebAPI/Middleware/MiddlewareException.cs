@@ -2,7 +2,7 @@
 using System.Net;
 using System.Text.Json;
 
-namespace TaskManagementApi.PresentationUI.Middleware
+namespace TaskManagementApi.WebAPI.Middleware
 {
     /// <summary>
     /// Catches unhandled exceptions globally and logs them.

@@ -5,7 +5,7 @@ VisualStudioVersion = 17.14.36121.58
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaskManagementApi.Application", "TaskManagementApi.Application\TaskManagementApi.Application.csproj", "{F3585803-6B9D-4B25-87B9-EA299B7B3C49}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaskManagementApi.PresentationUI", "TaskManagementApi.PresentationUI\TaskManagementApi.PresentationUI.csproj", "{C2C7BD8C-CBE4-42FB-86A1-84AB77D57A6A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaskManagementApi.WebAPI", "TaskManagementApi.WebAPI\TaskManagementApi.WebAPI.csproj", "{C2C7BD8C-CBE4-42FB-86A1-84AB77D57A6A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaskManagementApi.Infrastructures", "TaskManagementApi.Infrastructures\TaskManagementApi.Infrastructures.csproj", "{F3FFF09D-38E3-45F5-B0CC-07049FFAA8C5}"
 EndProject
@@ -14,6 +14,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaskManagement.Test", "TaskManagement.Test\TaskManagement.Test.csproj", "{0F278D06-DB84-4F3F-ABE7-5C33103FC973}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaskManagement.ClientApp", "TaskManagement.ClientApp\TaskManagement.ClientApp.csproj", "{0E816A3E-0512-44E3-B5F0-5672B31EBD43}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,6 +43,10 @@ Global
 		{0F278D06-DB84-4F3F-ABE7-5C33103FC973}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0F278D06-DB84-4F3F-ABE7-5C33103FC973}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0F278D06-DB84-4F3F-ABE7-5C33103FC973}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0E816A3E-0512-44E3-B5F0-5672B31EBD43}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0E816A3E-0512-44E3-B5F0-5672B31EBD43}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0E816A3E-0512-44E3-B5F0-5672B31EBD43}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0E816A3E-0512-44E3-B5F0-5672B31EBD43}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

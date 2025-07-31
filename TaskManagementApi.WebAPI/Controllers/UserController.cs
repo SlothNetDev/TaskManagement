@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TaskManagementApi.Application.Features.User.Queries;
 
-namespace TaskManagementApi.PresentationUI.Controllers
+namespace TaskManagementApi.WebAPI.Controllers
 {
     [Authorize]
     [Route("account")]

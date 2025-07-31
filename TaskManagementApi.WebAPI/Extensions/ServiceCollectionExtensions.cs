@@ -28,7 +28,7 @@ using TaskManagementApi.Application.Features.Task.Query;
 using TaskManagementApi.Core.IRepository.Categories;
 using TaskManagementApi.Core.IRepository.Task;
 
-namespace TaskManagementApi.PresentationUI.Extensions
+namespace TaskManagementApi.WebAPI.Extensions
 {
     /// <summary>
     /// Uses for builder Service

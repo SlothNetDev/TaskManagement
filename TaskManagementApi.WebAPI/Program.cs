@@ -2,9 +2,9 @@ using Serilog;
 using Serilog.Events;
 using System.Threading.Tasks;
 using TaskManagementApi.Application.Common.Settings;
-using TaskManagementApi.PresentationUI.Extensions;
+using TaskManagementApi.WebAPI.Extensions;
 
-namespace TaskManagementApi.PresentationUI
+namespace TaskManagementApi.WebAPI
 {
     public class Program(Logger<Program> _logger)
     {

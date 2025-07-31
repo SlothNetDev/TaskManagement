@@ -79,10 +79,12 @@ public class TaskRepository(ApplicationDbContext dbContext) :ITaskRepository
                     x.Title.ToLower().Contains(lowerSearch) ||
                     x.Status.ToString().ToLower().Contains(lowerSearch) ||
                     x.Priority.ToString().ToLower().Contains(lowerSearch) ||
-                    (x.DueDate.HasValue && x.DueDate.Value.ToString("yyyy-MM-dd").ToLower().Contains(lowerSearch)) || // More specific date format
+                    (x.DueDate.HasValue && x.DueDate.Value.ToString("yyyy-MM-ddTHH:mm:ssZ").ToLower().Contains(lowerSearch)) || // More specific date format
                     (x.Category != null && x.Category.CategoryName.ToLower().Contains(lowerSearch)) // Null check for category
             );
         }
-        return await Task.FromResult<IEnumerable<TaskItem>>(query.ToList());
+        var queryResult = await query.ToListAsync();
+        
+        return queryResult;
     }
 }

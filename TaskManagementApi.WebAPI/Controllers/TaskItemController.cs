@@ -6,7 +6,7 @@ using TaskManagementApi.Application.Features.Task.Commands;
 using TaskManagementApi.Application.Features.Task.Query;
 using TaskManagementApi.Application.Features.Task.TaskDto;
 
-namespace TaskManagementApi.PresentationUI.Controllers
+namespace TaskManagementApi.WebAPI.Controllers
 {
     [Route("task")]
     [ApiController]
@@ -66,7 +66,7 @@ namespace TaskManagementApi.PresentationUI.Controllers
         }
         
         [HttpGet("GetTaskById{id}")]
-        public async Task<IActionResult> GetTaskById(Guid id)
+        public async Task<IActionResult> GetTaskById([FromQuery] Guid id)
         {
             var result = await _mediaR.Send(new GetByIdTaskQuery(id));
             if (!result.Success)
@@ -78,7 +78,7 @@ namespace TaskManagementApi.PresentationUI.Controllers
         }
         
         [HttpGet("paganation")]
-        public async Task<IActionResult> GetPaganatedAsync(PaganationDto request)
+        public async Task<IActionResult> GetPaganatedAsync([FromQuery]PaganationDto request)
         {
             var result = await _mediaR.Send(new GetPaganationTasksQuery(request));
 
@@ -90,7 +90,7 @@ namespace TaskManagementApi.PresentationUI.Controllers
             return Ok(result);
         }
         [HttpPost("delete")]
-        public async Task<IActionResult> DeleteTaskAsync(Guid id)
+        public async Task<IActionResult> DeleteTaskAsync([FromRoute] Guid id)
         {
             var result = await _mediaR.Send(new DeleteTaskCommand(id));
 

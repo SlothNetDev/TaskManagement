@@ -3,9 +3,9 @@ using Scalar.AspNetCore;
 using System.Threading.Tasks;
 using TaskManagement.Infrastructures.Data.Seeders;
 using TaskManagement.Infrastructures.Identity.Models;
-using TaskManagementApi.PresentationUI.Middleware;
+using TaskManagementApi.WebAPI.Middleware;
 
-namespace TaskManagementApi.PresentationUI.Extensions
+namespace TaskManagementApi.WebAPI.Extensions
 {
     public static class ApplicationBuilderExtensions
     {

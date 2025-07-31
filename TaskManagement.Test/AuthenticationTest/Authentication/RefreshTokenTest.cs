@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.Testing;
 using System.Net.Http.Json;
-using TaskManagementApi.PresentationUI;
+using TaskManagementApi.WebAPI;
 using Xunit.Abstractions;
 using TaskManagementApi.Application.Features.Authentication.DTOs;
 using TaskManagement.Test.HelperTest;
@@ -10,7 +10,7 @@ using System.Text.Json;
 
 namespace TaskManagement.Test.AuthenticationTest.Authentication
 {
-    public class RefreshTokenTest : IClassFixture<CustomWebApplicationFactory<TaskManagementApi.PresentationUI.Program>>
+    public class RefreshTokenTest : IClassFixture<CustomWebApplicationFactory<TaskManagementApi.WebAPI.Program>>
     {
         private readonly HttpClient _client;
         private readonly ITestOutputHelper _output;

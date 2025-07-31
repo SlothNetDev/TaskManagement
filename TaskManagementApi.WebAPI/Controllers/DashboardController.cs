@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using TaskManagementApi.Application.Features.Authentication.Commands;
 using TaskManagementApi.Application.Features.Authentication.DTOs;
 
-namespace TaskManagementApi.PresentationUI.Controllers
+namespace TaskManagementApi.WebAPI.Controllers
 {
     
     [ApiController]

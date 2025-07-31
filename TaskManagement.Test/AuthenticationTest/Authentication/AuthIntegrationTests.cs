@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using TaskManagementApi.Application.Common.Settings;
-using TaskManagementApi.PresentationUI;
+using TaskManagementApi.WebAPI;
 using Xunit.Abstractions;
 
 namespace TaskManagement.Test.AuthenticationTest.Authentication
